@@ -9,7 +9,7 @@
 - 👯 I'm looking to collaborate on **cool projects**
 - 💬 Ask me about **anything**
 - 📫 How to reach me **snehilms@gmail.com**
-- 📄 Know about my experiences [Resume](https://drive.google.com/file/d/1AQqNWtrE66VbwDqyhP656ksY1WRpiM5J/view?usp=sharing)
+- 📄 Know about my experiences [Resume]([https://drive.google.com/file/d/1AQqNWtrE66VbwDqyhP656ksY1WRpiM5J/view?usp=sharing](https://drive.google.com/file/d/1isdZltjazED0bWX_n5KyAakcwrrRPLZr/view?usp=sharing))
 - ⚡ Fun fact **I think I am funny and philosophical**
 
 ## Connect with me:
