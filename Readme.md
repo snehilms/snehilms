@@ -1,6 +1,6 @@
 # Hi 👋, I'm Snehil S Kumar
 
-## A Full Stack Developer, working on building LLM applications.
+## A Full Stack Developer, working on building Fintech and LLM applications.
 
 <p align="left"> <img src="https://komarev.com/ghpvc/?username=snehilms&label=Profile%20views&color=0e75b6&style=flat" alt="snehilms" /> </p>
 
@@ -9,7 +9,7 @@
 - 👯 I'm looking to collaborate on **cool projects**
 - 💬 Ask me about **anything**
 - 📫 How to reach me **snehilms@gmail.com**
-- 📄 Know about my experiences [Resume](https://drive.google.com/file/d/1isdZltjazED0bWX_n5KyAakcwrrRPLZr/view?usp=sharing)
+- 📄 Know about my experiences [Resume](https://drive.google.com/file/d/1EiH9yXxHgkH9nn-ftxp2Qcn_UuE2aSjI/view?usp=sharing)
 <br clear="both">
 
 ## Connect with me:
