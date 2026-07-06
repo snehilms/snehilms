@@ -10,7 +10,6 @@
 - 💬 Ask me about **anything**
 - 📫 How to reach me **snehilms@gmail.com**
 - 📄 Know about my experiences [Resume](https://drive.google.com/file/d/1isdZltjazED0bWX_n5KyAakcwrrRPLZr/view?usp=sharing)
-- 
 <br clear="both">
 
 ## Connect with me:
