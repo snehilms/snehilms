@@ -1,0 +1,319 @@
+/* ============================================================================
+   DOSSIER
+
+   A glass panel over a blurred void. The shard that was clicked sits behind
+   it and lights it from underneath, which is why the backdrop blurs rather
+   than blacking out — losing that light would make the panel feel pasted on.
+   ========================================================================= */
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dossier);
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(5 7 15 / 0.62);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  will-change: opacity;
+}
+
+.panel {
+  position: relative;
+  width: min(100%, 1320px);
+  max-height: calc(100svh - var(--s-8));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  padding: var(--s-5);
+
+  background: linear-gradient(180deg, rgb(16 27 48 / 0.72), rgb(10 18 34 / 0.78));
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--r-lg);
+  box-shadow: var(--glow-soft), 0 0 120px -40px rgb(127 212 255 / 0.35);
+  will-change: transform, opacity;
+}
+
+/* --- Head ---------------------------------------------------------------- */
+
+.head {
+  /* Children of a scrolling flex column must not shrink — otherwise the
+     diagram is squashed to fit rather than the panel scrolling. */
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding-bottom: var(--s-3);
+  border-bottom: 1px solid var(--c-line);
+}
+
+.headMeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-opt);
+}
+
+.codename { color: var(--c-ice-500); }
+
+.title {
+  font-size: var(--t-h3);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-tight);
+  font-weight: 600;
+  color: var(--c-ice-100);
+}
+
+.sub {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+}
+
+.dot {
+  width: 3px;
+  height: 3px;
+  border-radius: var(--r-full);
+  background: var(--c-text-ghost);
+}
+
+.close {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  padding: var(--s-1) var(--s-2);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-full);
+  color: var(--c-text-dim);
+  white-space: nowrap;
+  transition: color var(--d-fast) var(--e-out),
+              border-color var(--d-fast) var(--e-out),
+              background-color var(--d-fast) var(--e-out);
+}
+
+.close:hover {
+  color: var(--c-ice-100);
+  border-color: rgb(127 212 255 / 0.4);
+  background: rgb(127 212 255 / 0.08);
+}
+
+.blurb {
+  flex: 0 0 auto;
+  max-width: 88ch;
+  font-size: var(--t-sm);
+  line-height: var(--lh-body);
+  color: var(--c-text-dim);
+  text-wrap: pretty;
+}
+
+/* --- Diagram ------------------------------------------------------------- */
+
+.diagramWrap {
+  flex: 0 0 auto;
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+  background: rgb(5 7 15 / 0.42);
+  padding: var(--s-2);
+  overflow-x: auto;
+}
+
+.diagram {
+  display: block;
+  width: 100%;
+  min-width: 860px;
+  height: auto;
+}
+
+.laneLabel {
+  fill: var(--c-text-faint);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: var(--ls-mono);
+  text-anchor: middle;
+  text-transform: uppercase;
+}
+
+.laneRule {
+  stroke: var(--c-line);
+  stroke-width: 1;
+  stroke-dasharray: 2 8;
+}
+
+/* --- Edges --------------------------------------------------------------- */
+
+.edgeBase {
+  fill: none;
+  stroke: url(#dossier-edge);
+  stroke-width: 1.5;
+  opacity: 0.72;
+}
+
+.edgeFeedback {
+  stroke: var(--c-ice-600);
+  stroke-dasharray: 5 6;
+  opacity: 0.6;
+}
+
+/* The travelling packet. A short dash looping along the same path is a much
+   cheaper way to show direction than an animated marker per edge. */
+.packet {
+  fill: none;
+  stroke: var(--c-ice-100);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 9 250;
+  animation: flow 3.4s linear infinite;
+  will-change: stroke-dashoffset;
+}
+
+@keyframes flow {
+  from { stroke-dashoffset: 259; }
+  to   { stroke-dashoffset: 0; }
+}
+
+.edgeLabel {
+  fill: var(--c-text-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-anchor: middle;
+}
+
+/* --- Nodes --------------------------------------------------------------- */
+
+.node { will-change: transform, opacity; }
+
+.nodeBox {
+  fill: rgb(16 27 48 / 0.92);
+  stroke: var(--c-line-strong);
+  stroke-width: 1;
+}
+
+.nodeLabel {
+  fill: var(--c-ice-100);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.nodeSub {
+  fill: var(--c-text-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+/* Kind is carried on the group and read by the accent bar — one attribute
+   drives both the diagram and the legend below it. */
+.nodeAccent { fill: var(--c-ice-400); }
+
+.node[data-kind='source'] .nodeAccent { fill: var(--c-ice-200); }
+.node[data-kind='core'] .nodeAccent { fill: var(--c-ice-400); }
+.node[data-kind='model'] .nodeAccent { fill: var(--c-ice-500); }
+.node[data-kind='store'] .nodeAccent { fill: var(--c-ice-600); }
+.node[data-kind='sink'] .nodeAccent { fill: var(--c-ice-100); }
+
+.node[data-kind='store'] .nodeBox { stroke-dasharray: 4 5; }
+
+/* --- Foot ---------------------------------------------------------------- */
+
+.foot {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: var(--s-5);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--c-line);
+}
+
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.note {
+  position: relative;
+  padding-left: var(--s-3);
+  font-size: var(--t-sm);
+  line-height: var(--lh-body);
+  color: var(--c-text-dim);
+  text-wrap: pretty;
+  will-change: transform, opacity;
+}
+
+.note::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.66em;
+  width: var(--s-2);
+  height: 1px;
+  background: var(--c-ice-500);
+}
+
+.footMeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.stack,
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+}
+
+.chip {
+  padding: var(--s-opt) var(--s-1);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.06em;
+  color: var(--c-ice-300);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--s-opt);
+}
+
+.legendSwatch {
+  width: var(--s-opt);
+  height: var(--s-2);
+  border-radius: 1px;
+  background: var(--c-ice-400);
+}
+
+.legendItem[data-kind='source'] .legendSwatch { background: var(--c-ice-200); }
+.legendItem[data-kind='core'] .legendSwatch { background: var(--c-ice-400); }
+.legendItem[data-kind='model'] .legendSwatch { background: var(--c-ice-500); }
+.legendItem[data-kind='store'] .legendSwatch { background: var(--c-ice-600); }
+.legendItem[data-kind='sink'] .legendSwatch { background: var(--c-ice-100); }
+
+/* --- Responsive ---------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .panel { padding: var(--s-3); gap: var(--s-3); }
+  .foot { grid-template-columns: 1fr; gap: var(--s-3); }
+  .head { flex-direction: column; gap: var(--s-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .packet { animation: none; opacity: 0.4; }
+}

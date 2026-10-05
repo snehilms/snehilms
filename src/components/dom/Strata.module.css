@@ -1,0 +1,99 @@
+.core {
+  display: flex;
+  flex-direction: column;
+}
+
+.band {
+  display: grid;
+  grid-template-columns: var(--s-1) minmax(200px, 240px) minmax(0, 1fr);
+  gap: var(--s-4);
+  align-items: start;
+  padding-block: var(--s-6);
+  border-top: 1px solid var(--c-line);
+}
+
+.band:last-child { border-bottom: 1px solid var(--c-line); }
+
+/* --- Depth bar ---------------------------------------------------------- */
+
+.bar {
+  position: relative;
+  width: var(--s-1);
+  align-self: stretch;
+  min-height: var(--s-8);
+  background: rgb(191 226 247 / 0.04);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+
+.barFill {
+  position: absolute;
+  inset: 0;
+  transform-origin: top center;
+  will-change: transform;
+}
+
+/* Each layer is colder and denser than the one above it. */
+.barFill[data-layer='0'] { background: linear-gradient(180deg, var(--c-ice-200), var(--c-ice-400)); }
+.barFill[data-layer='1'] { background: linear-gradient(180deg, var(--c-ice-400), var(--c-ice-500)); }
+.barFill[data-layer='2'] { background: linear-gradient(180deg, var(--c-ice-500), var(--c-ice-600)); }
+.barFill[data-layer='3'] { background: linear-gradient(180deg, var(--c-ice-600), var(--c-rime)); }
+
+/* --- Meta --------------------------------------------------------------- */
+
+.bandMeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  will-change: transform, opacity;
+}
+
+.depth { color: var(--c-ice-500); }
+
+.bandLabel {
+  font-size: var(--t-lead);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-snug);
+  font-weight: 600;
+  color: var(--c-ice-100);
+}
+
+/* --- Chips -------------------------------------------------------------- */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+  padding-top: var(--s-opt);
+}
+
+.chip {
+  padding: var(--s-1) var(--s-2);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-full);
+  background: var(--c-glass);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  font-size: var(--t-sm);
+  letter-spacing: var(--ls-snug);
+  color: var(--c-text-dim);
+  white-space: nowrap;
+  will-change: transform, opacity;
+  transition: color var(--d-fast) var(--e-out),
+              border-color var(--d-fast) var(--e-out),
+              transform var(--d-fast) var(--e-out);
+}
+
+.chip:hover {
+  color: var(--c-ice-100);
+  border-color: rgb(127 212 255 / 0.38);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 860px) {
+  .band {
+    grid-template-columns: var(--s-1) minmax(0, 1fr);
+    gap: var(--s-2) var(--s-3);
+  }
+  .chips { grid-column: 2; }
+}

@@ -1,0 +1,92 @@
+.root {
+  position: fixed;
+  top: 50%;
+  right: var(--gutter);
+  transform: translateY(-50%);
+  z-index: var(--z-nav);
+  display: flex;
+  align-items: stretch;
+  gap: var(--s-2);
+  will-change: transform, opacity;
+}
+
+/* --- Progress spine ----------------------------------------------------- */
+
+.track {
+  position: relative;
+  width: 1px;
+  background: var(--c-line);
+  overflow: hidden;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--c-ice-400), var(--c-ice-600));
+  transform: scaleY(0);
+  transform-origin: top center;
+  will-change: transform;
+}
+
+/* --- Nodes -------------------------------------------------------------- */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+
+.node {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  padding-block: var(--s-opt);
+  color: var(--c-text-ghost);
+  transition: color var(--d-base) var(--e-out);
+}
+
+.node:hover { color: var(--c-text-dim); }
+.active { color: var(--c-ice-200); }
+
+.tick {
+  width: var(--s-2);
+  height: 1px;
+  background: currentColor;
+  transition: width var(--d-base) var(--e-out), box-shadow var(--d-base) var(--e-out);
+  will-change: width;
+}
+
+.active .tick {
+  width: var(--s-4);
+  box-shadow: 0 0 8px var(--c-ice-400);
+}
+
+.index {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: var(--ls-mono);
+}
+
+/* Label is revealed by opacity + transform only — never by width, which
+   would relayout the rail on every chapter change. */
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: var(--ls-mono);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity var(--d-base) var(--e-out), transform var(--d-base) var(--e-out);
+  will-change: transform, opacity;
+}
+
+.active .label,
+.node:hover .label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (max-width: 900px) {
+  .root { display: none; }
+}

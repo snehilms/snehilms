@@ -1,0 +1,131 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-16);
+}
+
+/* --- CTA ---------------------------------------------------------------- */
+
+.cta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+}
+
+.prompt {
+  font-size: var(--t-h3);
+  line-height: 1.24;
+  letter-spacing: var(--ls-snug);
+  color: var(--c-text-dim);
+  max-width: 24ch;
+}
+
+/* Generous invisible hit area — the magnet needs runway to be felt. */
+.magnetZone {
+  display: flex;
+  justify-content: flex-start;
+  padding: var(--s-6) var(--s-4);
+  margin: calc(var(--s-6) * -1) calc(var(--s-4) * -1);
+}
+
+.email {
+  display: inline-block;
+  font-size: var(--t-h2);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+  font-weight: 600;
+  color: var(--c-ice-100);
+  will-change: transform;
+
+  background-image: linear-gradient(90deg, var(--c-ice-400), var(--c-ice-400));
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  background-position: left 88%;
+  transition: background-size var(--d-base) var(--e-out), color var(--d-base) var(--e-out);
+}
+
+.email:hover {
+  background-size: 100% 1px;
+  color: var(--c-ice-400);
+}
+
+/* --- Socials ------------------------------------------------------------ */
+
+.socials {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0;
+  border-top: 1px solid var(--c-line);
+}
+
+.social {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+  padding: var(--s-3) var(--s-2) var(--s-3) 0;
+  border-bottom: 1px solid var(--c-line);
+  font-size: var(--t-body);
+  color: var(--c-text-dim);
+  will-change: transform, opacity;
+  transition: color var(--d-fast) var(--e-out), padding-left var(--d-base) var(--e-out);
+}
+
+.social:hover {
+  color: var(--c-ice-100);
+  padding-left: var(--s-2);
+}
+
+.socialArrow {
+  color: var(--c-text-ghost);
+  transform: translate(-4px, 4px);
+  opacity: 0;
+  transition: transform var(--d-base) var(--e-out),
+              opacity var(--d-base) var(--e-out),
+              color var(--d-base) var(--e-out);
+}
+
+.social:hover .socialArrow {
+  transform: translate(0, 0);
+  opacity: 1;
+  color: var(--c-ice-400);
+}
+
+/* --- Colophon ----------------------------------------------------------- */
+
+.colophon {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--s-6);
+  padding-top: var(--s-8);
+  border-top: 1px solid var(--c-line);
+}
+
+.colophonItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  will-change: transform, opacity;
+}
+
+.colophonItem p {
+  font-size: var(--t-sm);
+  line-height: var(--lh-body);
+  color: var(--c-text-faint);
+  max-width: 40ch;
+  text-wrap: pretty;
+}
+
+.colophonLine {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--c-line);
+}
+
+@media (max-width: 720px) {
+  .root { gap: var(--s-10); }
+  .colophonLine { flex-direction: column; gap: var(--s-1); }
+}

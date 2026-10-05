@@ -1,0 +1,86 @@
+/* ============================================================================
+   CHAPTER SHELL — shared by every section.
+
+   Sections are transparent. The canvas is the background, permanently, so
+   every value here is about giving text enough contrast to survive over
+   moving light without ever occluding the field.
+   ========================================================================= */
+
+.section {
+  position: relative;
+  z-index: var(--z-content);
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Sections breathe, but not so much that short chapters become voids. */
+  padding-block: clamp(var(--s-12), 13vh, var(--s-20));
+  /* Sections must not swallow pointer events meant for the canvas layer —
+     only their actual content blocks do. */
+  pointer-events: none;
+}
+
+.section > * { pointer-events: auto; }
+
+.stretched { justify-content: flex-start; }
+
+.stretched .shell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.shell {
+  width: 100%;
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  padding-bottom: var(--s-3);
+}
+
+/* Drawn in with scaleX. A separate element rather than a border so the
+   reveal is compositor-only. */
+.rule {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--c-line-strong), var(--c-line) 62%, transparent);
+  transform-origin: left center;
+  will-change: transform;
+  margin-bottom: var(--s-10);
+}
+
+.index {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: var(--ls-mono);
+  color: var(--c-ice-400);
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--c-text);
+}
+
+.caption {
+  margin-left: auto;
+  font-size: var(--t-sm);
+  color: var(--c-text-faint);
+  text-align: right;
+  max-width: 34ch;
+}
+
+@media (max-width: 720px) {
+  .section { padding-block: var(--s-10); }
+  .head { flex-wrap: wrap; gap: var(--s-1) var(--s-2); padding-bottom: var(--s-2); }
+  .rule { margin-bottom: var(--s-6); }
+  .caption { margin-left: 0; text-align: left; flex-basis: 100%; }
+}

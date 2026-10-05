@@ -1,0 +1,34 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-cursor);
+  pointer-events: none;
+}
+
+.ring,
+.dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: var(--r-full);
+  will-change: transform;
+}
+
+.ring {
+  width: var(--s-4);
+  height: var(--s-4);
+  border: 1px solid rgb(191 226 247 / 0.34);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.dot {
+  width: var(--s-opt);
+  height: var(--s-opt);
+  background: var(--c-ice-400);
+  box-shadow: 0 0 12px rgb(127 212 255 / 0.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root { display: none; }
+}

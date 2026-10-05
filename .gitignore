@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+.DS_Store
+*.tsbuildinfo
+.env*.local
+
+# Machine-local settings — absolute paths into this machine's home folder
+.claude/settings.local.json
+.impeccable/config.local.json
+
+# Tooling scratch
+.agents

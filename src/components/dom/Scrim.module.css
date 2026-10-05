@@ -1,0 +1,47 @@
+/* ============================================================================
+   SCRIM
+
+   The one piece of the design that exists purely to make the other two
+   layers coexist. The particle field is bright, moving, and everywhere; body
+   copy needs a stable ground or it shimmers as particles pass behind it.
+
+   A left-weighted wash covers the reading column, a bottom wash anchors the
+   footer, and the right two-thirds stay completely clear so the field is
+   never veiled where it is supposed to be the subject.
+   ========================================================================= */
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1; /* above --z-canvas, below --z-content */
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      98deg,
+      rgb(5 7 15 / 0.78) 0%,
+      rgb(5 7 15 / 0.56) 20%,
+      rgb(5 7 15 / 0.22) 40%,
+      rgb(5 7 15 / 0.03) 58%,
+      transparent 72%
+    ),
+    linear-gradient(
+      to top,
+      rgb(5 7 15 / 0.52) 0%,
+      rgb(5 7 15 / 0.14) 20%,
+      transparent 40%
+    );
+}
+
+/* Below the two-column breakpoint the content spans the full width, so the
+   directional wash stops making sense — flatten it to an even veil. */
+@media (max-width: 900px) {
+  .scrim {
+    background: linear-gradient(
+      to top,
+      rgb(5 7 15 / 0.74) 0%,
+      rgb(5 7 15 / 0.58) 46%,
+      rgb(5 7 15 / 0.48) 100%
+    );
+  }
+}

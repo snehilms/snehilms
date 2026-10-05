@@ -1,0 +1,230 @@
+/* ============================================================================
+   ARCHIVE
+
+   Two layouts from one markup tree:
+
+   .slots   the gallery — a sticky row centred in a tall section, with each
+            slot framing the 3D shard behind it. The middle of every slot is
+            deliberately empty; that void IS the shard.
+   .cards   the compact fallback below 900px, where the same button becomes a
+            conventional glass card.
+   ========================================================================= */
+
+/* Extra runway so the sticky row can hold centre for a real scroll distance
+   rather than flashing past. */
+.tall { min-height: 230svh; }
+
+.slots {
+  position: sticky;
+  top: 50svh;
+  transform: translateY(-50%);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s-3);
+  will-change: transform;
+}
+
+/* --- Slot ---------------------------------------------------------------- */
+
+.slot {
+  display: block;
+  height: 68svh;
+  text-align: left;
+  /* The shard lives behind this button. Nothing here may paint over it. */
+  background: none;
+}
+
+.slotFrame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: var(--s-2);
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  will-change: transform, opacity;
+  transition: border-color var(--d-base) var(--e-out),
+              background-color var(--d-base) var(--e-out);
+}
+
+.slot:hover .slotFrame,
+.slot:focus-visible .slotFrame {
+  border-color: var(--c-line);
+  background: rgb(10 18 34 / 0.22);
+}
+
+/* --- Head ---------------------------------------------------------------- */
+
+.slotHead {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-opt);
+}
+
+.codename {
+  color: var(--c-ice-500);
+  transition: color var(--d-base) var(--e-out);
+}
+
+.slot:hover .codename { color: var(--c-ice-400); }
+
+.title {
+  font-size: var(--t-lead);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-snug);
+  font-weight: 600;
+  color: var(--c-ice-100);
+}
+
+/* Hairline running from the label down toward the shard — the survey-marker
+   leader line from the reference. Scales on X only. */
+.leader {
+  position: absolute;
+  top: calc(100% + var(--s-2));
+  left: 0;
+  width: var(--s-8);
+  height: 1px;
+  background: linear-gradient(90deg, var(--c-ice-400), transparent);
+  transform: scaleX(0.34);
+  transform-origin: left center;
+  transition: transform var(--d-slow) var(--e-out);
+  will-change: transform;
+}
+
+.slot:hover .leader,
+.slot:focus-visible .leader { transform: scaleX(1); }
+
+/* --- Foot ---------------------------------------------------------------- */
+
+.slotFoot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s-2);
+}
+
+.readout {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.readoutRow {
+  display: flex;
+  gap: var(--s-1);
+  opacity: 0.55;
+  transition: opacity var(--d-base) var(--e-out);
+}
+
+.slot:hover .readoutRow,
+.slot:focus-visible .readoutRow { opacity: 1; }
+
+.readoutValue { color: var(--c-ice-300); }
+
+.explore {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--s-opt);
+  text-align: right;
+  color: var(--c-text-faint);
+  transition: color var(--d-base) var(--e-out);
+}
+
+.slot:hover .explore,
+.slot:focus-visible .explore { color: var(--c-ice-200); }
+
+.exploreRule {
+  width: var(--s-6);
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0.5);
+  transform-origin: right center;
+  transition: transform var(--d-base) var(--e-out);
+}
+
+.slot:hover .exploreRule,
+.slot:focus-visible .exploreRule { transform: scaleX(1); }
+
+/* --- Compact fallback ---------------------------------------------------- */
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.card {
+  display: block;
+  text-align: left;
+  width: 100%;
+}
+
+.card .slotFrame {
+  gap: var(--s-3);
+  padding: var(--s-3);
+  border-color: var(--c-line);
+  border-radius: var(--r-lg);
+  background: var(--c-glass);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+}
+
+.card:hover .slotFrame {
+  border-color: rgb(127 212 255 / 0.32);
+  background: var(--c-glass-hi);
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.cardBlurb {
+  font-size: var(--t-sm);
+  line-height: var(--lh-body);
+  color: var(--c-text-dim);
+  text-wrap: pretty;
+}
+
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+}
+
+.chip {
+  padding: var(--s-opt) var(--s-1);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.06em;
+  color: var(--c-text-faint);
+}
+
+/* In compact mode the leader line has nothing to point at. */
+.card .leader { display: none; }
+
+/* Side by side, the readout and the call to action fight for a narrow
+   column and "Click to explore" wraps mid-phrase. Stack them instead. */
+.card .slotFoot {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-2);
+}
+
+.card .explore {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.card .exploreRule { transform-origin: left center; }
+
+@media (max-width: 1180px) {
+  .slot { height: 62svh; }
+  .title { font-size: var(--t-body); }
+}

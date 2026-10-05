@@ -1,0 +1,238 @@
+/* ============================================================================
+   CRYO ARCHIVE — DESIGN TOKENS
+   Single source of truth. Nothing in this codebase hardcodes a colour,
+   a spacing value, a radius, or a duration. Everything resolves to a token.
+   ========================================================================= */
+
+:root {
+  /* --- Ground: the frozen void -------------------------------------- */
+  --c-void:        #05070f;
+  --c-deep:        #070b16;
+  --c-abyss:       #0a1222;
+  --c-shelf:       #101b30;
+  --c-rime:        #16243d;
+
+  /* --- Ice: the light that survives the cold ------------------------ */
+  --c-ice-100:     #f4fbff;
+  --c-ice-200:     #e8f4ff;
+  --c-ice-300:     #bfe2f7;
+  --c-ice-400:     #7fd4ff;
+  --c-ice-500:     #4fb6e8;
+  --c-ice-600:     #2a7fa8;
+
+  /* --- Semantic text ----------------------------------------------- */
+  --c-text:        var(--c-ice-200);
+  --c-text-dim:    rgb(232 244 255 / 0.58);
+  --c-text-faint:  rgb(232 244 255 / 0.34);
+  --c-text-ghost:  rgb(232 244 255 / 0.14);
+
+  /* --- Glass + hairlines ------------------------------------------- */
+  --c-line:        rgb(191 226 247 / 0.10);
+  --c-line-strong: rgb(191 226 247 / 0.22);
+  --c-glass:       rgb(16 27 48 / 0.34);
+  --c-glass-hi:    rgb(22 36 61 / 0.56);
+  --blur-glass:    blur(20px) saturate(140%);
+
+  /* --- Glow --------------------------------------------------------- */
+  --glow-ice:      0 0 0 1px rgb(127 212 255 / 0.18),
+                   0 0 24px -4px rgb(127 212 255 / 0.28),
+                   0 0 64px -12px rgb(79 182 232 / 0.22);
+  --glow-soft:     0 8px 32px -8px rgb(5 7 15 / 0.8);
+
+  /* --- Space: hard 8px grid. No value off this ladder. -------------- */
+  --s-0:   0px;
+  --s-1:   8px;
+  --s-2:   16px;
+  --s-3:   24px;
+  --s-4:   32px;
+  --s-5:   40px;
+  --s-6:   48px;
+  --s-8:   64px;
+  --s-10:  80px;
+  --s-12:  96px;
+  --s-16:  128px;
+  --s-20:  160px;
+  --s-24:  192px;
+  --s-32:  256px;
+  /* Optical half-step: icon/baseline nudges ONLY, never layout. */
+  --s-opt: 4px;
+
+  /* --- Radius ------------------------------------------------------- */
+  --r-sm:   8px;
+  --r-md:   16px;
+  --r-lg:   24px;
+  --r-full: 999px;
+
+  /* --- Typography: modern system stack ------------------------------ */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+               'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+               'Liberation Mono', monospace;
+
+  /* Fluid scale — 320px → 1600px viewport */
+  --t-mono:    clamp(0.6875rem, 0.66rem + 0.14vw, 0.75rem);
+  --t-sm:      clamp(0.8125rem, 0.78rem + 0.17vw, 0.9375rem);
+  --t-body:    clamp(0.9375rem, 0.88rem + 0.28vw, 1.125rem);
+  --t-lead:    clamp(1.125rem, 1.00rem + 0.62vw, 1.5rem);
+  --t-h3:      clamp(1.5rem, 1.25rem + 1.25vw, 2.25rem);
+  --t-h2:      clamp(2rem, 1.4rem + 3.0vw, 4rem);
+  --t-h1:      clamp(2.75rem, 1.2rem + 7.6vw, 8.5rem);
+
+  --lh-tight:  0.92;
+  --lh-snug:   1.12;
+  --lh-body:   1.62;
+
+  --ls-mono:   0.18em;
+  --ls-tight:  -0.035em;
+  --ls-snug:   -0.015em;
+
+  /* --- Motion ------------------------------------------------------- */
+  --d-fast:   0.24s;
+  --d-base:   0.48s;
+  --d-slow:   0.96s;
+  --e-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --e-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+
+  /* --- Layout ------------------------------------------------------- */
+  --gutter:    clamp(var(--s-3), 4vw, var(--s-10));
+  --max-w:     1440px;
+  --max-read:  62ch;
+
+  /* --- Elevation ---------------------------------------------------- */
+  --z-canvas:  0;
+  --z-content: 10;
+  --z-nav:     40;
+  --z-dossier: 80;
+  --z-cursor:  90;
+  --z-loader:  100;
+}
+
+/* ============================================================================
+   RESET
+   ========================================================================= */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+* { margin: 0; padding: 0; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto; /* Lenis owns scrolling */
+}
+
+body {
+  min-height: 100svh;
+  font-family: var(--font-sans);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  color: var(--c-text);
+  background-color: var(--c-void);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+}
+
+img, svg, video, canvas { display: block; max-width: 100%; }
+button, input, textarea, select { font: inherit; color: inherit; background: none; border: none; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; }
+
+::selection {
+  background: var(--c-ice-400);
+  color: var(--c-void);
+}
+
+/* Hide native scrollbar — the rail is the scroll indicator */
+::-webkit-scrollbar { width: 0; height: 0; }
+html { scrollbar-width: none; }
+
+/* ============================================================================
+   PRIMITIVES
+   ========================================================================= */
+
+.u-shell {
+  width: 100%;
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.u-mono {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--c-text-faint);
+  font-weight: 500;
+}
+
+.u-glass {
+  background: var(--c-glass);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+}
+
+/* Anything GSAP animates declares its intent up front. */
+.u-gpu {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Per-character / per-line mask reveal */
+.u-mask { overflow: hidden; display: block; }
+.u-mask > * { display: block; will-change: transform; }
+
+/* ============================================================================
+   CURSOR
+
+   The OS cursor is suppressed only where the custom one actually renders:
+   a fine pointer, hover capability, and no reduced-motion preference.
+   This lives in the global sheet because CSS Modules cannot own a selector
+   with no local class in it.
+   ========================================================================= */
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  body,
+  a,
+  button,
+  [data-cursor='hover'] {
+    cursor: none;
+  }
+}
+
+/* ============================================================================
+   ACCESSIBILITY
+   ========================================================================= */
+
+.u-sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-ice-400);
+  outline-offset: var(--s-opt);
+  border-radius: var(--r-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

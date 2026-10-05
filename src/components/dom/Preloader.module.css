@@ -1,0 +1,78 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-loader);
+  display: grid;
+  place-items: end stretch;
+}
+
+.panels {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.panel {
+  background: var(--c-void);
+  will-change: transform;
+  transform-origin: top center;
+}
+
+/* Hairline seams between panels sell them as physical plates. */
+.panel + .panel {
+  box-shadow: inset 1px 0 0 var(--c-line);
+}
+
+.content {
+  position: relative;
+  width: 100%;
+  padding: var(--gutter);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.meta,
+.readout {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+
+.line {
+  display: block;
+  will-change: transform;
+}
+
+.counter {
+  font-family: var(--font-mono);
+  font-size: clamp(3rem, 12vw, 9rem);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+  color: var(--c-text);
+  font-variant-numeric: tabular-nums;
+  will-change: contents;
+}
+
+.track {
+  position: relative;
+  height: 1px;
+  width: 100%;
+  background: var(--c-line);
+  overflow: hidden;
+}
+
+.bar {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--c-ice-600), var(--c-ice-400));
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root { display: none; }
+}
