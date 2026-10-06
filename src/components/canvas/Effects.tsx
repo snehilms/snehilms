@@ -13,13 +13,14 @@ import { scrollState } from '@/lib/scrollState';
 
    Three passes, each doing exactly one job:
 
-   Bloom     — the particles are additive points; bloom is what turns them
-               from pixels into light. Threshold sits low because the whole
-               palette is dark and nothing else in frame will trigger it.
+   Bloom     — only the light sources bloom: the horizon strip, facet
+               glints, the stage rings. The threshold sits high because
+               the whole chamber is pale; anything lower turns the fog into
+               a white-out.
    Chromatic — scales with scroll velocity only. At rest it is zero. This is
                the single cue that ties scroll speed to the image.
-   Vignette  — pulls the frame edges into the void so DOM text has somewhere
-               quiet to sit.
+   Vignette  — a light hand: the chamber's corners settle a shade toward
+               slate, so the lit centre reads as the room's light source.
    ========================================================================= */
 
 const MAX_ABERRATION = 0.0022;
@@ -46,9 +47,9 @@ export function Effects() {
   return (
     <EffectComposer multisampling={0}>
       <Bloom
-        intensity={1.15}
-        luminanceThreshold={0.08}
-        luminanceSmoothing={0.32}
+        intensity={0.55}
+        luminanceThreshold={0.86}
+        luminanceSmoothing={0.18}
         mipmapBlur
         radius={0.72}
       />
@@ -59,7 +60,7 @@ export function Effects() {
         radialModulation={false}
         modulationOffset={0}
       />
-      <Vignette offset={0.26} darkness={0.72} blendFunction={BlendFunction.NORMAL} />
+      <Vignette offset={0.32} darkness={0.3} blendFunction={BlendFunction.NORMAL} />
     </EffectComposer>
   );
 }

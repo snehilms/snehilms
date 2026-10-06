@@ -21,7 +21,7 @@
   width: var(--s-1);
   align-self: stretch;
   min-height: var(--s-8);
-  background: rgb(191 226 247 / 0.04);
+  background: rgb(16 21 29 / 0.06);
   border-radius: var(--r-full);
   overflow: hidden;
 }
@@ -34,10 +34,10 @@
 }
 
 /* Each layer is colder and denser than the one above it. */
-.barFill[data-layer='0'] { background: linear-gradient(180deg, var(--c-ice-200), var(--c-ice-400)); }
-.barFill[data-layer='1'] { background: linear-gradient(180deg, var(--c-ice-400), var(--c-ice-500)); }
-.barFill[data-layer='2'] { background: linear-gradient(180deg, var(--c-ice-500), var(--c-ice-600)); }
-.barFill[data-layer='3'] { background: linear-gradient(180deg, var(--c-ice-600), var(--c-rime)); }
+.barFill[data-layer='0'] { background: linear-gradient(180deg, var(--c-ink-2), var(--c-accent)); }
+.barFill[data-layer='1'] { background: linear-gradient(180deg, var(--c-accent), var(--c-accent-2)); }
+.barFill[data-layer='2'] { background: linear-gradient(180deg, var(--c-accent-2), var(--c-accent-3)); }
+.barFill[data-layer='3'] { background: linear-gradient(180deg, var(--c-accent-3), var(--c-accent-4)); }
 
 /* --- Meta --------------------------------------------------------------- */
 
@@ -48,14 +48,14 @@
   will-change: transform, opacity;
 }
 
-.depth { color: var(--c-ice-500); }
+.depth { color: var(--c-accent-2); }
 
 .bandLabel {
   font-size: var(--t-lead);
   line-height: var(--lh-snug);
   letter-spacing: var(--ls-snug);
   font-weight: 600;
-  color: var(--c-ice-100);
+  color: var(--c-ink);
 }
 
 /* --- Chips -------------------------------------------------------------- */
@@ -85,8 +85,8 @@
 }
 
 .chip:hover {
-  color: var(--c-ice-100);
-  border-color: rgb(127 212 255 / 0.38);
+  color: var(--c-ink);
+  border-color: var(--c-accent);
   transform: translateY(-2px);
 }
 

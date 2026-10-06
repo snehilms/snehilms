@@ -102,6 +102,8 @@ vec3 curlNoise(vec3 p) {
   float y = (pz1.x - pz0.x) - (px1.z - px0.z);
   float z = (px1.y - px0.y) - (py1.x - py0.x);
 
-  return normalize(vec3(x, y, z) / (2.0 * e));
+  // Safe normalise: the curl can be exactly zero, and normalize(0) is NaN.
+  vec3 c = vec3(x, y, z);
+  return c / max(length(c), 1e-6);
 }
 `;

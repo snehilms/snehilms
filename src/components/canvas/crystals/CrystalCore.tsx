@@ -153,9 +153,10 @@ const BUILDERS: Record<CoreKind, () => THREE.BufferGeometry> = {
 
 /* --- Palette per kind ---------------------------------------------------- */
 const CORE_COLORS: Record<CoreKind, { base: THREE.Color; highlight: THREE.Color }> = {
-  ladder: { base: new THREE.Color('#bfe2f7'), highlight: new THREE.Color('#f4fbff') },
-  graph: { base: new THREE.Color('#7fd4ff'), highlight: new THREE.Color('#e8f4ff') },
-  ribbon: { base: new THREE.Color('#e8f4ff'), highlight: new THREE.Color('#7fd4ff') },
+  /* Dark artefacts under pale ice: the core is what the eye finds first. */
+  ladder: { base: new THREE.Color('#323b49'), highlight: new THREE.Color('#eef3f8') },
+  graph: { base: new THREE.Color('#1c5a80'), highlight: new THREE.Color('#e4f0f8') },
+  ribbon: { base: new THREE.Color('#4a5466'), highlight: new THREE.Color('#f4f6f9') },
 };
 
 type Props = {

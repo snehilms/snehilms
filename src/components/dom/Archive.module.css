@@ -51,7 +51,7 @@
 .slot:hover .slotFrame,
 .slot:focus-visible .slotFrame {
   border-color: var(--c-line);
-  background: rgb(10 18 34 / 0.22);
+  background: rgb(236 239 243 / 0.36);
 }
 
 /* --- Head ---------------------------------------------------------------- */
@@ -64,18 +64,18 @@
 }
 
 .codename {
-  color: var(--c-ice-500);
+  color: var(--c-accent-2);
   transition: color var(--d-base) var(--e-out);
 }
 
-.slot:hover .codename { color: var(--c-ice-400); }
+.slot:hover .codename { color: var(--c-accent); }
 
 .title {
   font-size: var(--t-lead);
   line-height: var(--lh-snug);
   letter-spacing: var(--ls-snug);
   font-weight: 600;
-  color: var(--c-ice-100);
+  color: var(--c-ink);
 }
 
 /* Hairline running from the label down toward the shard — the survey-marker
@@ -86,7 +86,7 @@
   left: 0;
   width: var(--s-8);
   height: 1px;
-  background: linear-gradient(90deg, var(--c-ice-400), transparent);
+  background: linear-gradient(90deg, var(--c-accent), transparent);
   transform: scaleX(0.34);
   transform-origin: left center;
   transition: transform var(--d-slow) var(--e-out);
@@ -121,7 +121,7 @@
 .slot:hover .readoutRow,
 .slot:focus-visible .readoutRow { opacity: 1; }
 
-.readoutValue { color: var(--c-ice-300); }
+.readoutValue { color: var(--c-ink-3); }
 
 .explore {
   display: flex;
@@ -134,7 +134,7 @@
 }
 
 .slot:hover .explore,
-.slot:focus-visible .explore { color: var(--c-ice-200); }
+.slot:focus-visible .explore { color: var(--c-ink-2); }
 
 .exploreRule {
   width: var(--s-6);
@@ -173,7 +173,7 @@
 }
 
 .card:hover .slotFrame {
-  border-color: rgb(127 212 255 / 0.32);
+  border-color: var(--c-accent);
   background: var(--c-glass-hi);
 }
 

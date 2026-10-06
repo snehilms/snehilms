@@ -36,29 +36,32 @@ import type { Core } from '@/config/content';
    matter how the material was tuned.
    ========================================================================= */
 
-/* The synthetic environment is deliberately far brighter than the page it
-   sits on. Glass has nothing of its own to show — it can only report what is
-   around it, and an environment matched to this near-black scene produces a
-   near-black crystal no matter how the material is tuned. */
+/* The synthetic environment is the chamber itself: pale fog overhead, a
+   white horizon strip, a slate floor below. Glass has nothing of its own to
+   show, so the floor is kept darker than the page: against a pale ground,
+   it is the slate the lower facets refract and reflect that makes the
+   crystal read as a solid block of ice rather than a pale smear. */
 const ENV = {
-  low: new THREE.Color('#16273f'),
-  high: new THREE.Color('#8fc4e0'),
-  band: new THREE.Color('#cfeeff'),
+  low: new THREE.Color('#4a5466'),
+  high: new THREE.Color('#f4f6f9'),
+  band: new THREE.Color('#ffffff'),
   key: new THREE.Color('#ffffff'),
-  rim: new THREE.Color('#7fd4ff'),
+  rim: new THREE.Color('#cfe6f5'),
 };
 
 const GLASS = {
-  tint: new THREE.Color('#5fa8d6'),
-  ice: new THREE.Color('#7fd4ff'),
-  line: new THREE.Color('#bfe2f7'),
-  node: new THREE.Color('#e8f4ff'),
-  /** Per-channel absorption. Red absorbs fastest, so depth goes cyan.
-      Kept low: heavy absorption reads as murk, not as thickness. */
-  absorb: new THREE.Vector3(0.42, 0.24, 0.13),
+  tint: new THREE.Color('#4e6f8c'),
+  ice: new THREE.Color('#eef6fb'),
+  /** Inner network: dark structure frozen in the ice, not light inside it. */
+  line: new THREE.Color('#323b49'), // --c-ink-3
+  node: new THREE.Color('#1c5a80'), // --c-accent
+  /** Per-channel absorption. Red absorbs fastest, so depth goes glacial blue.
+      Stronger than a dark scene needs: in fog, thickness has to be shown by
+      the ice darkening, because there is no black behind it to do the job. */
+  absorb: new THREE.Vector3(0.78, 0.5, 0.3),
   ior: 1.34, // ice
   dispersion: 0.034,
-  baseAlpha: 0.40,
+  baseAlpha: 0.52,
 };
 
 /** Key light direction, shared by the glass and the core so they agree. */
@@ -159,7 +162,8 @@ export function CrystalShard({ index, seed, core, focusIndex }: Props) {
       transparent: true,
       depthWrite: false,
       depthTest: false,
-      blending: THREE.AdditiveBlending,
+      /* Normal blending: additive light vanishes against fog. */
+      blending: THREE.NormalBlending,
     });
 
     const nodes = new THREE.ShaderMaterial({
@@ -178,7 +182,8 @@ export function CrystalShard({ index, seed, core, focusIndex }: Props) {
       transparent: true,
       depthWrite: false,
       depthTest: false,
-      blending: THREE.AdditiveBlending,
+      /* Normal blending: additive light vanishes against fog. */
+      blending: THREE.NormalBlending,
     });
 
     return { front, back, lines, nodes, shared };

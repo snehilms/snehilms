@@ -14,6 +14,8 @@ import { Thaw } from './dom/Thaw';
 import { Archive } from './dom/Archive';
 import { Strata } from './dom/Strata';
 import { Surface } from './dom/Surface';
+import { SocialStage } from './dom/SocialStage';
+import { SystemToggles } from './dom/SystemToggles';
 
 /* The canvas is client-only: GPUComputationRenderer needs a live WebGL
    context, and rendering a placeholder on the server then hydrating over it
@@ -44,10 +46,12 @@ export function Experience() {
         <Archive />
         <Strata />
         <Surface />
+        <SocialStage />
       </main>
 
       <Nav />
       <ChapterRail />
+      <SystemToggles />
       <Dossier />
       <Cursor />
       <Preloader />

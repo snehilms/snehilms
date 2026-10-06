@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import { gsap, useGSAP, ScrollTrigger } from '@/lib/gsap';
 import { scrollTo } from './SmoothScroll';
-import { chapters, identity } from '@/config/content';
+import { chapters, identity, socialsSection } from '@/config/content';
 import styles from './Nav.module.css';
 
 /* ============================================================================
@@ -46,30 +46,30 @@ export function Nav() {
   return (
     <header ref={ref} className={`${styles.root} ${condensed ? styles.condensed : ''}`}>
       <div className={styles.inner}>
-        <button className={styles.brand} onClick={() => scrollTo('#signal')} aria-label="Back to top">
+        <button className={styles.brand} onClick={() => scrollTo(`#${chapters[0].id}`)} aria-label="Back to top">
           <span className={styles.mark}>{identity.initials}</span>
           <span className={styles.brandText}>
             <span className={styles.brandName}>{identity.name}</span>
-            <span className="u-mono">{identity.role}</span>
+            <span className="u-cue">{identity.role}</span>
           </span>
         </button>
 
         <nav className={styles.links} aria-label="Chapters">
-          {chapters.map((chapter) => (
+          {[...chapters, socialsSection].map((section) => (
             <button
-              key={chapter.id}
+              key={section.id}
               className={styles.link}
-              onClick={() => scrollTo(`#${chapter.id}`)}
+              onClick={() => scrollTo(`#${section.id}`)}
             >
-              <span className={styles.linkIndex}>{chapter.index}</span>
-              <span className={styles.linkLabel}>{chapter.title}</span>
+              <span className={styles.linkIndex}>{section.index}</span>
+              <span className={styles.linkLabel}>{section.title}</span>
             </button>
           ))}
         </nav>
 
         <a className={styles.status} href={`mailto:${identity.email}`}>
           <span className={styles.pulse} aria-hidden="true" />
-          <span className="u-mono">{identity.availability}</span>
+          <span className="u-cue">{identity.availability}</span>
         </a>
       </div>
     </header>

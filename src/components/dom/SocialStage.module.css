@@ -1,0 +1,212 @@
+/* ============================================================================
+   SOCIAL STAGE
+
+   A chamber, not a section: full viewport, nothing on it but the mark, the
+   pedestal, two range marks and the selector. The canvas is the room; the
+   DOM only names what is on the plinth and lets you take it.
+   ========================================================================= */
+
+.stage {
+  position: relative;
+  z-index: var(--z-content);
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* --- Range marks ---------------------------------------------------------
+   Thin rules either side of the mark at its centre line: the bench marks of
+   an instrument, framing the specimen without boxing it. Deliberately plain:
+   with arrowheads they read as prev/next controls they are not. */
+
+.mark {
+  position: absolute;
+  top: 46%;
+  width: var(--s-12);
+  height: 1px;
+  background: var(--c-ink-3);
+  opacity: 0.5;
+}
+
+.markLeft { left: max(var(--gutter), 8vw); }
+.markRight { right: max(var(--gutter), 8vw); }
+
+/* --- Selector ------------------------------------------------------------ */
+
+.selector {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(var(--s-2), 3vh, var(--s-5));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+  padding-inline: var(--gutter);
+  isolation: isolate; /* keeps the veil behind the names, above the canvas */
+  will-change: transform, opacity;
+}
+
+/* The selector stands on the chamber's slate floor, where faint text drops
+   to ~2.6:1. A soft fog veil lifts the floor under the band back above
+   4.5:1 for the inactive names, so the faint/ink hierarchy survives. */
+.selector::before {
+  content: '';
+  position: absolute;
+  inset: calc(var(--s-3) * -1) 0;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse 46% 70% at 50% 55%,
+    rgb(236 239 243 / 0.88) 0%,
+    rgb(236 239 243 / 0.74) 55%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.rowWrap {
+  position: relative;
+}
+
+.row {
+  display: flex;
+  gap: clamp(var(--s-1), 3vw, var(--s-5));
+}
+
+.link {
+  display: block;
+  padding: var(--s-1) var(--s-3);
+  font-size: var(--t-lead);
+  font-weight: 500;
+  letter-spacing: var(--ls-snug);
+  color: var(--c-text-faint);
+  transition: color var(--d-base) var(--e-out);
+}
+
+.link:hover,
+.link[aria-current='true'] {
+  color: var(--c-ink);
+}
+
+/* Focus is carried by the brackets, which already travel to the focused
+   name; the ring stays for keyboard users as a second, plainer signal. */
+.link:focus-visible {
+  outline-offset: 0;
+}
+
+/* Two corner pairs. Each half is a narrow box drawing a top and a bottom
+   corner, moved by transform to the active name's edges. */
+.bracket {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--s-2);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.bracket::before,
+.bracket::after {
+  content: '';
+  position: absolute;
+  width: var(--s-2);
+  height: var(--s-2);
+  border-color: var(--c-ink);
+  border-style: solid;
+  border-width: 0;
+}
+
+.bracket::before { top: 0; }
+.bracket::after { bottom: 0; }
+
+.bracketL::before { left: 0; border-top-width: 1.5px; border-left-width: 1.5px; }
+.bracketL::after { left: 0; border-bottom-width: 1.5px; border-left-width: 1.5px; }
+.bracketR::before { right: 0; border-top-width: 1.5px; border-right-width: 1.5px; }
+.bracketR::after { right: 0; border-bottom-width: 1.5px; border-right-width: 1.5px; }
+
+/* The handle is data — a username, an address — so it is set in mono. */
+.handle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+  letter-spacing: 0.04em;
+  color: var(--c-accent);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.3em;
+  transition: text-decoration-color var(--d-base) var(--e-out);
+}
+
+a.handle:hover {
+  text-decoration-color: currentColor;
+}
+
+/* A handle with no link yet is a placeholder, not a call to action. */
+span.handle {
+  color: var(--c-text-faint);
+}
+
+.arrow {
+  width: var(--s-2);
+  height: var(--s-2);
+  transition: transform var(--d-base) var(--e-out);
+}
+
+.handle:hover .arrow {
+  transform: translate(2px, -2px);
+}
+
+/* --- Colophon ------------------------------------------------------------ */
+
+.colophon {
+  position: relative;
+  z-index: var(--z-content);
+  padding-block: var(--s-10) var(--s-6);
+}
+
+.colophonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--s-6);
+  width: 100%;
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  padding-top: var(--s-8);
+  border-top: 1px solid var(--c-line);
+}
+
+.colophonItem {
+  font-size: var(--t-sm);
+  line-height: var(--lh-body);
+  color: var(--c-text-dim);
+  max-width: 40ch;
+  text-wrap: pretty;
+  will-change: transform, opacity;
+}
+
+/* Run-in leads instead of labels above: the sentence names its own topic. */
+.colophonItem strong {
+  font-weight: 600;
+  color: var(--c-ink);
+}
+
+.colophonLine {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--c-line);
+}
+
+@media (max-width: 720px) {
+  .link {
+    padding-inline: var(--s-1);
+    font-size: var(--t-body);
+  }
+  .mark { width: var(--s-6); }
+  .colophonLine { flex-direction: column; gap: var(--s-1); }
+}

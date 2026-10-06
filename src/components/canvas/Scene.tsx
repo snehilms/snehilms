@@ -40,7 +40,7 @@ export function Scene() {
         }}
         camera={{ fov: 45, near: 0.1, far: 120, position: [0, 0, 9.4] }}
         onCreated={({ gl }) => {
-          gl.setClearColor(new THREE.Color('#05070f'), 1);
+          gl.setClearColor(new THREE.Color('#dde1e7'), 1); // --c-ground
           gl.toneMapping = THREE.ACESFilmicToneMapping;
           gl.toneMappingExposure = 1.05;
         }}

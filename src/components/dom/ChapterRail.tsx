@@ -85,10 +85,12 @@ export function ChapterRail() {
               className={`${styles.node} ${i === active ? styles.active : ''}`}
               onClick={() => scrollTo(`#${chapter.id}`)}
               aria-current={i === active ? 'true' : undefined}
+              aria-label={chapter.title}
             >
               <span className={styles.tick} aria-hidden="true" />
-              <span className={styles.index}>{chapter.index}</span>
-              <span className={styles.label}>{chapter.kicker}</span>
+              <span className={styles.label}>
+                {chapter.index} {chapter.kicker}
+              </span>
             </button>
           </li>
         ))}

@@ -2,12 +2,13 @@
    SCRIM
 
    The one piece of the design that exists purely to make the other two
-   layers coexist. The particle field is bright, moving, and everywhere; body
-   copy needs a stable ground or it shimmers as particles pass behind it.
+   layers coexist. The bead field and the slate floor of the chamber both
+   carry dark values; body copy needs an even, pale ground or it shimmers as
+   beads pass behind it.
 
-   A left-weighted wash covers the reading column, a bottom wash anchors the
-   footer, and the right two-thirds stay completely clear so the field is
-   never veiled where it is supposed to be the subject.
+   In fog, legibility comes from more fog: a left-weighted haze over the
+   reading column, a thin lift along the very bottom edge, and the right
+   two-thirds left clear so the field and the slate floor stay visible.
    ========================================================================= */
 
 .scrim {
@@ -19,29 +20,29 @@
   background:
     linear-gradient(
       98deg,
-      rgb(5 7 15 / 0.78) 0%,
-      rgb(5 7 15 / 0.56) 20%,
-      rgb(5 7 15 / 0.22) 40%,
-      rgb(5 7 15 / 0.03) 58%,
+      rgb(236 239 243 / 0.82) 0%,
+      rgb(236 239 243 / 0.6) 20%,
+      rgb(236 239 243 / 0.24) 40%,
+      rgb(236 239 243 / 0.04) 58%,
       transparent 72%
     ),
     linear-gradient(
       to top,
-      rgb(5 7 15 / 0.52) 0%,
-      rgb(5 7 15 / 0.14) 20%,
-      transparent 40%
+      rgb(236 239 243 / 0.42) 0%,
+      rgb(236 239 243 / 0.12) 10%,
+      transparent 18%
     );
 }
 
 /* Below the two-column breakpoint the content spans the full width, so the
-   directional wash stops making sense — flatten it to an even veil. */
+   directional haze stops making sense — flatten it to an even veil. */
 @media (max-width: 900px) {
   .scrim {
     background: linear-gradient(
       to top,
-      rgb(5 7 15 / 0.74) 0%,
-      rgb(5 7 15 / 0.58) 46%,
-      rgb(5 7 15 / 0.48) 100%
+      rgb(236 239 243 / 0.82) 0%,
+      rgb(236 239 243 / 0.62) 46%,
+      rgb(236 239 243 / 0.52) 100%
     );
   }
 }

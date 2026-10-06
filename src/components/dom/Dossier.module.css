@@ -18,7 +18,7 @@
 .backdrop {
   position: absolute;
   inset: 0;
-  background: rgb(5 7 15 / 0.62);
+  background: rgb(221 225 231 / 0.62);
   backdrop-filter: blur(18px) saturate(120%);
   -webkit-backdrop-filter: blur(18px) saturate(120%);
   will-change: opacity;
@@ -36,12 +36,12 @@
   gap: var(--s-4);
   padding: var(--s-5);
 
-  background: linear-gradient(180deg, rgb(16 27 48 / 0.72), rgb(10 18 34 / 0.78));
+  background: linear-gradient(180deg, var(--c-glass-hi), rgb(236 239 243 / 0.84));
   backdrop-filter: var(--blur-glass);
   -webkit-backdrop-filter: var(--blur-glass);
   border: 1px solid var(--c-line-strong);
   border-radius: var(--r-lg);
-  box-shadow: var(--glow-soft), 0 0 120px -40px rgb(127 212 255 / 0.35);
+  box-shadow: var(--shadow-soft);
   will-change: transform, opacity;
 }
 
@@ -65,14 +65,14 @@
   gap: var(--s-opt);
 }
 
-.codename { color: var(--c-ice-500); }
+.codename { color: var(--c-accent-2); }
 
 .title {
   font-size: var(--t-h3);
   line-height: var(--lh-snug);
   letter-spacing: var(--ls-tight);
   font-weight: 600;
-  color: var(--c-ice-100);
+  color: var(--c-ink);
 }
 
 .sub {
@@ -103,9 +103,9 @@
 }
 
 .close:hover {
-  color: var(--c-ice-100);
-  border-color: rgb(127 212 255 / 0.4);
-  background: rgb(127 212 255 / 0.08);
+  color: var(--c-ink);
+  border-color: var(--c-accent);
+  background: rgb(28 90 128 / 0.08);
 }
 
 .blurb {
@@ -123,7 +123,7 @@
   flex: 0 0 auto;
   border: 1px solid var(--c-line);
   border-radius: var(--r-md);
-  background: rgb(5 7 15 / 0.42);
+  background: rgb(236 239 243 / 0.6);
   padding: var(--s-2);
   overflow-x: auto;
 }
@@ -160,7 +160,7 @@
 }
 
 .edgeFeedback {
-  stroke: var(--c-ice-600);
+  stroke: var(--c-accent-3);
   stroke-dasharray: 5 6;
   opacity: 0.6;
 }
@@ -169,7 +169,7 @@
    cheaper way to show direction than an animated marker per edge. */
 .packet {
   fill: none;
-  stroke: var(--c-ice-100);
+  stroke: var(--c-ink);
   stroke-width: 2;
   stroke-linecap: round;
   stroke-dasharray: 9 250;
@@ -195,13 +195,13 @@
 .node { will-change: transform, opacity; }
 
 .nodeBox {
-  fill: rgb(16 27 48 / 0.92);
+  fill: var(--c-fog-hi);
   stroke: var(--c-line-strong);
   stroke-width: 1;
 }
 
 .nodeLabel {
-  fill: var(--c-ice-100);
+  fill: var(--c-ink);
   font-family: var(--font-sans);
   font-size: 16px;
   font-weight: 600;
@@ -217,13 +217,13 @@
 
 /* Kind is carried on the group and read by the accent bar — one attribute
    drives both the diagram and the legend below it. */
-.nodeAccent { fill: var(--c-ice-400); }
+.nodeAccent { fill: var(--c-accent); }
 
-.node[data-kind='source'] .nodeAccent { fill: var(--c-ice-200); }
-.node[data-kind='core'] .nodeAccent { fill: var(--c-ice-400); }
-.node[data-kind='model'] .nodeAccent { fill: var(--c-ice-500); }
-.node[data-kind='store'] .nodeAccent { fill: var(--c-ice-600); }
-.node[data-kind='sink'] .nodeAccent { fill: var(--c-ice-100); }
+.node[data-kind='source'] .nodeAccent { fill: var(--c-ink-2); }
+.node[data-kind='core'] .nodeAccent { fill: var(--c-accent); }
+.node[data-kind='model'] .nodeAccent { fill: var(--c-accent-2); }
+.node[data-kind='store'] .nodeAccent { fill: var(--c-accent-3); }
+.node[data-kind='sink'] .nodeAccent { fill: var(--c-ink); }
 
 .node[data-kind='store'] .nodeBox { stroke-dasharray: 4 5; }
 
@@ -261,7 +261,7 @@
   top: 0.66em;
   width: var(--s-2);
   height: 1px;
-  background: var(--c-ice-500);
+  background: var(--c-accent-2);
 }
 
 .footMeta {
@@ -284,7 +284,7 @@
   font-family: var(--font-mono);
   font-size: var(--t-mono);
   letter-spacing: 0.06em;
-  color: var(--c-ice-300);
+  color: var(--c-ink-3);
 }
 
 .legendItem {
@@ -297,14 +297,14 @@
   width: var(--s-opt);
   height: var(--s-2);
   border-radius: 1px;
-  background: var(--c-ice-400);
+  background: var(--c-accent);
 }
 
-.legendItem[data-kind='source'] .legendSwatch { background: var(--c-ice-200); }
-.legendItem[data-kind='core'] .legendSwatch { background: var(--c-ice-400); }
-.legendItem[data-kind='model'] .legendSwatch { background: var(--c-ice-500); }
-.legendItem[data-kind='store'] .legendSwatch { background: var(--c-ice-600); }
-.legendItem[data-kind='sink'] .legendSwatch { background: var(--c-ice-100); }
+.legendItem[data-kind='source'] .legendSwatch { background: var(--c-ink-2); }
+.legendItem[data-kind='core'] .legendSwatch { background: var(--c-accent); }
+.legendItem[data-kind='model'] .legendSwatch { background: var(--c-accent-2); }
+.legendItem[data-kind='store'] .legendSwatch { background: var(--c-accent-3); }
+.legendItem[data-kind='sink'] .legendSwatch { background: var(--c-ink); }
 
 /* --- Responsive ---------------------------------------------------------- */
 
@@ -314,6 +314,9 @@
   .head { flex-direction: column; gap: var(--s-2); }
 }
 
+/* Reduced by the OS unless the visitor chose full motion, or by choice. */
 @media (prefers-reduced-motion: reduce) {
-  .packet { animation: none; opacity: 0.4; }
+  :global(:root:not([data-motion='full'])) .packet { animation: none; opacity: 0.4; }
 }
+
+:global(:root[data-motion='reduced']) .packet { animation: none; opacity: 0.4; }

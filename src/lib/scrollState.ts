@@ -34,6 +34,12 @@ export type ScrollState = {
   pointerSmooth: { x: number; y: number };
   /** Set once the preloader hands off. Gates the intro timeline. */
   ready: boolean;
+  /**
+   * 0 → 1 as the socials stage takes the viewport. The background field
+   * recedes against it so the stage's own mark owns the frame. Written by
+   * the stage's ScrollTrigger, reset on leave.
+   */
+  stage: number;
 };
 
 export const scrollState: ScrollState = {
@@ -46,6 +52,7 @@ export const scrollState: ScrollState = {
   pointer: { x: 0, y: 0 },
   pointerSmooth: { x: 0, y: 0 },
   ready: false,
+  stage: 0,
 };
 
 /** Frame-rate independent exponential damping. */

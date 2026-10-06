@@ -1,0 +1,373 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-06T12:00:00Z",
+  "title": "Design System: Cryo Archive",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Glacial Ink",
+        "canonical": "#1c5a80",
+        "tonalRamp": [
+          "#0b2433",
+          "#12384f",
+          "#1c5a80",
+          "#24608a",
+          "#4a82aa",
+          "#6f9fc2",
+          "#a9c6db",
+          "#dbe8f1"
+        ]
+      },
+      "accent-2": {
+        "role": "primary",
+        "displayName": "Deep Current",
+        "canonical": "#24608a"
+      },
+      "accent-3": {
+        "role": "primary",
+        "displayName": "Meltwater (fill only)",
+        "canonical": "#6f9fc2"
+      },
+      "accent-4": {
+        "role": "primary",
+        "displayName": "Shelf Ice (fill only)",
+        "canonical": "#a9c6db"
+      },
+      "fog-hi": {
+        "role": "neutral",
+        "displayName": "Overhead Haze",
+        "canonical": "#eceff3"
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Chamber Fog",
+        "canonical": "#dde1e7",
+        "tonalRamp": [
+          "#10151d",
+          "#1d2430",
+          "#323b49",
+          "#5d6676",
+          "#8e97a5",
+          "#c9cfd8",
+          "#dde1e7",
+          "#eceff3"
+        ]
+      },
+      "fog-lo": {
+        "role": "neutral",
+        "displayName": "Low Fog",
+        "canonical": "#c9cfd8"
+      },
+      "floor": {
+        "role": "neutral",
+        "displayName": "Slate Floor (visible below the horizon)",
+        "canonical": "#8e97a5"
+      },
+      "floor-deep": {
+        "role": "neutral",
+        "displayName": "Deep Floor",
+        "canonical": "#5d6676"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Slate Ink",
+        "canonical": "#10151d"
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Text Slate",
+        "canonical": "#1d2430"
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Shade Slate",
+        "canonical": "#323b49"
+      },
+      "text-dim": {
+        "role": "neutral",
+        "displayName": "Dim Text",
+        "canonical": "#3b4452"
+      },
+      "text-faint": {
+        "role": "neutral",
+        "displayName": "Faint Text",
+        "canonical": "#4d5665"
+      },
+      "text-ghost": {
+        "role": "neutral",
+        "displayName": "Ghost (decorative only)",
+        "canonical": "rgb(16 21 29 / 0.26)"
+      },
+      "glint": {
+        "role": "neutral",
+        "displayName": "Glint (light, never text)",
+        "canonical": "#ffffff"
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "rgb(16 21 29 / 0.12)"
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline",
+        "canonical": "rgb(16 21 29 / 0.24)"
+      },
+      "glass": {
+        "role": "neutral",
+        "displayName": "Frost",
+        "canonical": "rgb(244 246 249 / 0.48)"
+      },
+      "glass-hi": {
+        "role": "neutral",
+        "displayName": "Bright Frost",
+        "canonical": "rgb(248 250 252 / 0.72)"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headline only; uppercase, second line in accent."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Email CTA and stat values."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Dossier titles; thaw lead and surface prompt at weight 400."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Archive titles, strata labels, social selector names, hero tagline."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Prose, capped at 60-62ch."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Blurbs, chips, nav links, captions."
+      },
+      "label": {
+        "displayName": "Mono label",
+        "purpose": "Measurements, handles, codenames, readouts. Never status, prompts or prose."
+      },
+      "cue": {
+        "displayName": "Cue",
+        "purpose": "Sans 500 interface prompts and status: nav role line, availability pill, scroll and explore cues, footer line. ink-3 where it sits on the floor."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-accent",
+        "value": "0 0 0 1px rgb(28 90 128 / 0.22), 0 8px 24px -8px rgb(28 90 128 / 0.32)",
+        "purpose": "Hover halo on the brand mark and status pill."
+      },
+      {
+        "name": "shadow-soft",
+        "value": "0 16px 48px -16px rgb(29 36 48 / 0.34)",
+        "purpose": "The dossier overlay panel."
+      },
+      {
+        "name": "blur-glass",
+        "value": "blur(20px) saturate(120%)",
+        "purpose": "Frost backdrop for pills, chips, cards, condensed nav, dossier."
+      }
+    ],
+    "motion": [
+      {
+        "name": "d-fast",
+        "value": "0.24s",
+        "purpose": "Hover colour and border changes."
+      },
+      {
+        "name": "d-base",
+        "value": "0.48s",
+        "purpose": "State changes, rail labels, selector colour."
+      },
+      {
+        "name": "d-slow",
+        "value": "0.96s",
+        "purpose": "Leader-line extension."
+      },
+      {
+        "name": "e-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Default easing; equals GSAP EASE.token."
+      },
+      {
+        "name": "e-in-out",
+        "value": "cubic-bezier(0.76, 0, 0.24, 1)",
+        "purpose": "Looping ambient animations (pulse, scroll-hint bead)."
+      },
+      {
+        "name": "reveal",
+        "value": "SplitText line mask, yPercent 118, expo.out, once",
+        "purpose": "Text entrances."
+      },
+      {
+        "name": "stage-snap",
+        "value": "scrub 0.6, snap 1/steps, 0.25-0.7s, power2.inOut",
+        "purpose": "Socials stage walking marks."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "720px"
+      },
+      {
+        "name": "two-column",
+        "value": "900px"
+      },
+      {
+        "name": "nav-links",
+        "value": "1080px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Top navigation link with mono index.",
+      "html": "<a class=\"ds-nav-link\" href=\"#\"><span class=\"ds-nav-index\">02</span><span>Archive</span></a>",
+      "css": ".ds-nav-link { display: inline-flex; align-items: baseline; gap: var(--s-1); padding: var(--s-1) var(--s-2); border-radius: var(--r-full); color: var(--c-text-dim); font-size: var(--t-sm); letter-spacing: var(--ls-snug); text-decoration: none; transition: color var(--d-fast) var(--e-out), background-color var(--d-fast) var(--e-out); } .ds-nav-index { font-family: var(--font-mono); font-size: var(--t-mono); letter-spacing: var(--ls-mono); color: var(--c-text-faint); } .ds-nav-link:hover { color: var(--c-text); background: rgb(16 21 29 / 0.05); } .ds-nav-link:hover .ds-nav-index { color: var(--c-accent); } .ds-nav-link:focus-visible { outline: 2px solid var(--c-accent); outline-offset: var(--s-opt); }"
+    },
+    {
+      "name": "Status Pill",
+      "kind": "button",
+      "refersTo": "status-pill",
+      "description": "Frosted availability pill with accent pulse.",
+      "html": "<a class=\"ds-status\" href=\"#\"><span class=\"ds-pulse\"></span><span class=\"ds-cue\">Available</span></a>",
+      "css": ".ds-status { display: inline-flex; align-items: center; gap: var(--s-1); padding: var(--s-1) var(--s-2); border: 1px solid var(--c-line); border-radius: var(--r-full); background: var(--c-glass); backdrop-filter: var(--blur-glass); text-decoration: none; transition: border-color var(--d-fast) var(--e-out), box-shadow var(--d-fast) var(--e-out); } .ds-status:hover { border-color: var(--c-accent); box-shadow: var(--shadow-accent); } .ds-status:focus-visible { outline: 2px solid var(--c-accent); outline-offset: var(--s-opt); } .ds-pulse { width: var(--s-1); height: var(--s-1); border-radius: var(--r-full); background: var(--c-accent); } .ds-cue { font-family: var(--font-sans); font-size: var(--t-sm); font-weight: 500; letter-spacing: 0.02em; color: var(--c-text-faint); }"
+    },
+    {
+      "name": "Skill Chip",
+      "kind": "chip",
+      "refersTo": "skill-chip",
+      "description": "Frosted pill chip in the strata bands.",
+      "html": "<span class=\"ds-chip\">Rust</span>",
+      "css": ".ds-chip { display: inline-block; padding: var(--s-1) var(--s-2); border: 1px solid var(--c-line); border-radius: var(--r-full); background: var(--c-glass); backdrop-filter: var(--blur-glass); font-size: var(--t-sm); letter-spacing: var(--ls-snug); color: var(--c-text-dim); transition: color var(--d-fast) var(--e-out), border-color var(--d-fast) var(--e-out), transform var(--d-fast) var(--e-out); } .ds-chip:hover { color: var(--c-ink); border-color: var(--c-accent); transform: translateY(-2px); }"
+    },
+    {
+      "name": "Stack Tag",
+      "kind": "chip",
+      "refersTo": "stack-tag",
+      "description": "Mono hairline tag for project stacks.",
+      "html": "<span class=\"ds-tag\">WebSocket</span>",
+      "css": ".ds-tag { display: inline-block; padding: var(--s-opt) var(--s-1); border: 1px solid var(--c-line); border-radius: var(--r-sm); font-family: var(--font-mono); font-size: var(--t-mono); letter-spacing: 0.06em; color: var(--c-text-faint); }"
+    },
+    {
+      "name": "Archive Card",
+      "kind": "card",
+      "refersTo": "archive-card",
+      "description": "Compact frosted project card below 900px.",
+      "html": "<button class=\"ds-card\"><span class=\"ds-card-code\">PROJECT 01</span><span class=\"ds-card-title\">Market Making Engine</span><span class=\"ds-card-blurb\">Rust order book and matching engine.</span></button>",
+      "css": ".ds-card { display: flex; flex-direction: column; gap: var(--s-2); width: 100%; text-align: left; padding: var(--s-3); border: 1px solid var(--c-line); border-radius: var(--r-lg); background: var(--c-glass); backdrop-filter: var(--blur-glass); cursor: pointer; font: inherit; transition: border-color var(--d-base) var(--e-out), background-color var(--d-base) var(--e-out); } .ds-card:hover { border-color: var(--c-accent); background: var(--c-glass-hi); } .ds-card:focus-visible { outline: 2px solid var(--c-accent); outline-offset: var(--s-opt); } .ds-card-code { font-family: var(--font-mono); font-size: var(--t-mono); letter-spacing: var(--ls-mono); color: var(--c-accent-2); } .ds-card-title { font-size: var(--t-lead); line-height: var(--lh-snug); letter-spacing: var(--ls-snug); font-weight: 600; color: var(--c-ink); } .ds-card-blurb { font-size: var(--t-sm); line-height: var(--lh-body); color: var(--c-text-dim); }"
+    },
+    {
+      "name": "Dossier Panel",
+      "kind": "card",
+      "refersTo": "dossier-panel",
+      "description": "Glass overlay panel for project detail.",
+      "html": "<div class=\"ds-dossier\"><h3 class=\"ds-dossier-title\">Market Making Engine</h3><p class=\"ds-dossier-blurb\">Order book, matching engine and risk in one process.</p></div>",
+      "css": ".ds-dossier { display: flex; flex-direction: column; gap: var(--s-4); padding: var(--s-5); background: linear-gradient(180deg, var(--c-glass-hi), rgb(236 239 243 / 0.84)); backdrop-filter: var(--blur-glass); border: 1px solid var(--c-line-strong); border-radius: var(--r-lg); box-shadow: var(--shadow-soft); } .ds-dossier-title { font-size: var(--t-h3); line-height: var(--lh-snug); letter-spacing: var(--ls-tight); font-weight: 600; color: var(--c-ink); margin: 0; } .ds-dossier-blurb { font-size: var(--t-sm); line-height: var(--lh-body); color: var(--c-text-dim); margin: 0; }"
+    },
+    {
+      "name": "Social Selector",
+      "kind": "custom",
+      "refersTo": "social-selector-link",
+      "description": "Stage selector row with corner brackets on the active name; mono accent handle when linked, faint plain mono when not.",
+      "html": "<div class=\"ds-sel\"><div class=\"ds-sel-row\"><a class=\"ds-sel-link ds-sel-active\" href=\"#\">GitHub</a><a class=\"ds-sel-link\" href=\"#\">LinkedIn</a><a class=\"ds-sel-link\" href=\"#\">X</a><a class=\"ds-sel-link\" href=\"#\">Email</a></div><a class=\"ds-handle\" href=\"#\">snehilms@gmail.com <svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"M4 12L12 4M6 4h6v6\"/></svg></a></div>",
+      "css": ".ds-sel { display: flex; flex-direction: column; align-items: center; gap: var(--s-2); } .ds-sel-row { display: flex; gap: var(--s-3); } .ds-sel-link { position: relative; padding: var(--s-1) var(--s-3); font-size: var(--t-lead); font-weight: 500; letter-spacing: var(--ls-snug); color: var(--c-text-faint); text-decoration: none; transition: color var(--d-base) var(--e-out); } .ds-sel-link:hover, .ds-sel-active { color: var(--c-ink); } .ds-sel-active::before, .ds-sel-active::after { content: ''; position: absolute; top: 0; bottom: 0; width: var(--s-2); border: 0 solid var(--c-ink); } .ds-sel-active::before { left: 0; border-top-width: 1.5px; border-bottom-width: 1.5px; border-left-width: 1.5px; } .ds-sel-active::after { right: 0; border-top-width: 1.5px; border-bottom-width: 1.5px; border-right-width: 1.5px; } .ds-sel-link:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 0; } .ds-handle { display: inline-flex; align-items: center; gap: var(--s-1); font-family: var(--font-mono); font-size: var(--t-sm); letter-spacing: 0.04em; color: var(--c-accent); text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 0.3em; transition: text-decoration-color var(--d-base) var(--e-out); } .ds-handle:hover { text-decoration-color: currentColor; } .ds-handle-unlinked { font-family: var(--font-mono); font-size: var(--t-sm); letter-spacing: 0.04em; color: var(--c-text-faint); }"
+    },
+    {
+      "name": "Email CTA",
+      "kind": "button",
+      "refersTo": "email-cta",
+      "description": "Headline-size email link with a drawn accent underline.",
+      "html": "<a class=\"ds-email\" href=\"#\">snehilms@gmail.com</a>",
+      "css": ".ds-email { display: inline-block; font-size: var(--t-h2); line-height: var(--lh-tight); letter-spacing: var(--ls-tight); font-weight: 600; color: var(--c-ink); text-decoration: none; background-image: linear-gradient(90deg, var(--c-accent), var(--c-accent)); background-repeat: no-repeat; background-size: 0% 1px; background-position: left 88%; transition: background-size var(--d-base) var(--e-out), color var(--d-base) var(--e-out); } .ds-email:hover { background-size: 100% 1px; color: var(--c-accent); } .ds-email:focus-visible { outline: 2px solid var(--c-accent); outline-offset: var(--s-opt); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Glacier Laboratory in Fog",
+    "overview": "The whole site happens inside one pale, cold chamber lit from overhead: brightest under the ceiling, a white horizon band where the light pools, then a slate floor falling away below. Every artefact in it is a solid. The particle field and the social marks are built from opaque, lit beads of rime; the archive crystals are frosted ice glass with dark slate cores and a frozen ink network. Nothing glows on black. Things read by value against fog, and distance folds them back into the fog colour.\n\nThe DOM is quiet instrumentation laid over that room. Type is the system sans, set large, uppercase only for the hero headline, and calm everywhere else; short interface cues (role line, availability, scroll and explore prompts, footer line) are a quiet medium-weight sans, and mono is reserved strictly for measurements, handles, codenames and readouts. Surfaces are transparent so the canvas stays the background at all times; legibility comes from more fog (a directional haze scrim), not from opaque panels. One glacial-ink accent means \"act here\". White is used as light (rings, rims, glints, the horizon), never as a text colour.\n\nMotion is continuous, never cut: entrances rise out of line masks once, continuous elements scrub with scroll, and the signature socials stage pins, walks four marks with snap, and tears each mark apart and re-forms it into the next.",
+    "keyCharacteristics": [
+      "Pale fog ground (`ground`) ramping from bright haze to a slate floor; dark-first was replaced, not tinted.",
+      "Opaque lit beads whose \"opacity\" is spent as density, never translucency.",
+      "Frosted ice glass with slate cores and dark inner networks, normal blending only.",
+      "One accent family (glacial ink blue), with white reserved for light.",
+      "System sans, large and quiet; a medium-weight sans cue for interface prompts; mono only for data.",
+      "Hard 8px spacing grid, CSS-module components on a `:root` token layer."
+    ],
+    "rules": [
+      {
+        "name": "The Light Is Not Ink Rule",
+        "body": "`glint` white is for rings, rims, glints, wireframes and the horizon. It never sets text; text on fog is always slate or accent.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Accent Rule",
+        "body": "Glacial Ink and its siblings are the only hue. accent-3 and accent-4 are fills; if it is readable text, it is accent or accent-2.",
+        "section": "colors"
+      },
+      {
+        "name": "The Fog-Measured Rule",
+        "body": "Any text colour must clear 4.5:1 against `ground` (the measured mid band). `text-faint` is the floor; `text-ghost` never carries meaning.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mono Is Data Rule",
+        "body": "Mono sets measurements, handles, codenames and readouts only. Status, prompts and calls to action are cues in sans; mono never sets prose, headings or labels that merely name a section.",
+        "section": "typography"
+      },
+      {
+        "name": "The Quiet Scale Rule",
+        "body": "Only the hero headline is uppercase. Everything else is sentence case carried by size and weight.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Additive Light Rule",
+        "body": "No additive blending anywhere. In a pale room additive light washes to white; every material uses normal blending or opaque, depth-written fragments.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Density Not Translucency Rule",
+        "body": "Beads fade by dropping out, never by going translucent. A thinner cloud is fewer solid beads.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Fog Is the Scrim Rule",
+        "body": "Legibility over the canvas comes from haze in the fog colour, not from opaque panels or dark overlays.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do resolve every colour, space, radius, duration and easing to a `:root` token; canvas materials read them through `cssColor('--c-…')`.",
+      "Do measure text contrast against `ground`: ink 14.0:1, body text 11.9:1, dim 7.5:1, faint 5.6:1, accent 5.7:1.",
+      "Do spend bead opacity as density: discard beads, keep the survivors fully solid and depth-written.",
+      "Do use white only as light: rings, rims, glints, the dome wireframe, the horizon band.",
+      "Do keep sections transparent and earn legibility with fog-coloured haze over the reading column.",
+      "Do animate transform and opacity only, and declare `will-change` on anything GSAP moves.",
+      "Do make every mark change on the stage a tear and re-form of the same beads.",
+      "Do give reduced-motion users the final state: no pin, no scrub, instant changes."
+    ],
+    "donts": [
+      "Don't use additive blending anywhere, on beads, glass, rings or post.",
+      "Don't fade beads by translucency; translucent beads read as smudges.",
+      "Don't set text in `glint` white, `accent-3`, `accent-4`, `floor` or `text-ghost`.",
+      "Don't return to dark-mode neon: no glow-on-black, no neon gradients on type. A colour shift reads as emphasis in fog; a gradient on text reads as a rendering fault.",
+      "Sora + JetBrains Mono only (owner's call); don't add other faces.",
+      "Don't use `s-opt` (4px) for layout spacing.",
+      "Don't use hard offset shadows; the only shadows are the two soft, tinted ones above.",
+      "Don't set status, prompts or calls to action in mono; they are sans cues.",
+      "Don't style a destination-less handle as a link.",
+      "Don't let the canvas take pointer events; interaction belongs to real DOM elements."
+    ]
+  }
+}

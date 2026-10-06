@@ -9,6 +9,7 @@ import { VELOCITY_SHADER, POSITION_SHADER, POINTS_VERTEX, POINTS_FRAGMENT } from
 import { buildTargets, initialPositions, cloudToTexture } from './gpgpu/targets';
 import { scrollState, damp, clamp01 } from '@/lib/scrollState';
 import { identity } from '@/config/content';
+import { cssColor } from './Atmosphere';
 
 /* ============================================================================
    PARTICLE FIELD
@@ -22,11 +23,6 @@ import { identity } from '@/config/content';
    uniform write.
    ========================================================================= */
 
-const PALETTE = {
-  core: new THREE.Color('#f4fbff'), // --c-ice-100
-  edge: new THREE.Color('#4fb6e8'), // --c-ice-500
-  hot: new THREE.Color('#7fd4ff'), // --c-ice-400
-};
 
 /* ----------------------------------------------------------------------
    ART DIRECTION, per chapter.
@@ -42,14 +38,18 @@ const ART = [
   // yaw is the AMPLITUDE of a bounded oscillation, in radians — never a rate.
   // Chapter 01 is the initials: a flat glyph plane that must face the camera,
   // so its amplitude is zero. Anything else turns the letterforms edge-on.
-  { offsetX: 1.05, offsetY: 0.0, offsetZ: 0.0, opacity: 1.0, size: 2.7, yaw: 0.34 }, // 00 signal
-  { offsetX: 2.35, offsetY: 0.1, offsetZ: -1.2, opacity: 0.42, size: 2.2, yaw: 0.0 }, // 01 thaw
+  // Lifted clear of the meta row at the hero's foot: solid beads under small
+  // type fail contrast where soft glow never did.
+  // Back 2.6 into the fog and right: the shell then sits between the header
+  // rule and the meta row, clear of the caption and the headline's last line.
+  { offsetX: 2.95, offsetY: 0.0, offsetZ: -2.6, opacity: 1.0, size: 2.7, yaw: 0.34 }, // 00 intro
+  { offsetX: 2.35, offsetY: 0.1, offsetZ: -1.2, opacity: 0.42, size: 2.2, yaw: 0.0 }, // 01 experience
   // The archive belongs to the shards. The field retreats in depth as well
   // as in opacity — pushing it back lets the depth fog finish the job, so it
   // reads as weather behind the crystals instead of a veil over them.
-  { offsetX: 0.0, offsetY: 0.0, offsetZ: -4.2, opacity: 0.20, size: 1.8, yaw: 0.16 }, // 02 archive
-  { offsetX: 2.15, offsetY: 0.0, offsetZ: -1.2, opacity: 0.4, size: 2.1, yaw: 0.1 }, // 03 strata
-  { offsetX: 0.0, offsetY: -0.45, offsetZ: 0.0, opacity: 0.95, size: 2.7, yaw: 0.28 }, // 04 surface
+  { offsetX: 0.0, offsetY: 0.0, offsetZ: -4.2, opacity: 0.20, size: 1.8, yaw: 0.16 }, // 02 projects
+  { offsetX: 2.15, offsetY: 0.0, offsetZ: -1.2, opacity: 0.4, size: 2.1, yaw: 0.1 }, // 03 stack
+  { offsetX: 0.0, offsetY: -0.45, offsetZ: 0.0, opacity: 0.95, size: 2.7, yaw: 0.28 }, // 04 contact
 ] as const;
 
 function lerp(a: number, b: number, t: number) {
@@ -69,6 +69,7 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
   const revealRef = useRef(0);
   const pointerWorld = useRef(new THREE.Vector3(0, 0, 0));
   const dispersionRef = useRef(0);
+  const stageRef = useRef(0);
 
   /* --- Build the simulation once ------------------------------------- */
   const sim = useMemo(() => {
@@ -133,8 +134,8 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
       refs[i * 2 + 1] = (Math.floor(i / simSize) + 0.5) / simSize;
 
       seeds[i] = Math.random();
-      // Heavy tail: most particles are dust, a few are visibly larger shards.
-      scales[i] = 0.55 + Math.pow(Math.random(), 3.2) * 2.1;
+      // A short tail: beads vary, but none grows into a marble.
+      scales[i] = 0.75 + Math.pow(Math.random(), 3.2) * 0.9;
     }
 
     // Positions are read from the simulation texture, but three still needs
@@ -174,23 +175,21 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
              camera, which is exactly where the intro cloud starts and
              nowhere the settled formations ever reach: the hero sphere's
              nearest point sits around 6.7 units out. */
-          uMaxSize: { value: 14 },
+          uMaxSize: { value: 9 },
           uNearFade: { value: 5.2 },
-          uColorCore: { value: PALETTE.core },
-          uColorEdge: { value: PALETTE.edge },
-          uColorHot: { value: PALETTE.hot },
-          uFogNear: { value: 6 },
-          uFogFar: { value: 19 },
+          uColorLit: { value: cssColor('--c-fog-lo', '#c9cfd8') },
+          uColorShade: { value: cssColor('--c-ink-3', '#323b49') },
+          uColorHot: { value: cssColor('--c-accent-3', '#6f9fc2') },
+          uFogColor: { value: cssColor('--c-ground', '#dde1e7') },
+          uFogNear: { value: 8 },
+          uFogFar: { value: 24 },
         },
-        transparent: true,
-        depthWrite: false,
-        /* Depth TESTED but not written. The field still draws over the
-           atmosphere (which writes no depth), while solid geometry in front
-           of it — the crystal shards — correctly occludes it. With testing
-           off, 65k additive points painted straight over the glass and no
-           amount of material tuning could make a shard look solid. */
+        /* Opaque beads in the opaque pass, depth written. Three draws the
+           opaque list before any transparent object, so the glass shards are
+           composited over beads that are already correctly depth-sorted. */
+        transparent: false,
+        depthWrite: true,
         depthTest: true,
-        blending: THREE.AdditiveBlending,
       }),
     [],
   );
@@ -262,10 +261,16 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
     const b = ART[index + 1];
     const artOffsetX = lerp(a.offsetX, b.offsetX, mix);
     const artOffsetY = lerp(a.offsetY, b.offsetY, mix);
-    const artOffsetZ = lerp(a.offsetZ, b.offsetZ, mix);
+    /* Portrait screens: text spans the full width, so the field moves back
+       into the fog and thins out rather than sitting solid under type. */
+    const portrait = viewport.width < viewport.height;
+    const artOffsetZ = lerp(a.offsetZ, b.offsetZ, mix) + (portrait ? -3.2 : 0);
     const artYaw = lerp(a.yaw, b.yaw, mix);
 
-    material.uniforms.uOpacity.value = lerp(a.opacity, b.opacity, mix);
+    // The socials stage is its own room: the field leaves it entirely.
+    stageRef.current = damp(stageRef.current, scrollState.stage, 3, dt);
+    material.uniforms.uOpacity.value =
+      lerp(a.opacity, b.opacity, mix) * (1 - stageRef.current) * (portrait ? 0.6 : 1);
     material.uniforms.uSize.value = lerp(a.size, b.size, mix);
 
     /* Mid-transition, loosen the springs and raise turbulence. The form has

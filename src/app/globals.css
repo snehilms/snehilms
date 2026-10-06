@@ -5,39 +5,47 @@
    ========================================================================= */
 
 :root {
-  /* --- Ground: the frozen void -------------------------------------- */
-  --c-void:        #05070f;
-  --c-deep:        #070b16;
-  --c-abyss:       #0a1222;
-  --c-shelf:       #101b30;
-  --c-rime:        #16243d;
+  /* --- Ground: a lit chamber of cold fog --------------------------- */
+  /* The page is the inside of the fog: brightest overhead, settling into
+     a slate floor. Text sits on the mid band, where contrast was measured. */
+  --c-fog-hi:      #eceff3;
+  --c-ground:      #dde1e7;
+  --c-fog-lo:      #c9cfd8;
+  --c-floor:       #8e97a5;
+  --c-floor-deep:  #5d6676;
+  /* The socials stage's dimmer room tone (see Atmosphere). */
+  --c-room:        #9ea8b6;
 
-  /* --- Ice: the light that survives the cold ------------------------ */
-  --c-ice-100:     #f4fbff;
-  --c-ice-200:     #e8f4ff;
-  --c-ice-300:     #bfe2f7;
-  --c-ice-400:     #7fd4ff;
-  --c-ice-500:     #4fb6e8;
-  --c-ice-600:     #2a7fa8;
+  /* --- Ink: slate, from strongest to quietest ----------------------- */
+  --c-ink:         #10151d;
+  --c-ink-2:       #1d2430;
+  --c-ink-3:       #323b49;
 
-  /* --- Semantic text ----------------------------------------------- */
-  --c-text:        var(--c-ice-200);
-  --c-text-dim:    rgb(232 244 255 / 0.58);
-  --c-text-faint:  rgb(232 244 255 / 0.34);
-  --c-text-ghost:  rgb(232 244 255 / 0.14);
+  /* --- Glacial accent: the one colour that means "act here" --------- */
+  --c-accent:      #1c5a80;
+  --c-accent-2:    #24608a;
+  --c-accent-3:    #6f9fc2;
+  --c-accent-4:    #a9c6db;
+  /* Light, not colour: rings, rims and glints. Never for text. */
+  --c-glint:       #ffffff;
 
-  /* --- Glass + hairlines ------------------------------------------- */
-  --c-line:        rgb(191 226 247 / 0.10);
-  --c-line-strong: rgb(191 226 247 / 0.22);
-  --c-glass:       rgb(16 27 48 / 0.34);
-  --c-glass-hi:    rgb(22 36 61 / 0.56);
-  --blur-glass:    blur(20px) saturate(140%);
+  /* --- Semantic text (contrast on --c-ground: 11.9 / 7.5 / 5.6) ------ */
+  --c-text:        var(--c-ink-2);
+  --c-text-dim:    #3b4452;
+  --c-text-faint:  #4d5665;
+  --c-text-ghost:  rgb(16 21 29 / 0.26);
 
-  /* --- Glow --------------------------------------------------------- */
-  --glow-ice:      0 0 0 1px rgb(127 212 255 / 0.18),
-                   0 0 24px -4px rgb(127 212 255 / 0.28),
-                   0 0 64px -12px rgb(79 182 232 / 0.22);
-  --glow-soft:     0 8px 32px -8px rgb(5 7 15 / 0.8);
+  /* --- Frost + hairlines -------------------------------------------- */
+  --c-line:        rgb(16 21 29 / 0.12);
+  --c-line-strong: rgb(16 21 29 / 0.24);
+  --c-glass:       rgb(244 246 249 / 0.48);
+  --c-glass-hi:    rgb(248 250 252 / 0.72);
+  --blur-glass:    blur(20px) saturate(120%);
+
+  /* --- Elevation: offset, soft, tinted from the slate --------------- */
+  --shadow-accent: 0 0 0 1px rgb(28 90 128 / 0.22),
+                   0 8px 24px -8px rgb(28 90 128 / 0.32);
+  --shadow-soft:   0 16px 48px -16px rgb(29 36 48 / 0.34);
 
   /* --- Space: hard 8px grid. No value off this ladder. -------------- */
   --s-0:   0px;
@@ -63,11 +71,11 @@
   --r-lg:   24px;
   --r-full: 999px;
 
-  /* --- Typography: modern system stack ------------------------------ */
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-               'Helvetica Neue', Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
-               'Liberation Mono', monospace;
+  /* --- Typography: Sora + JetBrains Mono (self-hosted, layout.tsx) ---- */
+  --font-sans: var(--font-sora), -apple-system, BlinkMacSystemFont, 'Segoe UI',
+               Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, 'SF Mono',
+               Menlo, Consolas, 'Liberation Mono', monospace;
 
   /* Fluid scale — 320px → 1600px viewport */
   --t-mono:    clamp(0.6875rem, 0.66rem + 0.14vw, 0.75rem);
@@ -128,7 +136,7 @@ body {
   font-size: var(--t-body);
   line-height: var(--lh-body);
   color: var(--c-text);
-  background-color: var(--c-void);
+  background-color: var(--c-ground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -143,11 +151,14 @@ a { color: inherit; text-decoration: none; }
 ul, ol { list-style: none; }
 
 ::selection {
-  background: var(--c-ice-400);
-  color: var(--c-void);
+  background: var(--c-accent);
+  color: var(--c-fog-hi);
 }
 
-/* Hide native scrollbar — the rail is the scroll indicator */
+/* The caret is part of the world too. */
+html { caret-color: var(--c-accent); }
+
+/* Native scrollbar hidden — the chapter rail is the scroll indicator */
 ::-webkit-scrollbar { width: 0; height: 0; }
 html { scrollbar-width: none; }
 
@@ -169,6 +180,14 @@ html { scrollbar-width: none; }
   text-transform: uppercase;
   color: var(--c-text-faint);
   font-weight: 500;
+}
+
+.u-cue {
+  font-family: var(--font-sans);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--c-text-faint);
 }
 
 .u-glass {
@@ -194,16 +213,26 @@ html { scrollbar-width: none; }
    CURSOR
 
    The OS cursor is suppressed only where the custom one actually renders:
-   a fine pointer, hover capability, and no reduced-motion preference.
+   a fine pointer, hover capability, and motion not reduced — by the OS
+   or by the visitor's choice (html[data-motion], see lib/motionPref.ts).
    This lives in the global sheet because CSS Modules cannot own a selector
    with no local class in it.
    ========================================================================= */
 
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  body,
-  a,
-  button,
-  [data-cursor='hover'] {
+  :root:not([data-motion='reduced']) body,
+  :root:not([data-motion='reduced']) a,
+  :root:not([data-motion='reduced']) button,
+  :root:not([data-motion='reduced']) [data-cursor='hover'] {
+    cursor: none;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :root[data-motion='full'] body,
+  :root[data-motion='full'] a,
+  :root[data-motion='full'] button,
+  :root[data-motion='full'] [data-cursor='hover'] {
     cursor: none;
   }
 }
@@ -222,17 +251,26 @@ html { scrollbar-width: none; }
 }
 
 :focus-visible {
-  outline: 2px solid var(--c-ice-400);
+  outline: 2px solid var(--c-accent);
   outline-offset: var(--s-opt);
   border-radius: var(--r-sm);
 }
 
+/* Reduced motion: by the OS (unless the visitor chose full), or by choice. */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  :root:not([data-motion='full']) *,
+  :root:not([data-motion='full']) *::before,
+  :root:not([data-motion='full']) *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+:root[data-motion='reduced'] *,
+:root[data-motion='reduced'] *::before,
+:root[data-motion='reduced'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
 }

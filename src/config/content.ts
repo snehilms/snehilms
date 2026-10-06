@@ -84,50 +84,55 @@ export const identity = {
     'Software engineer working across low-latency systems, real-time data, and interfaces that have no right to feel this smooth.',
   location: 'Remote · IST (UTC+5:30)',
   availability: 'Open to select work — 2026',
-  email: 'hello@example.com',
+  email: 'snehilms@gmail.com',
 } as const;
 
 /* The narrative spine. Each chapter owns a slice of global scroll progress
    and a morph target for the particle field. Order here IS page order. */
 export const chapters = [
   {
-    id: 'signal',
+    id: 'intro',
     index: '00',
-    kicker: 'SIGNAL',
-    title: 'Signal',
-    caption: 'Something is still transmitting under the ice.',
+    kicker: 'INTRO',
+    title: 'Intro',
+    caption: 'Low-latency systems and the interfaces on top.',
   },
   {
-    id: 'thaw',
+    id: 'experience',
     index: '01',
-    kicker: 'THAW',
-    title: 'Thaw',
-    caption: 'The first layer gives. A shape resolves.',
+    kicker: 'EXPERIENCE',
+    title: 'Experience',
+    caption: 'Exchanges, schedulers, realtime data: what I have built and scaled.',
   },
   {
-    id: 'archive',
+    id: 'projects',
     index: '02',
-    kicker: 'THE ARCHIVE',
-    title: 'The Archive',
-    caption: 'Three systems, recovered intact. Open one.',
+    kicker: 'PROJECTS',
+    title: 'Projects',
+    caption: 'Three systems, end to end. Open one for its architecture.',
   },
   {
-    id: 'strata',
+    id: 'stack',
     index: '03',
-    kicker: 'STRATA',
-    title: 'Strata',
-    caption: 'Cut down through the layers. Read the record.',
+    kicker: 'STACK',
+    title: 'Stack',
+    caption: 'The tools I reach for, from the interface down to the platform.',
   },
   {
-    id: 'surface',
+    id: 'contact',
     index: '04',
-    kicker: 'SURFACE',
-    title: 'Surface',
-    caption: 'Back up through the shelf. Open channel.',
+    kicker: 'CONTACT',
+    title: 'Contact',
+    caption: 'Email is fastest. Every other channel is just below.',
   },
 ] as const;
 
 export type ChapterId = (typeof chapters)[number]['id'];
+
+/* The socials stage follows the last chapter. It is a nav destination but not
+   a chapter: chapter space drives the particle field, and the stage is its own
+   room with its own canvas. */
+export const socialsSection = { id: 'socials', index: '05', title: 'Socials' } as const;
 
 export const about = {
   lead: 'I build the unglamorous middle — the order books, the schedulers, the serialization — and then I make the surface feel effortless.',
@@ -136,12 +141,12 @@ export const about = {
     'The other half is the part people touch. I care about the 16ms budget, about motion that carries meaning instead of decoration, and about interfaces that tell you where you are without a tooltip.',
     'Across trading engines, LLM tooling and realtime multiplayer, the lesson repeats: the systems that survive are the ones that were boring on purpose in exactly the right places.',
   ],
-  /* Replace these with your own figures — they are the first thing a
-     reader checks and the easiest thing to get wrong. */
+  /* From the resume (Flint Labs, 2024–26). Verified figures only — these are
+     the first thing a reader checks. */
   stats: [
-    { value: '20%', label: 'Sim throughput gain' },
-    { value: '3', label: 'Systems shipped end to end' },
-    { value: '9+', label: 'Languages & runtimes' },
+    { value: '$25B+', label: 'Volume through the perps exchange I scaled' },
+    { value: '300K+', label: 'Traders on that exchange' },
+    { value: '−80%', label: 'Matching-engine latency' },
   ],
 } as const;
 
@@ -331,12 +336,27 @@ export const strata: Stratum[] = [
   },
 ];
 
-export const socials = [
-  { label: 'GitHub', href: 'https://github.com' },
-  { label: 'LinkedIn', href: 'https://linkedin.com' },
-  { label: 'X', href: 'https://x.com' },
-  { label: 'Email', href: `mailto:${identity.email}` },
-] as const;
+/* The socials stage. `handle` is what the stage prints under the selector.
+   An entry without `href` renders as a mark on the stage but links nowhere —
+   X stays that way until there is a real handle (add href + handle). */
+export type Social = {
+  label: string;
+  handle: string;
+  glyph: 'github' | 'linkedin' | 'x' | 'email';
+  href?: string;
+};
+
+export const socials: readonly Social[] = [
+  { label: 'GitHub', href: 'https://github.com/snehilms', handle: 'snehilms', glyph: 'github' },
+  {
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/in/snehil-s-kumar',
+    handle: 'snehil-s-kumar',
+    glyph: 'linkedin',
+  },
+  { label: 'X', handle: 'handle to come', glyph: 'x' },
+  { label: 'Email', href: `mailto:${identity.email}`, handle: identity.email, glyph: 'email' },
+];
 
 export const meta = {
   title: `${identity.name} — ${identity.role}`,

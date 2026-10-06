@@ -18,7 +18,7 @@
   font-size: var(--t-h3);
   line-height: 1.24;
   letter-spacing: var(--ls-snug);
-  color: var(--c-ice-100);
+  color: var(--c-ink);
   margin-bottom: var(--s-3);
   text-wrap: pretty;
 }
@@ -59,7 +59,7 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, var(--c-ice-500), var(--c-line) 70%, transparent);
+  background: linear-gradient(90deg, var(--c-accent-2), var(--c-line) 70%, transparent);
   transform-origin: left center;
   will-change: transform;
 }
@@ -69,7 +69,7 @@
   line-height: var(--lh-tight);
   letter-spacing: var(--ls-tight);
   font-weight: 600;
-  color: var(--c-ice-200);
+  color: var(--c-ink-2);
   font-variant-numeric: tabular-nums;
 }
 

@@ -11,3 +11,11 @@ out
 
 # Tooling scratch
 .agents
+
+# Review captures: large, regenerable, and igloo-ref holds frames of a
+# third-party site. Keep only the written audit.
+.impeccable/review/*
+!.impeccable/review/audit/
+.impeccable/review/audit/*
+!.impeccable/review/audit/REPORT.md
+.impeccable/hook.cache.json

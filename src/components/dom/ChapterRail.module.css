@@ -1,12 +1,14 @@
 .root {
   position: fixed;
   top: 50%;
-  right: var(--gutter);
+  /* In the viewport gutter, outside the content column: anchored to the
+     column it overlapped right-aligned text (stat captions, headers). */
+  right: var(--s-2);
   transform: translateY(-50%);
   z-index: var(--z-nav);
   display: flex;
   align-items: stretch;
-  gap: var(--s-2);
+  gap: var(--s-1);
   will-change: transform, opacity;
 }
 
@@ -22,7 +24,7 @@
 .fill {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, var(--c-ice-400), var(--c-ice-600));
+  background: linear-gradient(180deg, var(--c-accent), var(--c-accent-3));
   transform: scaleY(0);
   transform-origin: top center;
   will-change: transform;
@@ -38,16 +40,17 @@
 }
 
 .node {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--s-1);
-  padding-block: var(--s-opt);
+  min-height: var(--s-3); /* a usable target now the index text is gone */
   color: var(--c-text-ghost);
   transition: color var(--d-base) var(--e-out);
 }
 
 .node:hover { color: var(--c-text-dim); }
-.active { color: var(--c-ice-200); }
+.active { color: var(--c-ink-2); }
 
 .tick {
   width: var(--s-2);
@@ -59,32 +62,37 @@
 
 .active .tick {
   width: var(--s-4);
-  box-shadow: 0 0 8px var(--c-ice-400);
 }
 
-.index {
-  font-family: var(--font-mono);
-  font-size: var(--t-mono);
-  letter-spacing: var(--ls-mono);
-}
-
-/* Label is revealed by opacity + transform only — never by width, which
-   would relayout the rail on every chapter change. */
+/* The label is out of flow: laid out, the longest label ("EXPERIENCE")
+   widened the rail into the content column. It surfaces as a frosted tag on
+   the far side of the spine on hover or focus; the active chapter is marked
+   by its long tick and the nav. Revealed by opacity + transform only. */
 .label {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + var(--s-3));
+  padding: var(--s-opt) var(--s-1);
+  border-radius: var(--r-sm);
+  background: var(--c-glass-hi);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
   font-family: var(--font-mono);
   font-size: var(--t-mono);
   letter-spacing: var(--ls-mono);
+  color: var(--c-ink-2);
   white-space: nowrap;
+  pointer-events: none;
   opacity: 0;
-  transform: translateX(-8px);
+  transform: translate(var(--s-1), -50%);
   transition: opacity var(--d-base) var(--e-out), transform var(--d-base) var(--e-out);
   will-change: transform, opacity;
 }
 
-.active .label,
-.node:hover .label {
+.node:hover .label,
+.node:focus-visible .label {
   opacity: 1;
-  transform: translateX(0);
+  transform: translate(0, -50%);
 }
 
 @media (max-width: 900px) {

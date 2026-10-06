@@ -59,7 +59,7 @@
   font-family: var(--font-mono);
   font-size: var(--t-mono);
   letter-spacing: var(--ls-mono);
-  color: var(--c-ice-400);
+  color: var(--c-accent);
 }
 
 .kicker {

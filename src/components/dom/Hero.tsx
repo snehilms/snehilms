@@ -35,27 +35,33 @@ export function Hero() {
         },
         (context) => {
           const { motion } = context.conditions as { motion: boolean; reduced: boolean };
-          if (!motion) return;
+              if (!motion) return;
 
           const tl = gsap.timeline({ delay: INTRO_START });
 
-          tl.from(`.${styles.headlineLine} > span`, {
-            yPercent: 116,
-            duration: 1.35,
-            stagger: 0.09,
-            ease: 'expo.out',
-          })
-            .from(
+          /* Explicit start AND end values on every property, including y.
+             The transform cache on these elements can be re-read between
+             mount and the intro's start; a `from` tween then animates
+             yPercent home on top of a stale pixel offset and leaves the line
+             parked under its mask. Pinning both ends makes that impossible. */
+          tl.fromTo(
+            `.${styles.headlineLine} > span`,
+            { yPercent: 116, y: 0 },
+            { yPercent: 0, y: 0, duration: 1.35, stagger: 0.09, ease: 'expo.out' },
+          )
+            .fromTo(
               `.${styles.tagline}`,
-              { yPercent: 40, opacity: 0, duration: 1.1, ease: 'expo.out' },
+              { yPercent: 40, y: 0, opacity: 0 },
+              { yPercent: 0, y: 0, opacity: 1, duration: 1.1, ease: 'expo.out' },
               '-=0.95',
             )
-            .from(
+            .fromTo(
               `.${styles.metaItem}`,
-              { yPercent: 60, opacity: 0, duration: 0.9, stagger: 0.07, ease: 'expo.out' },
+              { yPercent: 60, y: 0, opacity: 0 },
+              { yPercent: 0, y: 0, opacity: 1, duration: 0.9, stagger: 0.07, ease: 'expo.out' },
               '-=0.85',
             )
-            .from(`.${styles.hint}`, { opacity: 0, duration: 0.8 }, '-=0.6');
+            .fromTo(`.${styles.hint}`, { opacity: 0 }, { opacity: 1, duration: 0.8 }, '-=0.6');
 
           /* Departure. Scrubbed, so scroll position always maps to the exact
              same frame of the exit — no catching up, no overshoot. */
@@ -117,7 +123,7 @@ export function Hero() {
       </div>
 
       <button className={styles.hint} onClick={() => scrollTo(`#${chapters[1].id}`)}>
-        <span className="u-mono">Scroll to thaw</span>
+        <span className="u-cue">Scroll to {chapters[1].title.toLowerCase()}</span>
         <span className={styles.hintTrack} aria-hidden="true">
           <span className={styles.hintBead} />
         </span>

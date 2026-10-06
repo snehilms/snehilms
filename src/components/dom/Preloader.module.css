@@ -14,7 +14,7 @@
 }
 
 .panel {
-  background: var(--c-void);
+  background: var(--c-ground);
   will-change: transform;
   transform-origin: top center;
 }
@@ -67,12 +67,15 @@
 .bar {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, var(--c-ice-600), var(--c-ice-400));
+  background: linear-gradient(90deg, var(--c-accent-3), var(--c-accent));
   transform: scaleX(0);
   transform-origin: left center;
   will-change: transform;
 }
 
+/* Reduced by the OS unless the visitor chose full motion, or by choice. */
 @media (prefers-reduced-motion: reduce) {
-  .root { display: none; }
+  :global(:root:not([data-motion='full'])) .root { display: none; }
 }
+
+:global(:root[data-motion='reduced']) .root { display: none; }

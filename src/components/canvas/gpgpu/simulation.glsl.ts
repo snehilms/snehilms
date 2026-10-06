@@ -70,6 +70,10 @@ void main() {
   vel += acceleration * uDelta;
   vel *= uDamping;
 
+  // One NaN bead is enough to black out a block of the screen: bloom's
+  // mip chain spreads it across the coarsest levels. Recover, don't carry it.
+  if (any(isnan(vel)) || any(isinf(vel))) vel = vec3(0.0);
+
   gl_FragColor = vec4(vel, velData.w);
 }
 `;
@@ -89,6 +93,10 @@ void main() {
 
   vec3 pos = posData.xyz + velData.xyz * uDelta;
 
+  // See the velocity pass: a poisoned bead restarts at the centre and
+  // springs back to its formation.
+  if (any(isnan(pos)) || any(isinf(pos))) pos = vec3(0.0);
+
   gl_FragColor = vec4(pos, posData.w);
 }
 `;
@@ -100,6 +108,19 @@ void main() {
    position attribute worth speaking of — it reads each particle's position
    out of the simulation texture using a per-vertex UV reference.
    ========================================================================= */
+
+/* --- Render pass ---------------------------------------------------------
+   Every particle is a lit bead of rime, not a point of light. The field sits
+   in a pale chamber, so it has to read by value against the fog rather than
+   by glowing on black: each sprite is shaded as a sphere under the chamber's
+   overhead key, and distance folds it into the fog colour instead of fading
+   its alpha. Beads are opaque and write depth, so they occlude each other
+   correctly without sorting.
+
+   Opacity is spent as DENSITY: a chapter at 0.3 keeps 30% of the beads, each
+   fully solid. Translucent beads read as smudges; fewer solid ones read as a
+   thinner cloud.
+   ------------------------------------------------------------------------- */
 
 export const POINTS_VERTEX = /* glsl */ `
 uniform sampler2D uPositions;
@@ -119,9 +140,11 @@ varying float vSeed;
 varying float vDepth;
 varying float vSpeed;
 varying float vNear;
+varying float vHeight;
 
 void main() {
   vec3 pos = texture2D(uPositions, aRef).xyz;
+  vHeight = (modelMatrix * vec4(pos, 1.0)).y;
   float speed = length(texture2D(uVelocities, aRef).xyz);
 
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
@@ -133,18 +156,13 @@ void main() {
   vDepth = dist;
   vSpeed = speed;
 
-  // Slow asynchronous twinkle. Frozen particulate catching a low sun.
-  float twinkle = 0.72 + 0.28 * sin(uTime * 1.4 + aSeed * 42.0);
-
-  // Fast particles stretch slightly brighter and larger — motion made visible.
-  float energy = 1.0 + clamp(speed * 1.6, 0.0, 1.2);
-
-  // Particles that drift close to the near plane would otherwise blow up
-  // into screen-filling discs. Clamp the size and fade them out instead, so
-  // they read as passing out of frame rather than as artefacts.
+  // Beads drifting at the near plane are dropped, not blown up.
   vNear = smoothstep(0.0, uNearFade, dist);
 
-  float size = uSize * aScale * twinkle * energy * uReveal * uPixelRatio * (10.0 / dist);
+  // Fast beads swell slightly: motion made visible without a glow.
+  float energy = 1.0 + clamp(speed * 0.8, 0.0, 0.5);
+
+  float size = uSize * aScale * energy * uReveal * uPixelRatio * (10.0 / dist);
   gl_PointSize = min(size, uMaxSize * uPixelRatio);
 }
 `;
@@ -152,9 +170,10 @@ void main() {
 export const POINTS_FRAGMENT = /* glsl */ `
 precision highp float;
 
-uniform vec3  uColorCore;
-uniform vec3  uColorEdge;
+uniform vec3  uColorLit;
+uniform vec3  uColorShade;
 uniform vec3  uColorHot;
+uniform vec3  uFogColor;
 uniform float uOpacity;
 uniform float uFogNear;
 uniform float uFogFar;
@@ -163,22 +182,37 @@ varying float vSeed;
 varying float vDepth;
 varying float vSpeed;
 varying float vNear;
+varying float vHeight;
 
 void main() {
-  // Round the point sprite and build a soft radial falloff.
-  vec2 c = gl_PointCoord - 0.5;
-  float d2 = dot(c, c);
-  if (d2 > 0.25) discard;
+  // Density, not translucency — see the block comment above.
+  if (vSeed > uOpacity) discard;
+  if (vNear < fract(vSeed * 7.13)) discard;
 
-  float alpha = smoothstep(0.25, 0.0, d2);
-  alpha = pow(alpha, 1.7);
+  vec2 c = gl_PointCoord * 2.0 - 1.0;
+  c.y = -c.y;
+  float r2 = dot(c, c);
+  if (r2 > 1.0) discard;
 
-  vec3 color = mix(uColorEdge, uColorCore, alpha);
-  color = mix(color, uColorHot, clamp(vSpeed * 1.9, 0.0, 1.0));
+  vec3 n = vec3(c, sqrt(1.0 - r2));
+  vec3 L = normalize(vec3(-0.35, 0.8, 0.5));
+  float diffuse = max(dot(n, L), 0.0) * 0.88 + 0.12;
+  float spec = pow(max(dot(reflect(-L, n), vec3(0.0, 0.0, 1.0)), 0.0), 26.0);
 
-  // Depth fog folds the far field into the void instead of ending abruptly.
-  float fog = 1.0 - smoothstep(uFogNear, uFogFar, vDepth);
+  vec3 color = mix(uColorShade, uColorLit, diffuse) + spec * 0.22;
 
-  gl_FragColor = vec4(color, alpha * uOpacity * fog * vNear);
+  // Overhead light: the chamber is lit from above, so the top of any
+  // formation is brighter than its underside.
+  color *= mix(0.78, 1.06, smoothstep(-3.0, 3.0, vHeight));
+
+  // Beads in fast motion catch a glacial tint.
+  color = mix(color, uColorHot, clamp(vSpeed * 0.9, 0.0, 0.55));
+
+  // Atmospheric perspective: far beads dissolve into the chamber's fog.
+  float fog = smoothstep(uFogNear, uFogFar, vDepth);
+  color = mix(color, uFogColor, fog * 0.75);
+
+  gl_FragColor = vec4(color, 1.0);
+  #include <colorspace_fragment>
 }
 `;

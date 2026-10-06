@@ -31,7 +31,9 @@ function detect(): DeviceProfile {
 
   let tier: DeviceTier = 'high';
   if (narrow || isTouch || cores <= 4 || mem <= 4) tier = 'mid';
-  if (cores <= 2 || mem <= 2 || reducedMotion) tier = 'low';
+  // Reduced motion is a preference about movement, not a hardware signal:
+  // it must never cost the visitor resolution, bead count or post.
+  if (cores <= 2 || mem <= 2) tier = 'low';
 
   return { ...PROFILES[tier], reducedMotion, isTouch };
 }

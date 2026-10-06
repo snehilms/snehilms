@@ -58,6 +58,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
   /* Global progress probe. Writes straight into the mutable store —
      zero React renders, readable from useFrame at 60fps. */
   useEffect(() => {
+    let lastUpdate = 0;
     const st = ScrollTrigger.create({
       trigger: document.documentElement,
       start: 0,
@@ -65,14 +66,26 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       onUpdate: (self) => {
         scrollState.progress = self.progress;
         scrollState.velocity = gsap.utils.clamp(-1, 1, self.getVelocity() / 3000);
+        lastUpdate = performance.now();
       },
     });
+
+    /* onUpdate only fires while scrolling, so the last velocity it wrote
+       would stick after the page stops, freezing the chromatic split on.
+       Once updates stop, bleed velocity back to zero. */
+    const settle = (_time: number, deltaMs: number) => {
+      if (performance.now() - lastUpdate < 90) return;
+      scrollState.velocity *= Math.exp(-(deltaMs / 1000) * 9);
+      if (Math.abs(scrollState.velocity) < 0.001) scrollState.velocity = 0;
+    };
+    gsap.ticker.add(settle);
 
     const onResize = () => ScrollTrigger.refresh();
     window.addEventListener('resize', onResize);
 
     return () => {
       st.kill();
+      gsap.ticker.remove(settle);
       window.removeEventListener('resize', onResize);
     };
   }, []);

@@ -154,7 +154,7 @@ export function Archive() {
                 </span>
 
                 <span className={styles.explore}>
-                  <span className="u-mono">Click to explore</span>
+                  <span className="u-cue">Click to explore</span>
                   <span className={styles.exploreRule} aria-hidden="true" />
                 </span>
               </span>

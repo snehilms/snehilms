@@ -239,9 +239,10 @@ export function Dossier() {
                 x2={VIEW_W}
                 y2="0"
               >
-                <stop offset="0%" stopColor="#2a7fa8" />
-                <stop offset="55%" stopColor="#4fb6e8" />
-                <stop offset="100%" stopColor="#7fd4ff" />
+                {/* Tokens via style: a var() in the stop-color attribute is ignored. */}
+                <stop offset="0%" style={{ stopColor: 'var(--c-accent-3)' }} />
+                <stop offset="55%" style={{ stopColor: 'var(--c-accent)' }} />
+                <stop offset="100%" style={{ stopColor: 'var(--c-ink-3)' }} />
               </linearGradient>
             </defs>
 

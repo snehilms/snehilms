@@ -44,7 +44,7 @@
   letter-spacing: var(--ls-tight);
   font-weight: 600;
   text-transform: uppercase;
-  color: var(--c-ice-100);
+  color: var(--c-ink);
   /* Each line is its own mask; the inner span is what translates. */
   display: flex;
   flex-direction: column;
@@ -62,12 +62,11 @@
   padding-block: 0.06em;
 }
 
-/* Second line carries the accent so the eye lands mid-headline, not top. */
+/* Second line carries the accent so the eye lands mid-headline, not top.
+   Solid ink, not a gradient: in fog, a colour shift reads as emphasis and a
+   gradient reads as a rendering fault. */
 .headlineLine:nth-child(2) > span {
-  background: linear-gradient(94deg, var(--c-ice-100) 8%, var(--c-ice-400) 54%, var(--c-ice-600) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--c-accent);
 }
 
 /* --- Bottom row --------------------------------------------------------- */
@@ -118,11 +117,12 @@
   flex-direction: column;
   align-items: center;
   gap: var(--s-1);
-  color: var(--c-text-faint);
+  /* Sits on the slate floor, where faint text fails contrast. */
+  color: var(--c-ink-3);
   transition: color var(--d-fast) var(--e-out);
 }
 
-.hint:hover { color: var(--c-ice-300); }
+.hint:hover { color: var(--c-ink-3); }
 
 .hintTrack {
   position: relative;
@@ -136,7 +136,7 @@
   position: absolute;
   inset-inline: 0;
   height: var(--s-2);
-  background: linear-gradient(180deg, transparent, var(--c-ice-400));
+  background: linear-gradient(180deg, transparent, var(--c-accent));
   animation: bead 2.2s var(--e-in-out) infinite;
   will-change: transform;
 }
@@ -152,7 +152,7 @@
 @media (max-width: 860px) {
   .bottom { grid-template-columns: 1fr; gap: var(--s-4); }
   .meta { flex-wrap: wrap; gap: var(--s-3) var(--s-4); }
-  .top .u-mono:last-child { display: none; }
+  .top :global(.u-mono):last-child { display: none; }
 }
 
 @media (max-width: 520px) {

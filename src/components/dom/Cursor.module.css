@@ -17,7 +17,7 @@
 .ring {
   width: var(--s-4);
   height: var(--s-4);
-  border: 1px solid rgb(191 226 247 / 0.34);
+  border: 1px solid var(--c-line-strong);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
@@ -25,10 +25,12 @@
 .dot {
   width: var(--s-opt);
   height: var(--s-opt);
-  background: var(--c-ice-400);
-  box-shadow: 0 0 12px rgb(127 212 255 / 0.9);
+  background: var(--c-accent);
+  }
+
+/* Reduced by the OS unless the visitor chose full motion, or by choice. */
+@media (prefers-reduced-motion: reduce) {
+  :global(:root:not([data-motion='full'])) .root { display: none; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .root { display: none; }
-}
+:global(:root[data-motion='reduced']) .root { display: none; }

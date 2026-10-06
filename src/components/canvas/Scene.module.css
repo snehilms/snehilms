@@ -3,7 +3,7 @@
   inset: 0;
   z-index: var(--z-canvas);
   pointer-events: none;
-  background-color: var(--c-void);
+  background-color: var(--c-ground);
 }
 
 .stage canvas {

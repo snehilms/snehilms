@@ -5,9 +5,10 @@
 
    ENVIRONMENT  synthesised in the shader — sky gradient, horizon band, a key
                 and a rim light. No cubemap to load, and because it is
-                procedural the crystal can be lit brightly even though the
-                scene around it is nearly black. That is the whole trick for
-                making glass read on a dark page.
+                procedural it is the chamber itself: pale fog overhead, a
+                white horizon strip, a slate floor. On a pale page the slate
+                floor is what the lower facets report, and that contrast is
+                what makes the glass read as a solid block of ice.
 
    DISPERSION   refraction is traced three times, once per colour channel at
                 a slightly different IOR. The channels separate most where
@@ -42,7 +43,7 @@ ${SIMPLEX_CHUNK}
 vec3 distort(vec3 p, float time, float amount) {
   if (amount <= 0.0) return p;
   float wave = snoise(p * 1.9 + vec3(0.0, time * 0.42, 0.0));
-  return p + normalize(p) * wave * amount;
+  return p + p / max(length(p), 1e-4) * wave * amount;
 }
 `;
 
@@ -55,7 +56,7 @@ uniform vec3  uRimColor;
 uniform vec3  uKeyDir;
 
 vec3 envSample(vec3 dir) {
-  float up = dir.y * 0.5 + 0.5;
+  float up = clamp(dir.y * 0.5 + 0.5, 0.0, 1.0);
   vec3 col = mix(uEnvLow, uEnvHigh, pow(up, 1.35));
 
   // Bright horizon band — the studio strip light every product render has.
@@ -135,7 +136,7 @@ void main() {
   vec3 N = normalize(vWorldNormal) * uFacing;
   vec3 V = normalize(cameraPosition - vWorldPos);
 
-  float NdotV = max(dot(N, V), 0.0);
+  float NdotV = clamp(dot(N, V), 0.0, 1.0);
 
   // Schlick, with a high-ish F0 so the shard keeps a hard specular skin.
   float fres = 0.05 + 0.95 * pow(1.0 - NdotV, 4.0);
@@ -189,6 +190,7 @@ void main() {
   alpha *= uFacing > 0.0 ? 1.0 : 0.42;
 
   gl_FragColor = vec4(color, alpha);
+  #include <colorspace_fragment>
 }
 `;
 
@@ -230,7 +232,7 @@ void main() {
   // disappears into the crystal's own interior shadow.
   float diffuse = dot(N, key) * 0.5 + 0.5;
 
-  float rim = pow(1.0 - max(dot(N, V), 0.0), 2.6);
+  float rim = pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 2.6);
   float spec = pow(max(dot(reflect(-V, N), key), 0.0), 48.0);
 
   vec3 color = uBase * (0.28 + diffuse * 0.85);
@@ -238,6 +240,7 @@ void main() {
   color += uHighlight * spec * 1.3;
 
   gl_FragColor = vec4(color, uOpacity);
+  #include <colorspace_fragment>
 }
 `;
 
@@ -289,6 +292,7 @@ void main() {
   alpha *= smoothstep(vSeed * 0.55, vSeed * 0.55 + 0.45, uReveal);
 
   gl_FragColor = vec4(uColor, alpha * uOpacity);
+  #include <colorspace_fragment>
 }
 `;
 
@@ -347,5 +351,6 @@ void main() {
   alpha *= smoothstep(vSeed * 0.5, vSeed * 0.5 + 0.5, uReveal);
 
   gl_FragColor = vec4(uColor, alpha * uOpacity);
+  #include <colorspace_fragment>
 }
 `;
