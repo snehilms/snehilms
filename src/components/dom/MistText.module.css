@@ -1,0 +1,21 @@
+.root {
+  display: block;
+}
+
+/* Both slots occupy the same cell: the outgoing and incoming lines overlap
+   in place while one mists away and the other condenses. */
+.stage {
+  display: grid;
+}
+
+.slotA,
+.slotB {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+}
+
+/* Letters are transformed and blurred individually. */
+.char {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+}

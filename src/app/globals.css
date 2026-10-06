@@ -84,6 +84,8 @@
   --t-lead:    clamp(1.125rem, 1.00rem + 0.62vw, 1.5rem);
   --t-h3:      clamp(1.5rem, 1.25rem + 1.25vw, 2.25rem);
   --t-h2:      clamp(2rem, 1.4rem + 3.0vw, 4rem);
+  /* The name in the hero: one line on desktop, clear of the bead globe. */
+  --t-name:    clamp(2.5rem, 1.2rem + 4.2vw, 4.5rem);
   --t-h1:      clamp(2.75rem, 1.2rem + 7.6vw, 8.5rem);
 
   --lh-tight:  0.92;

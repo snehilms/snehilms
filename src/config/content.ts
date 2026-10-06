@@ -82,6 +82,16 @@ export const identity = {
   headline: 'SNEHIL\nS KUMAR',
   tagline:
     'Software engineer working across low-latency systems, real-time data, and interfaces that have no right to feel this smooth.',
+  /* Flipped one at a time under the name, like a split-flap clock. */
+  roles: [
+    'Fullstack Engineer',
+    'Web3 Developer',
+    'AI Engineer',
+    'Finance Enthusiast',
+    'Taekwondo Champion',
+    'AWS Architect',
+    'Swimmer',
+  ],
   /* Hero subheading. Shown as `from`, then glitches word by word into `to`.
      Words are aligned by position: equal words ("of all trades,") hold still,
      only the ones that differ glitch. */

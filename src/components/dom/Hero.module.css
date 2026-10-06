@@ -4,7 +4,6 @@
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   /* Bottom padding reserves the band the scroll hint occupies, so the
      tagline can never collide with it at any viewport height. */
   padding-block: var(--s-16) clamp(var(--s-12), 14vh, var(--s-20));
@@ -18,9 +17,28 @@
   max-width: var(--max-w);
   margin-inline: auto;
   padding-inline: var(--gutter);
+  /* Name at the head of the fold, motto and facts at its foot. */
+  flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: var(--s-8);
+}
+
+.lead {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-2);
+}
+
+.roles {
+  font-size: var(--t-h3);
+  font-weight: 400;
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-snug);
+  color: var(--c-ink-3);
+  will-change: transform, opacity;
 }
 
 .parallax { will-change: transform, opacity; }
@@ -28,15 +46,17 @@
 /* --- Headline ----------------------------------------------------------- */
 
 .headline {
-  font-size: var(--t-h1);
+  font-size: var(--t-name);
   line-height: var(--lh-tight);
   letter-spacing: var(--ls-tight);
   font-weight: 600;
   text-transform: uppercase;
   color: var(--c-ink);
-  /* Each line is its own mask; the inner span is what translates. */
+  /* Each part is its own mask; the inner span is what translates. The
+     parts sit on one line and wrap as whole words on narrow screens. */
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  column-gap: 0.26em;
 }
 
 .headlineLine {
@@ -49,13 +69,6 @@
   will-change: transform;
   /* Optical: uppercase sits high in the em box; pull the mask tight. */
   padding-block: 0.06em;
-}
-
-/* Second line carries the accent so the eye lands mid-headline, not top.
-   Solid ink, not a gradient: in fog, a colour shift reads as emphasis and a
-   gradient reads as a rendering fault. */
-.headlineLine:nth-child(2) > span {
-  color: var(--c-accent);
 }
 
 /* --- Bottom row --------------------------------------------------------- */

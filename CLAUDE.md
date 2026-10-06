@@ -114,6 +114,11 @@ stage beads dither out whole. Translucent beads read as smudges on a pale ground
 **Global utility classes inside CSS Modules need `:global(...)`.** A bare `.u-mono`
 in a module is renamed and silently never matches.
 
+**A CSS Module class that only JS uses must still be declared in the CSS.**
+An undeclared `styles.foo` is `undefined`: the element gets the literal class
+"undefined" and `querySelector('.undefined')` matches the first such element,
+so two hooks silently resolve to the same node (an old flip-card component's halves did).
+
 **`<shaderMaterial uniforms={…}>` copies the uniforms.** Mutating the memo'd
 object afterwards updates a dead copy. Write per-frame values through
 `materialRef.current.uniforms` (Atmosphere was frozen for months this way), or

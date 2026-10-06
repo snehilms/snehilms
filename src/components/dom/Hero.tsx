@@ -5,6 +5,7 @@ import { gsap, useGSAP } from '@/lib/gsap';
 import { identity, chapters } from '@/config/content';
 import { scrollTo } from './SmoothScroll';
 import { GlitchText } from './GlitchText';
+import { MistText } from './MistText';
 import styles from './Hero.module.css';
 
 /* ============================================================================
@@ -22,6 +23,8 @@ import styles from './Hero.module.css';
 const INTRO_START = 2.35;
 /* The motto holds its first line long enough to be read, then corrupts. */
 const MOTTO_TURN = INTRO_START + 3.2;
+/* First change of the roles line, once the name has landed. */
+const ROLES_START = INTRO_START + 2.4;
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
@@ -52,6 +55,12 @@ export function Hero() {
             { yPercent: 116, y: 0 },
             { yPercent: 0, y: 0, duration: 1.35, stagger: 0.09, ease: 'expo.out' },
           )
+            .fromTo(
+              `.${styles.roles}`,
+              { yPercent: 30, y: 0, opacity: 0 },
+              { yPercent: 0, y: 0, opacity: 1, duration: 1.0, ease: 'expo.out' },
+              '-=0.9',
+            )
             .fromTo(
               `.${styles.tagline}`,
               { yPercent: 40, y: 0, opacity: 0 },
@@ -96,13 +105,19 @@ export function Hero() {
   return (
     <section ref={ref} id={chapters[0].id} className={styles.root}>
       <div className={`${styles.shell} ${styles.parallax}`}>
-        <h1 className={styles.headline}>
-          {lines.map((line, i) => (
-            <span key={i} className={styles.headlineLine}>
-              <span>{line}</span>
-            </span>
-          ))}
-        </h1>
+        <div className={styles.lead}>
+          <h1 className={styles.headline}>
+            {lines.map((line, i) => (
+              <span key={i} className={styles.headlineLine}>
+                <span>{line}</span>
+              </span>
+            ))}
+          </h1>
+
+          <p className={styles.roles}>
+            <MistText items={identity.roles} delay={ROLES_START} />
+          </p>
+        </div>
 
         <div className={styles.bottom}>
           <GlitchText
