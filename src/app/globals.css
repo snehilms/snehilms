@@ -98,6 +98,7 @@
   --d-fast:   0.24s;
   --d-base:   0.48s;
   --d-slow:   0.96s;
+  --d-glitch: 0.16s; /* one slice cycle of the glitch layers */
   --e-out:    cubic-bezier(0.16, 1, 0.3, 1);
   --e-in-out: cubic-bezier(0.76, 0, 0.24, 1);
 

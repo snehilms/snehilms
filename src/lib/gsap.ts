@@ -3,13 +3,14 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
+import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { useGSAP } from '@gsap/react';
 
 /* Register once, at module scope, guarded for SSR. Every component imports
    gsap from HERE — never from 'gsap' directly — so registration can never
    be missed and plugin order can never race. */
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP);
+  gsap.registerPlugin(ScrollTrigger, SplitText, ScrambleTextPlugin, useGSAP);
 
   gsap.defaults({
     ease: 'power3.out',

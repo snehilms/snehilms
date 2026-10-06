@@ -71,7 +71,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     });
 
     /* onUpdate only fires while scrolling, so the last velocity it wrote
-       would stick after the page stops, freezing the chromatic split on.
+       would stick after the page stops, leaving the field's turbulence raised.
        Once updates stop, bleed velocity back to zero. */
     const settle = (_time: number, deltaMs: number) => {
       if (performance.now() - lastUpdate < 90) return;

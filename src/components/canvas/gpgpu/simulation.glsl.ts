@@ -205,8 +205,8 @@ void main() {
   // formation is brighter than its underside.
   color *= mix(0.78, 1.06, smoothstep(-3.0, 3.0, vHeight));
 
-  // Beads in fast motion catch a glacial tint.
-  color = mix(color, uColorHot, clamp(vSpeed * 0.9, 0.0, 0.55));
+  // Beads in fast motion catch a frost sheen: lighter, never a new hue.
+  color = mix(color, uColorHot, clamp(vSpeed * 0.9, 0.0, 0.4));
 
   // Atmospheric perspective: far beads dissolve into the chamber's fog.
   float fog = smoothstep(uFogNear, uFogFar, vDepth);

@@ -4,10 +4,11 @@ import { useRef } from 'react';
 import { gsap, useGSAP } from '@/lib/gsap';
 import { identity, chapters } from '@/config/content';
 import { scrollTo } from './SmoothScroll';
+import { GlitchText } from './GlitchText';
 import styles from './Hero.module.css';
 
 /* ============================================================================
-   HERO — 00 / SIGNAL
+   HERO — 00 / INTRO
 
    The only section that opens on a timed timeline rather than on scroll.
    It is choreographed against the preloader: the panels finish parting at
@@ -19,6 +20,8 @@ import styles from './Hero.module.css';
    ========================================================================= */
 
 const INTRO_START = 2.35;
+/* The motto holds its first line long enough to be read, then corrupts. */
+const MOTTO_TURN = INTRO_START + 3.2;
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
@@ -93,11 +96,6 @@ export function Hero() {
   return (
     <section ref={ref} id={chapters[0].id} className={styles.root}>
       <div className={`${styles.shell} ${styles.parallax}`}>
-        <div className={styles.top}>
-          <span className={`u-mono ${styles.metaItem}`}>{chapters[0].index} — {chapters[0].kicker}</span>
-          <span className={`u-mono ${styles.metaItem}`}>{chapters[0].caption}</span>
-        </div>
-
         <h1 className={styles.headline}>
           {lines.map((line, i) => (
             <span key={i} className={styles.headlineLine}>
@@ -107,7 +105,12 @@ export function Hero() {
         </h1>
 
         <div className={styles.bottom}>
-          <p className={styles.tagline}>{identity.tagline}</p>
+          <GlitchText
+            className={styles.tagline}
+            from={identity.motto.from}
+            to={identity.motto.to}
+            delay={MOTTO_TURN}
+          />
 
           <dl className={styles.meta}>
             <div className={styles.metaItem}>

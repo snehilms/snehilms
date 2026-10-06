@@ -25,17 +25,6 @@
 
 .parallax { will-change: transform, opacity; }
 
-/* --- Top meta ----------------------------------------------------------- */
-
-.top {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--s-3);
-  padding-bottom: var(--s-3);
-  border-bottom: 1px solid var(--c-line);
-}
-
 /* --- Headline ----------------------------------------------------------- */
 
 .headline {
@@ -83,7 +72,8 @@
   font-size: var(--t-lead);
   line-height: 1.45;
   letter-spacing: var(--ls-snug);
-  color: var(--c-text-dim);
+  font-weight: 500;
+  color: var(--c-text);
   text-wrap: balance;
   will-change: transform, opacity;
 }
@@ -152,7 +142,6 @@
 @media (max-width: 860px) {
   .bottom { grid-template-columns: 1fr; gap: var(--s-4); }
   .meta { flex-wrap: wrap; gap: var(--s-3) var(--s-4); }
-  .top :global(.u-mono):last-child { display: none; }
 }
 
 @media (max-width: 520px) {

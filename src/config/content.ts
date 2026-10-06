@@ -75,13 +75,20 @@ export type Stratum = {
 };
 
 export const identity = {
-  name: 'SNEHIL KUMAR',
+  name: 'SNEHIL S KUMAR',
   initials: 'SK',
   role: 'Software Engineer',
   /* Hero headline is split on \n — each line gets its own mask reveal. */
-  headline: 'BUILDING\nSYSTEMS\nTHAT HOLD',
+  headline: 'SNEHIL\nS KUMAR',
   tagline:
     'Software engineer working across low-latency systems, real-time data, and interfaces that have no right to feel this smooth.',
+  /* Hero subheading. Shown as `from`, then glitches word by word into `to`.
+     Words are aligned by position: equal words ("of all trades,") hold still,
+     only the ones that differ glitch. */
+  motto: {
+    from: 'Jack of all trades, master of none.',
+    to: 'Master of all trades, grandmaster at some, enlightened at one.',
+  },
   location: 'Remote · IST (UTC+5:30)',
   availability: 'Open to select work — 2026',
   email: 'snehilms@gmail.com',

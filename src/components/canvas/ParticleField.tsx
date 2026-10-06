@@ -40,8 +40,8 @@ const ART = [
   // so its amplitude is zero. Anything else turns the letterforms edge-on.
   // Lifted clear of the meta row at the hero's foot: solid beads under small
   // type fail contrast where soft glow never did.
-  // Back 2.6 into the fog and right: the shell then sits between the header
-  // rule and the meta row, clear of the caption and the headline's last line.
+  // Back 2.6 into the fog and right: the shell sits beside the name, clear of
+  // the headline and the meta row.
   { offsetX: 2.95, offsetY: 0.0, offsetZ: -2.6, opacity: 1.0, size: 2.7, yaw: 0.34 }, // 00 intro
   { offsetX: 2.35, offsetY: 0.1, offsetZ: -1.2, opacity: 0.42, size: 2.2, yaw: 0.0 }, // 01 experience
   // The archive belongs to the shards. The field retreats in depth as well
@@ -179,7 +179,7 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
           uNearFade: { value: 5.2 },
           uColorLit: { value: cssColor('--c-fog-lo', '#c9cfd8') },
           uColorShade: { value: cssColor('--c-ink-3', '#323b49') },
-          uColorHot: { value: cssColor('--c-accent-3', '#6f9fc2') },
+          uColorHot: { value: cssColor('--c-fog-hi', '#eceff3') }, // frost, not blue: stays in the grey world
           uFogColor: { value: cssColor('--c-ground', '#dde1e7') },
           uFogNear: { value: 8 },
           uFogFar: { value: 24 },

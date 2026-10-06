@@ -1,0 +1,67 @@
+/* The ghost (final line, invisible) sets the size; the live words sit on top,
+   so scrambled glyphs and new words never reflow the hero. */
+.root {
+  position: relative;
+}
+
+.ghost {
+  visibility: hidden;
+}
+
+.live {
+  position: absolute;
+  inset: 0;
+}
+
+/* Inline, not inline-block: empty slots then collapse their spaces. */
+.word {
+  position: relative;
+}
+
+.glitching {
+  animation: flicker var(--d-glitch) steps(2) infinite;
+}
+
+/* Two sliced copies of the incoming word, torn sideways in opposite
+   directions. Slate and meltwater, the chamber's own tones. */
+.glitching::before,
+.glitching::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: pre;
+  pointer-events: none;
+  will-change: transform, clip-path;
+}
+
+.glitching::before {
+  color: var(--c-accent-3);
+  animation: tear-a var(--d-glitch) steps(1) infinite;
+}
+
+.glitching::after {
+  color: var(--c-floor-deep);
+  animation: tear-b var(--d-glitch) steps(1) infinite reverse;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+@keyframes tear-a {
+  0%   { clip-path: inset(8% 0 62% 0);  transform: translateX(-0.08em); }
+  25%  { clip-path: inset(56% 0 14% 0); transform: translateX(0.06em); }
+  50%  { clip-path: inset(30% 0 42% 0); transform: translateX(-0.04em); }
+  75%  { clip-path: inset(72% 0 4% 0);  transform: translateX(0.09em); }
+  100% { clip-path: inset(18% 0 70% 0); transform: translateX(-0.05em); }
+}
+
+@keyframes tear-b {
+  0%   { clip-path: inset(64% 0 10% 0); transform: translateX(0.07em); }
+  25%  { clip-path: inset(12% 0 66% 0); transform: translateX(-0.06em); }
+  50%  { clip-path: inset(44% 0 30% 0); transform: translateX(0.04em); }
+  75%  { clip-path: inset(4% 0 80% 0);  transform: translateX(-0.08em); }
+  100% { clip-path: inset(80% 0 6% 0);  transform: translateX(0.05em); }
+}
