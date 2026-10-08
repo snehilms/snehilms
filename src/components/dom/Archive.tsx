@@ -109,16 +109,18 @@ export function Archive() {
   return (
     <Chapter
       id={chapter.id}
-      index={chapter.index}
-      kicker={chapter.kicker}
+      title={chapter.title}
       caption={chapter.caption}
-      stretch={!compact}
+      hold={!compact}
       className={compact ? undefined : styles.tall}
     >
       <div ref={ref} className={compact ? styles.cards : styles.slots}>
         {projects.map((project, i) => (
           <button
             key={project.id}
+            ref={(el) => {
+              archiveState.slots[i] = el;
+            }}
             type="button"
             className={compact ? styles.card : styles.slot}
             onPointerEnter={() => {
@@ -154,7 +156,7 @@ export function Archive() {
                 </span>
 
                 <span className={styles.explore}>
-                  <span className="u-cue">Click to explore</span>
+                  <span className="u-cue">Open the architecture</span>
                   <span className={styles.exploreRule} aria-hidden="true" />
                 </span>
               </span>

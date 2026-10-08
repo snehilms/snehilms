@@ -20,6 +20,9 @@ export const archiveState = {
   presence: 0,
   /** Damped presence, for anything that should lag the scroll slightly. */
   presenceSmooth: 0,
+  /** The DOM slots, registered by Archive. The gallery measures them every
+      frame and puts each shard exactly behind its slot. */
+  slots: [] as (HTMLElement | null)[],
 };
 
 /* --- Dossier store ------------------------------------------------------ */

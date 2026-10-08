@@ -68,7 +68,7 @@ export function Surface() {
   const chapter = chapters[4];
 
   return (
-    <Chapter id={chapter.id} index={chapter.index} kicker={chapter.kicker} caption={chapter.caption}>
+    <Chapter id={chapter.id} title={chapter.title} caption={chapter.caption}>
       <div className={styles.cta}>
         <RevealText as="p" className={styles.prompt} mode="lines">
           Working on something that has to hold under load?

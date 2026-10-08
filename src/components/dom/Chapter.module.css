@@ -22,13 +22,23 @@
 
 .section > * { pointer-events: auto; }
 
-.stretched { justify-content: flex-start; }
+.holding {
+  justify-content: flex-start;
+  padding-block: 0;
+}
 
-.stretched .shell {
-  flex: 1;
+.holding .shell {
+  position: sticky;
+  top: 0;
+  height: 100svh;
   display: flex;
   flex-direction: column;
+  /* Clears the fixed nav bar. */
+  padding-top: calc(var(--s-12) + var(--s-2));
+  padding-bottom: var(--s-4);
 }
+
+.holding .rule { margin-bottom: var(--s-3); }
 
 .shell {
   width: 100%;
@@ -37,10 +47,14 @@
   padding-inline: var(--gutter);
 }
 
+/* Heading with its caption beneath, both on the left: the bead field lives
+   on the right of the frame through the whole descent, and a right-aligned
+   caption kept landing on it. */
 .head {
   display: flex;
-  align-items: baseline;
-  gap: var(--s-3);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-2);
   padding-bottom: var(--s-3);
 }
 
@@ -55,32 +69,25 @@
   margin-bottom: var(--s-10);
 }
 
-.index {
-  font-family: var(--font-mono);
-  font-size: var(--t-mono);
-  letter-spacing: var(--ls-mono);
-  color: var(--c-accent);
-}
-
-.kicker {
-  font-family: var(--font-mono);
-  font-size: var(--t-mono);
-  letter-spacing: var(--ls-mono);
-  text-transform: uppercase;
-  color: var(--c-text);
+.title {
+  font-size: var(--t-h2);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+  color: var(--c-ink);
+  will-change: transform, opacity;
 }
 
 .caption {
-  margin-left: auto;
-  font-size: var(--t-sm);
-  color: var(--c-text-faint);
-  text-align: right;
-  max-width: 34ch;
+  font-size: var(--t-body);
+  line-height: var(--lh-snug);
+  color: var(--c-text-dim);
+  max-width: 52ch;
+  will-change: transform, opacity;
 }
 
 @media (max-width: 720px) {
   .section { padding-block: var(--s-10); }
-  .head { flex-wrap: wrap; gap: var(--s-1) var(--s-2); padding-bottom: var(--s-2); }
+  .head { gap: var(--s-1); padding-bottom: var(--s-2); }
   .rule { margin-bottom: var(--s-6); }
-  .caption { margin-left: 0; text-align: left; flex-basis: 100%; }
 }

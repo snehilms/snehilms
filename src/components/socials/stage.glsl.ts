@@ -71,12 +71,13 @@ void main() {
      sight) and part carry (along the cursor's motion), and the whole region
      inside the radius heats evenly, which keeps it cohesive. */
   float strength = clamp(length(uWind) * 0.7, 0.0, 1.0);
-  vec3 gust = (uWind * 0.5 + outward * length(uWind) * 0.6) * reach;
+  vec3 gust = (uWind * 0.4 + outward * length(uWind) * 0.3) * reach;
   vec3 knock = outward * uBurst * smoothstep(0.3, 0.8, reach) * 2.6;
 
   /* --- heat --- */
   float heat = vel.w;
-  heat = max(heat, smoothstep(0.08, 0.55, reach) * max(strength, uBurst));
+  // A hover only warms beads (capped well below white); a click still flares.
+  heat = max(heat, smoothstep(0.2, 0.75, reach) * max(strength * 0.45, uBurst));
   heat = min(1.0, heat + uKick * (0.55 + 0.45 * seed));
   heat = max(heat, uHold);
   // Cool from the base up: low beads settle first.
@@ -92,7 +93,7 @@ void main() {
   vec3 flow = curlNoise(pos.xyz * 0.62 + vec3(0.0, uTime * 0.16, uTime * 0.07));
   acc += flow * (0.12 + loose * 1.5) * uMotion;
   acc += vec3(0.0, 0.42, 0.0) * loose * uMotion;   // hot beads rise like smoke
-  acc += gust * 9.0;
+  acc += gust * 7.0;
 
   // The knock is an impulse (velocity), not a force: one frame, full effect.
   vec3 v = vel.xyz + acc * uDelta + knock;
@@ -140,6 +141,7 @@ uniform float uPxPerUnit;
 uniform float uRefDist;
 uniform float uDpr;
 uniform vec2  uResolution;
+uniform float uPresence;
 
 attribute vec2 aRef;
 
@@ -177,7 +179,9 @@ void main() {
   vStretch = 1.4 + clamp(speedPx * 0.35, 0.0, 2.6) * flying;
 
   float size = uBead * uPxPerUnit * (uRefDist / -mv.z) * uDpr * (0.78 + fract(seed * 7.31) * 0.44);
-  gl_PointSize = size * vStretch;
+  // Arrival and departure by density: whole beads drop out by seed (a
+  // translucent mark reads as a smudge on the pale room).
+  gl_PointSize = fract(seed * 3.17) < uPresence ? size * vStretch : 0.0;
 }
 `;
 
@@ -210,7 +214,9 @@ void main() {
   vec3 colour = mix(uShade, uLit, wrap) + spec * 0.16;
   /* Torn beads go icy white against the slate body: the contrast is what
      makes a gust read as light catching loose ice, as in the reference. */
-  float glow = smoothstep(0.05, 0.5, vHeat);
+  // Starts above the hover's heat cap (0.45): a hover never whitens a bead,
+  // only a click or a change of mark does.
+  float glow = smoothstep(0.5, 0.9, vHeat) * 0.7;
   colour = mix(colour, uHot * (1.0 + 0.12 * wrap), glow);
 
   gl_FragColor = vec4(colour, 1.0);
@@ -270,6 +276,7 @@ uniform float uBead;
 uniform float uPxPerUnit;
 uniform float uRefDist;
 uniform float uDpr;
+uniform float uPresence;
 attribute vec2 aRef;
 varying float vHeat;
 
@@ -279,8 +286,9 @@ void main() {
   vHeat = heat;
   vec4 mv = viewMatrix * vec4(pos.xyz, 1.0);
   gl_Position = projectionMatrix * mv;
-  // Cold beads collapse to nothing and cost no fill.
-  gl_PointSize = heat < 0.06 ? 0.0 : uBead * uPxPerUnit * (uRefDist / -mv.z) * uDpr * 4.2 * heat;
+  // Only real flares (a click, a change of mark) get a halo; a hover caps
+  // heat below this, and thousands of faint discs would stack into a cloud.
+  gl_PointSize = heat < 0.5 || fract(pos.w * 3.17) >= uPresence ? 0.0 : uBead * uPxPerUnit * (uRefDist / -mv.z) * uDpr * 2.6 * heat;
 }
 `;
 
@@ -291,7 +299,7 @@ void main() {
   vec2 c = gl_PointCoord * 2.0 - 1.0;
   float r2 = dot(c, c);
   if (r2 > 1.0) discard;
-  float a = exp(-r2 * 3.2) * vHeat * vHeat * 0.5;
+  float a = exp(-r2 * 3.2) * vHeat * vHeat * 0.22;
   gl_FragColor = vec4(uColor * a, a);
 }
 `;

@@ -76,23 +76,32 @@ export function Hero() {
             .fromTo(`.${styles.hint}`, { opacity: 0 }, { opacity: 1, duration: 0.8 }, '-=0.6');
 
           /* Departure. Scrubbed, so scroll position always maps to the exact
-             same frame of the exit — no catching up, no overshoot. */
+             same frame of the exit. Short on purpose: lingering, the motto and
+             the facts drifted up across the bead sphere and collided with it. */
           const exit = gsap.to(`.${styles.parallax}`, {
-            yPercent: -18,
+            yPercent: -10,
             opacity: 0,
             ease: 'none',
             scrollTrigger: {
               trigger: ref.current,
               start: 'top top',
-              end: 'bottom 30%',
-              scrub: 0.6,
+              end: 'bottom 78%',
+              scrub: 0.3,
             },
+          });
+          // The hint has done its job the moment scrolling starts.
+          const hint = gsap.to(`.${styles.hint}`, {
+            opacity: 0,
+            ease: 'none',
+            scrollTrigger: { trigger: ref.current, start: 'top top', end: '+=140', scrub: true },
           });
 
           return () => {
             tl.kill();
             exit.scrollTrigger?.kill();
             exit.kill();
+            hint.scrollTrigger?.kill();
+            hint.kill();
           };
         },
       );

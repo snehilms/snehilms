@@ -1,9 +1,9 @@
 /* ============================================================================
    SOCIAL STAGE
 
-   A chamber, not a section: full viewport, nothing on it but the mark, the
-   pedestal, two range marks and the selector. The canvas is the room; the
-   DOM only names what is on the plinth and lets you take it.
+   A chamber, not a section: full viewport, nothing on it but the mark over
+   its ice plinth, in a pre-rendered world per social, and the selector. The
+   canvas is the room; the DOM only names what is on the plinth.
    ========================================================================= */
 
 .stage {
@@ -13,22 +13,6 @@
   overflow: hidden;
 }
 
-/* --- Range marks ---------------------------------------------------------
-   Thin rules either side of the mark at its centre line: the bench marks of
-   an instrument, framing the specimen without boxing it. Deliberately plain:
-   with arrowheads they read as prev/next controls they are not. */
-
-.mark {
-  position: absolute;
-  top: 46%;
-  width: var(--s-12);
-  height: 1px;
-  background: var(--c-ink-3);
-  opacity: 0.5;
-}
-
-.markLeft { left: max(var(--gutter), 8vw); }
-.markRight { right: max(var(--gutter), 8vw); }
 
 /* --- Selector ------------------------------------------------------------ */
 
@@ -52,12 +36,16 @@
 .selector::before {
   content: '';
   position: absolute;
-  inset: calc(var(--s-3) * -1) 0;
+  /* Tall enough that the ellipse fades out INSIDE the box: when the box
+     clipped the gradient early it left a hard horizontal edge on the floor. */
+  inset: calc(var(--s-12) * -1) 0 calc(var(--s-8) * -1);
   z-index: -1;
+  opacity: var(--veil, 1);
   background: radial-gradient(
-    ellipse 46% 70% at 50% 55%,
-    rgb(236 239 243 / 0.88) 0%,
-    rgb(236 239 243 / 0.74) 55%,
+    ellipse 44% 50% at 50% 62%,
+    color-mix(in srgb, var(--c-fog-hi) 86%, transparent) 0%,
+    color-mix(in srgb, var(--c-fog-hi) 70%, transparent) 40%,
+    color-mix(in srgb, var(--c-fog-hi) 30%, transparent) 72%,
     transparent 100%
   );
   pointer-events: none;
@@ -69,13 +57,14 @@
 
 .row {
   display: flex;
-  gap: clamp(var(--s-1), 3vw, var(--s-5));
+  gap: clamp(var(--s-1), 2.4vw, var(--s-4));
 }
 
+/* Quiet names, one weight: the active one simply comes forward in ink. */
 .link {
   display: block;
-  padding: var(--s-1) var(--s-3);
-  font-size: var(--t-lead);
+  padding: var(--s-1) var(--s-2) var(--s-2);
+  font-size: var(--t-body);
   font-weight: 500;
   letter-spacing: var(--ls-snug);
   color: var(--c-text-faint);
@@ -87,44 +76,25 @@
   color: var(--c-ink);
 }
 
-/* Focus is carried by the brackets, which already travel to the focused
-   name; the ring stays for keyboard users as a second, plainer signal. */
 .link:focus-visible {
   outline-offset: 0;
 }
 
-/* Two corner pairs. Each half is a narrow box drawing a top and a bottom
-   corner, moved by transform to the active name's edges. */
-.bracket {
+/* The marker is a single bead, the same material as the mark above it. */
+.bead {
   position: absolute;
-  top: 0;
   left: 0;
   bottom: 0;
-  width: var(--s-2);
+  width: calc(var(--s-opt) * 1.5);
+  height: calc(var(--s-opt) * 1.5);
+  border-radius: var(--r-full);
+  background: var(--c-ink);
   pointer-events: none;
   will-change: transform;
 }
 
-.bracket::before,
-.bracket::after {
-  content: '';
-  position: absolute;
-  width: var(--s-2);
-  height: var(--s-2);
-  border-color: var(--c-ink);
-  border-style: solid;
-  border-width: 0;
-}
-
-.bracket::before { top: 0; }
-.bracket::after { bottom: 0; }
-
-.bracketL::before { left: 0; border-top-width: 1.5px; border-left-width: 1.5px; }
-.bracketL::after { left: 0; border-bottom-width: 1.5px; border-left-width: 1.5px; }
-.bracketR::before { right: 0; border-top-width: 1.5px; border-right-width: 1.5px; }
-.bracketR::after { right: 0; border-bottom-width: 1.5px; border-right-width: 1.5px; }
-
-/* The handle is data — a username, an address — so it is set in mono. */
+/* The handle is data — a username, an address — so it is set in mono, in
+   slate like everything else on the stage; it underlines on hover. */
 .handle {
   display: inline-flex;
   align-items: center;
@@ -132,14 +102,15 @@
   font-family: var(--font-mono);
   font-size: var(--t-sm);
   letter-spacing: 0.04em;
-  color: var(--c-accent);
+  color: var(--c-ink-3);
   text-decoration: underline;
   text-decoration-color: transparent;
   text-underline-offset: 0.3em;
-  transition: text-decoration-color var(--d-base) var(--e-out);
+  transition: color var(--d-base) var(--e-out), text-decoration-color var(--d-base) var(--e-out);
 }
 
 a.handle:hover {
+  color: var(--c-ink);
   text-decoration-color: currentColor;
 }
 
@@ -155,7 +126,7 @@ span.handle {
 }
 
 .handle:hover .arrow {
-  transform: translate(2px, -2px);
+  transform: translate(var(--s-opt), calc(var(--s-opt) * -1));
 }
 
 /* --- Colophon ------------------------------------------------------------ */
@@ -174,8 +145,10 @@ span.handle {
   max-width: var(--max-w);
   margin-inline: auto;
   padding-inline: var(--gutter);
+  /* No rule here: a full-width hairline right where the stage hands over
+     read as a hard cut. The footer's single rule is the one above the
+     signature line below. */
   padding-top: var(--s-8);
-  border-top: 1px solid var(--c-line);
 }
 
 .colophonItem {
@@ -205,8 +178,7 @@ span.handle {
 @media (max-width: 720px) {
   .link {
     padding-inline: var(--s-1);
-    font-size: var(--t-body);
+    font-size: var(--t-sm);
   }
-  .mark { width: var(--s-6); }
   .colophonLine { flex-direction: column; gap: var(--s-1); }
 }

@@ -14,21 +14,22 @@
    rather than flashing past. */
 .tall { min-height: 230svh; }
 
+/* The row fills what the held shell leaves under the heading. The chapter
+   shell (see Chapter `hold`) is what holds the screen now; a sticky row on
+   its own slid up over the heading on the way in. */
 .slots {
-  position: sticky;
-  top: 50svh;
-  transform: translateY(-50%);
+  flex: 1;
+  min-height: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--s-3);
-  will-change: transform;
 }
 
 /* --- Slot ---------------------------------------------------------------- */
 
 .slot {
   display: block;
-  height: 68svh;
+  height: 100%;
   text-align: left;
   /* The shard lives behind this button. Nothing here may paint over it. */
   background: none;
@@ -210,7 +211,7 @@
 .card .leader { display: none; }
 
 /* Side by side, the readout and the call to action fight for a narrow
-   column and "Click to explore" wraps mid-phrase. Stack them instead. */
+   column and the "Open the architecture" cue wraps mid-phrase. Stack them instead. */
 .card .slotFoot {
   flex-direction: column;
   align-items: flex-start;
@@ -225,6 +226,5 @@
 .card .exploreRule { transform-origin: left center; }
 
 @media (max-width: 1180px) {
-  .slot { height: 62svh; }
   .title { font-size: var(--t-body); }
 }

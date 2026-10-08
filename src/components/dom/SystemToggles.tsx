@@ -55,17 +55,27 @@ export function SystemToggles() {
     };
   }, []);
 
+  const soundLabel = `Sound: ${soundOn ? 'On' : 'Off'}`;
+  const motionLabel = `Motion: ${reduced ? 'Reduced' : 'Full'}`;
+
+  /* Compact icon buttons in the left gutter, mirroring the progress rail in
+     the right one: pinned over the content column they covered text in every
+     chapter. The state is in the icon (bars move when sound is on, the dot
+     fills when motion is full); the words surface as a tag on hover/focus. */
   return (
     <div className={styles.root}>
       <button
         type="button"
         className={styles.toggle}
         aria-pressed={soundOn}
+        aria-label={soundLabel}
         onClick={() => (soundOn ? sound.disable() : sound.enable())}
         data-cursor="hover"
       >
         <SoundBars on={soundOn} />
-        <span>Sound: {soundOn ? 'On' : 'Off'}</span>
+        <span className={styles.tag} aria-hidden="true">
+          {soundLabel}
+        </span>
       </button>
 
       {reduced !== null && (
@@ -73,12 +83,14 @@ export function SystemToggles() {
           type="button"
           className={styles.toggle}
           aria-pressed={!reduced}
+          aria-label={`${motionLabel}. ${reduced ? 'Turn on full motion' : 'Reduce motion'} (reloads)`}
           onClick={() => setMotionChoice(reduced ? 'full' : 'reduced')}
           data-cursor="hover"
-          title={reduced ? 'Turn on full motion (reloads)' : 'Reduce motion (reloads)'}
         >
           <span className={styles.dot} data-on={!reduced} aria-hidden="true" />
-          <span>Motion: {reduced ? 'Reduced' : 'Full'}</span>
+          <span className={styles.tag} aria-hidden="true">
+            {motionLabel}
+          </span>
         </button>
       )}
     </div>

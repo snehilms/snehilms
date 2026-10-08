@@ -17,18 +17,19 @@ import styles from './Chapter.module.css';
 
 type Props = {
   id: string;
-  index: string;
-  kicker: string;
+  /** The section's heading — a real h2, not a numbered eyebrow label. */
+  title: string;
   caption: string;
   children: ReactNode;
   className?: string;
-  /** Stretches the inner shell to the section's full height so a sticky
-      child has real scroll runway to stick over. Without this the shell is
-      only as tall as its content and `position: sticky` has nothing to do. */
-  stretch?: boolean;
+  /** The whole shell — heading, rule and content as one composition — holds
+      the viewport (sticky, full height) while the tall section scrolls
+      underneath it. Holding only the content let it slide up over its own
+      heading on the way in. */
+  hold?: boolean;
 };
 
-export function Chapter({ id, index, kicker, caption, children, className, stretch }: Props) {
+export function Chapter({ id, title, caption, children, className, hold }: Props) {
   const ref = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -61,13 +62,12 @@ export function Chapter({ id, index, kicker, caption, children, className, stret
     <section
       ref={ref}
       id={id}
-      className={`${styles.section} ${stretch ? styles.stretched : ''} ${className ?? ''}`}
+      className={`${styles.section} ${hold ? styles.holding : ''} ${className ?? ''}`}
     >
       <div className={styles.shell}>
         <header className={styles.head}>
-          <span className={styles.index}>{index}</span>
-          <span className={styles.kicker}>{kicker}</span>
-          <span className={styles.caption}>{caption}</span>
+          <h2 className={styles.title}>{title}</h2>
+          <p className={styles.caption}>{caption}</p>
         </header>
         <div className={styles.rule} aria-hidden="true" />
         {children}

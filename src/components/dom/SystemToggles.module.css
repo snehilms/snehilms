@@ -1,37 +1,65 @@
-/* Bottom-left HUD, anchored to the viewport corner like igloo.inc's. */
+/* System controls in the left gutter, the counterpart of the progress rail
+   in the right one. Outside the content column, so they never sit over text;
+   on phones (no gutter to speak of) they join the top bar instead. */
 .root {
   position: fixed;
-  left: var(--gutter);
+  left: var(--s-2);
   bottom: var(--s-3);
   z-index: var(--z-nav);
   display: flex;
+  flex-direction: column;
   gap: var(--s-1);
 }
 
 .toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s-1);
-  padding: var(--s-1) var(--s-2);
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--s-4);
+  height: var(--s-4);
   border: 1px solid var(--c-line);
   border-radius: var(--r-full);
   background: var(--c-glass-hi);
   backdrop-filter: var(--blur-glass);
   -webkit-backdrop-filter: var(--blur-glass);
-  font-size: var(--t-sm);
-  font-weight: 500;
-  letter-spacing: 0.02em;
   color: var(--c-text-dim);
   transition: color var(--d-fast) var(--e-out), border-color var(--d-fast) var(--e-out);
 }
 
-.toggle:hover {
+.toggle:hover,
+.toggle:focus-visible {
   color: var(--c-ink);
   border-color: var(--c-line-strong);
 }
 
 .toggle[aria-pressed='true'] {
   color: var(--c-ink);
+}
+
+/* The words, on demand: a frosted tag beside the button. */
+.tag {
+  position: absolute;
+  left: calc(100% + var(--s-1));
+  top: 50%;
+  padding: var(--s-opt) var(--s-1);
+  border-radius: var(--r-sm);
+  background: var(--c-glass-hi);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--c-ink-2);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(calc(var(--s-1) * -1), -50%);
+  transition: opacity var(--d-base) var(--e-out), transform var(--d-base) var(--e-out);
+}
+
+.toggle:hover .tag,
+.toggle:focus-visible .tag {
+  opacity: 1;
+  transform: translate(0, -50%);
 }
 
 /* Equaliser bars: still when off, gently moving when on. */
@@ -69,6 +97,14 @@
 }
 
 @media (max-width: 720px) {
-  .root { bottom: var(--s-2); }
-  .toggle { padding: var(--s-opt) var(--s-1); }
+  /* Into the top bar, left of the status dot. */
+  .root {
+    /* Centred on the 40px brand mark (s-3 + 4 + half of 32 = 44). */
+    top: calc(var(--s-3) + var(--s-opt));
+    bottom: auto;
+    left: auto;
+    right: calc(var(--gutter) + var(--s-6));
+    flex-direction: row;
+  }
+  .tag { display: none; }
 }

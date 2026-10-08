@@ -89,7 +89,7 @@ export function ChapterRail() {
             >
               <span className={styles.tick} aria-hidden="true" />
               <span className={styles.label}>
-                {chapter.index} {chapter.kicker}
+                {chapter.title}
               </span>
             </button>
           </li>

@@ -19,3 +19,9 @@ out
 .impeccable/review/audit/*
 !.impeccable/review/audit/REPORT.md
 .impeccable/hook.cache.json
+
+# Blender working files: CC0 sources from Poly Haven and .blend saves.
+# Only the scripts in art/scripts are versioned; renders ship from public/.
+art/src/
+art/out/
+*.blend1

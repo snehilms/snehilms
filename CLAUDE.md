@@ -85,8 +85,23 @@ Beads have velocity and a soft spring home; the cursor is a gust along its own
 velocity; per-bead heat (velocity.w) loosens, swirls and whitens beads and cools
 from the base up; switching mark kicks heat so the old shape smokes apart. The
 turn rate varies (slow front-on), so the yaw is integrated. It is a separate room with its own fixed camera, so it must not
-inherit the background canvas's dolly and art direction. It is transparent so the
-shared fog shows through, and renders only while on screen. Don't add more canvases
+inherit the background canvas's dolly and art direction. It renders only while on
+screen.
+
+**The stage's world is a pre-rendered plate, not live 3D.** `art/scripts/stage_world.py`
+builds each social's world in Blender (Cycles; CC0 Poly Haven sky and snow in the
+git-ignored `art/src/`) from the stage's exact camera, and publishes
+`public/stage/<glyph>.webp`. `Backdrop` draws it on a plane locked to the camera
+at the same vertical fov, so the rendered ice plinth registers with the live mark
+at any aspect. The plate is drawn in the OPAQUE pass (custom premultiplied
+blending, renderOrder first): as a transparent object three would draw it after,
+and over, the beads. Moving the mark's layout means re-rendering (PEDESTAL_TOP).
+
+**The background canvas pauses while the stage covers it.** The plate is opaque,
+so at `scrollState.stage >= 0.995` `PauseUnderStage` (Scene.tsx) sets R3F's
+frameloop to `never`, watched from GSAP's ticker (R3F's own loop is off then).
+Rendering both full-screen canvases dropped frames there, which is what made the
+cursor lag. The stage canvas is capped at 1.5× DPR for the same reason. Don't add more canvases
 without the same justification.
 
 **Stage scroll triggers anchor to the pin, not to elements below it.** Anything
@@ -96,6 +111,28 @@ screen.
 
 **Rotation with a variable rate must be integrated.** `angle += rate * dt`, never
 `angle = elapsed * rate` — changing the rate teleports the angle.
+
+**Shards sit behind their DOM slots by measurement, never by layout maths.**
+`Archive` registers its slot buttons in `archiveState.slots`; `CrystalGallery` casts
+a ray from the live camera through each slot's on-screen centre onto z = 0 every
+frame. The Projects chapter uses `Chapter hold`: the whole shell (heading, rule,
+cards) is sticky and full-height. Holding only the cards slid them over their own
+heading, and fixed-thirds shard placement left shards hanging after their labels.
+
+**Text on the left, the bead field on the right.** Chapter headings are real h2s
+with the caption beneath them (no numbered eyebrow labels, no numbers in nav or
+rail — owner's call); every `ART` formation sits right of the reading column.
+A right-aligned caption or a centred formation lands text on beads.
+
+**HUD lives in the gutters.** Progress rail right, Sound/Motion icon buttons left
+(top bar on phones). Anything fixed over the content column covers text in every
+chapter.
+
+**Every section boundary must dissolve.** The stage plate feathers its leading
+edge while the section moves in or out, the mark arrives/leaves by bead density
+with `scrollState.stage`, the selector veil fades out (`--veil`), and the field
+returns thinned for the footer (`scrollState.outro`). A full-width hairline or a
+clipped gradient at a hand-off reads as a hard cut.
 
 **Displace shard vertices radially, never along the facet normal.**
 `PolyhedronGeometry` is non-indexed: a corner exists once per face with a different

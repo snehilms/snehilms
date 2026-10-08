@@ -98,15 +98,6 @@
   background: rgb(16 21 29 / 0.05);
 }
 
-.linkIndex {
-  font-family: var(--font-mono);
-  font-size: var(--t-mono);
-  color: var(--c-text-ghost);
-  letter-spacing: var(--ls-mono);
-}
-
-.link:hover .linkIndex { color: var(--c-accent); }
-
 .linkLabel {
   font-size: var(--t-sm);
   letter-spacing: var(--ls-snug);

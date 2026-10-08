@@ -67,7 +67,7 @@ export function Thaw() {
   );
 
   return (
-    <Chapter id={chapter.id} index={chapter.index} kicker={chapter.kicker} caption={chapter.caption}>
+    <Chapter id={chapter.id} title={chapter.title} caption={chapter.caption}>
       <div ref={ref} className={styles.grid}>
         <div className={styles.prose}>
           <RevealText as="p" className={styles.lead} mode="lines" stagger={0.06}>

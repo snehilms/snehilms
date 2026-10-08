@@ -182,7 +182,7 @@ A cold, low-chroma slate-and-fog palette with a single glacial-ink accent; the o
 - **Chamber Fog** (ground): the page background and the band all text contrast is measured against.
 - **Low Fog** (fog-lo): the lit face of every bead and the pedestal stone.
 - **Slate Floor** (floor) and **Deep Floor** (floor-deep): the floor below the horizon, pedestal grooves, the pedestal's ground shadow. Not text colours.
-- **Slate Ink** (ink): headlines, active selector names, brackets. 14.0:1 on `ground`.
+- **Slate Ink** (ink): headlines, active selector names, the selector bead. 14.0:1 on `ground`.
 - **Text Slate** (ink-2, the semantic body text): 11.9:1 on `ground`.
 - **Shade Slate** (ink-3): the shaded side of every bead and the crystals' inner network lines; 8.6:1 when used for small values.
 - **Dim Text** (text-dim): secondary prose, taglines, blurbs. 7.5:1.
@@ -254,7 +254,7 @@ Depth is atmospheric first and shadowed rarely. The canvas supplies it: a fog ch
 
 ## Shapes
 
-Gentle, consistent rounding: tags and focus rings 8px, cards and diagram frames 16px, the dossier and compact archive cards 24px, pills and chips fully round. Borders are 1px hairlines in `line` or `line-strong`. Recurring geometry is instrumental: horizontal rules drawn in with scaleX and fading to transparent, survey-style leader lines, plain hairline range marks, travelling corner brackets, a 1px progress spine. On the canvas, forms are faceted (icosahedral shards, a triangulated half-dome) and round (beads, floor rings).
+Gentle, consistent rounding: tags and focus rings 8px, cards and diagram frames 16px, the dossier and compact archive cards 24px, pills and chips fully round. Borders are 1px hairlines in `line` or `line-strong`. Recurring geometry is instrumental: horizontal rules drawn in with scaleX and fading to transparent, survey-style leader lines, plain hairline range marks, a single travelling bead under the active stage name, a 1px progress spine. On the canvas, forms are faceted (icosahedral shards, a triangulated half-dome) and round (beads, floor rings).
 
 ## Components
 
@@ -279,7 +279,7 @@ Gentle, consistent rounding: tags and focus rings 8px, cards and diagram frames 
 - **Chapter rail:** fixed right, a 1px spine whose accent fill is scrubbed by scroll, with ticks and mono labels revealed by opacity and transform on the active chapter. Hidden below 900px.
 
 ### Socials Stage (signature)
-A pinned full-viewport chamber holding one bead mark (sized at a quarter of the viewport height, capped by width) floating clear above the far rim of a pale stone pedestal with `floor` grooves, white light rings spreading across the floor, a soft `floor-deep` ground shadow and the back half of a white triangulated wireframe dome (22% opacity). The DOM adds only two range marks (plain 1px `ink-3` rules at half opacity, no returns) at the mark's centre line, a selector row of four names near the bottom (faint, ink when active) framed by corner brackets (1.5px ink) that travel by transform to the active or focused name, and the handle beneath in mono accent with a diagonal SVG arrow. A name with no destination (currently X) is a select-only button and its handle is plain `text-faint` mono, never styled as a link. The selector stands on the slate floor, so a soft radial veil of `fog-hi` (0.88 at centre, fading out) sits behind the band; it lifts the floor under the inactive names to at least 4.78:1 against `text-faint` (measured), keeping the faint/ink hierarchy instead of darkening every name.
+A pinned full-viewport chamber holding one bead mark (sized at a quarter of the viewport height, capped by width) floating clear above the far rim of a pale stone pedestal with `floor` grooves, white light rings spreading across the floor, a soft `floor-deep` ground shadow and the back half of a white triangulated wireframe dome (22% opacity). The DOM adds only two range marks (plain 1px `ink-3` rules at half opacity, no returns) at the mark's centre line, a selector row of four names near the bottom (body size, faint, ink when active) with a single 6px ink bead under the active or focused name that glides there by transform, and the handle beneath in `ink-3` mono with a diagonal SVG arrow, underlining on hover. A name with no destination (currently X) is a select-only button and its handle is plain `text-faint` mono, never styled as a link. The selector stands on the slate floor, so a soft radial veil of `fog-hi` (0.88 at centre, fading out) sits behind the band; it lifts the floor under the inactive names to at least 4.78:1 against `text-faint` (measured), keeping the faint/ink hierarchy instead of darkening every name.
 
 Selection: hover or focus previews a mark; clicking the active name opens it. On touch the first tap jumps the pinned scroll to that mark and a second tap opens it.
 

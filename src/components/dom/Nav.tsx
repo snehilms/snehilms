@@ -34,7 +34,9 @@ export function Nav() {
 
       const st = ScrollTrigger.create({
         start: 'top -80',
-        end: 'max',
+        // One past max: at exactly 'max' the trigger deactivates on the last
+        // pixel and the bar lost its frost under the footer.
+        end: () => ScrollTrigger.maxScroll(window) + 1,
         onToggle: (self) => setCondensed(self.isActive),
       });
 
@@ -61,7 +63,6 @@ export function Nav() {
               className={styles.link}
               onClick={() => scrollTo(`#${section.id}`)}
             >
-              <span className={styles.linkIndex}>{section.index}</span>
               <span className={styles.linkLabel}>{section.title}</span>
             </button>
           ))}

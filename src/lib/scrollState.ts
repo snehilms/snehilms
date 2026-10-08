@@ -40,6 +40,12 @@ export type ScrollState = {
    * the stage's ScrollTrigger, reset on leave.
    */
   stage: number;
+  /**
+   * 0 → 1 as the stage hands over to the footer. The background field comes
+   * back for the colophon, but thinned, so it never sits at full density
+   * under body text.
+   */
+  outro: number;
 };
 
 export const scrollState: ScrollState = {
@@ -53,6 +59,7 @@ export const scrollState: ScrollState = {
   pointerSmooth: { x: 0, y: 0 },
   ready: false,
   stage: 0,
+  outro: 0,
 };
 
 /** Frame-rate independent exponential damping. */

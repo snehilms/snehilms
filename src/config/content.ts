@@ -109,36 +109,26 @@ export const identity = {
 export const chapters = [
   {
     id: 'intro',
-    index: '00',
-    kicker: 'INTRO',
     title: 'Intro',
     caption: 'Low-latency systems and the interfaces on top.',
   },
   {
     id: 'experience',
-    index: '01',
-    kicker: 'EXPERIENCE',
     title: 'Experience',
     caption: 'Exchanges, schedulers, realtime data: what I have built and scaled.',
   },
   {
     id: 'projects',
-    index: '02',
-    kicker: 'PROJECTS',
     title: 'Projects',
     caption: 'Three systems, end to end. Open one for its architecture.',
   },
   {
     id: 'stack',
-    index: '03',
-    kicker: 'STACK',
     title: 'Stack',
     caption: 'The tools I reach for, from the interface down to the platform.',
   },
   {
     id: 'contact',
-    index: '04',
-    kicker: 'CONTACT',
     title: 'Contact',
     caption: 'Email is fastest. Every other channel is just below.',
   },
@@ -149,7 +139,7 @@ export type ChapterId = (typeof chapters)[number]['id'];
 /* The socials stage follows the last chapter. It is a nav destination but not
    a chapter: chapter space drives the particle field, and the stage is its own
    room with its own canvas. */
-export const socialsSection = { id: 'socials', index: '05', title: 'Socials' } as const;
+export const socialsSection = { id: 'socials', title: 'Socials' } as const;
 
 export const about = {
   lead: 'I build the unglamorous middle — the order books, the schedulers, the serialization — and then I make the surface feel effortless.',

@@ -37,7 +37,7 @@ FIRST VIEWPORT: Unchanged composition this pass: a top-lit bead sphere shell
 right of centre in fog (the SK initials resolve in Thaw), three-line headline left in ink, availability pill top
 right. Signature moment, the socials stage: pinned full viewport, one bead mark
 at about 53vmin floating over a pedestal with light rings; scroll steps
-GitHub, LinkedIn, X, Email, each change a tear-and-reform; a bracketed selector
+GitHub, LinkedIn, X, Email, each change a tear-and-reform; a selector marked by a single gliding bead
 row at the bottom previews on hover or focus and jumps on tap; the cursor pushes beads aside.
 
 FORM: Owner-pinned direction ("crystal world plus igloo.inc aura, fully

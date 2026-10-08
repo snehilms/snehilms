@@ -43,13 +43,19 @@ const ART = [
   // Back 2.6 into the fog and right: the shell sits beside the name, clear of
   // the headline and the meta row.
   { offsetX: 2.95, offsetY: 0.0, offsetZ: -2.6, opacity: 1.0, size: 2.7, yaw: 0.34 }, // 00 intro
-  { offsetX: 2.35, offsetY: 0.1, offsetZ: -1.2, opacity: 0.42, size: 2.2, yaw: 0.0 }, // 01 experience
+  // Both columns carry text (prose left, stats right), so the field steps
+  // out past the stats and down, thinned: it must never sit under the labels.
+  { offsetX: 3.7, offsetY: -0.9, offsetZ: -1.6, opacity: 0.24, size: 1.9, yaw: 0.0 }, // 01 experience
   // The archive belongs to the shards. The field retreats in depth as well
   // as in opacity — pushing it back lets the depth fog finish the job, so it
   // reads as weather behind the crystals instead of a veil over them.
-  { offsetX: 0.0, offsetY: 0.0, offsetZ: -4.2, opacity: 0.20, size: 1.8, yaw: 0.16 }, // 02 projects
-  { offsetX: 2.15, offsetY: 0.0, offsetZ: -1.2, opacity: 0.4, size: 2.1, yaw: 0.1 }, // 03 stack
-  { offsetX: 0.0, offsetY: -0.45, offsetZ: 0.0, opacity: 0.95, size: 2.7, yaw: 0.28 }, // 04 contact
+  // Parked right and far back, on the same line as 01 and 03, so moving
+  // between chapters it never sweeps across a heading or a card.
+  { offsetX: 3.4, offsetY: -0.6, offsetZ: -4.2, opacity: 0.06, size: 1.8, yaw: 0.16 }, // 02 projects
+  { offsetX: 2.9, offsetY: 0.0, offsetZ: -1.8, opacity: 0.2, size: 2.0, yaw: 0.1 }, // 03 stack
+  // The prompt and address take the left half; the ring takes the right,
+  // as the sphere does in the hero, so the two ends of the page rhyme.
+  { offsetX: 2.7, offsetY: -0.6, offsetZ: -1.4, opacity: 0.9, size: 2.1, yaw: 0.28 }, // 04 contact
 ] as const;
 
 function lerp(a: number, b: number, t: number) {
@@ -70,6 +76,7 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
   const pointerWorld = useRef(new THREE.Vector3(0, 0, 0));
   const dispersionRef = useRef(0);
   const stageRef = useRef(0);
+  const outroRef = useRef(0);
 
   /* --- Build the simulation once ------------------------------------- */
   const sim = useMemo(() => {
@@ -269,8 +276,9 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
 
     // The socials stage is its own room: the field leaves it entirely.
     stageRef.current = damp(stageRef.current, scrollState.stage, 3, dt);
+    outroRef.current = damp(outroRef.current, scrollState.outro, 3, dt);
     material.uniforms.uOpacity.value =
-      lerp(a.opacity, b.opacity, mix) * (1 - stageRef.current) * (portrait ? 0.6 : 1);
+      lerp(a.opacity, b.opacity, mix) * (1 - stageRef.current) * (1 - 0.93 * outroRef.current) * (portrait ? 0.6 : 1);
     material.uniforms.uSize.value = lerp(a.size, b.size, mix);
 
     /* Mid-transition, loosen the springs and raise turbulence. The form has

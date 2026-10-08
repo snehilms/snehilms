@@ -27,8 +27,8 @@ import styles from './StageCanvas.module.css';
    STAGE CANVAS
 
    The one deliberate exception to "one canvas". The socials stage is a
-   separate room: a mark on a pedestal under a dome, framed by its own fixed
-   camera. Built into the background canvas it would inherit the dolly, the
+   separate room: a mark over an ice plinth in a pre-rendered world (see
+   Backdrop), framed by its own fixed camera. Built into the background canvas it would inherit the dolly, the
    pointer parallax and the field's art direction, all of which belong to the
    descent, not to this room.
 
@@ -47,7 +47,10 @@ const LOOK_AT = new THREE.Vector3(0, 0.05, 0);
 const MORPH_SECONDS = 1.2;
 
 /* --- Layout ---------------------------------------------------------------
-   One source for the mark and the chamber, so they always agree. Projected
+   The mark's placement. The ice plinth in the backdrop render sits where
+   the old pedestal did at landscape sizes (top at markY - scale - 0.6 =
+   -1.155; PEDESTAL_TOP in art/scripts/stage_world.py): change one, change
+   the other. Projected
    at 1440×900: mark 11–62% of the height (about 51vmin). The camera looks
    down, so the pedestal's far rim projects ABOVE the plane the mark stands
    on; the gap is sized so the mark's base still clears that rim by ~40px
@@ -57,10 +60,7 @@ const MORPH_SECONDS = 1.2;
 function layout(viewport: { width: number; height: number }) {
   const scale = Math.min(viewport.height * 0.22, viewport.width * 0.34);
   const markY = LOOK_AT.y + scale * 0.52;
-  const pedestalTop = markY - scale - 0.6;
-  /* The plinth narrows on a portrait screen so it never runs off the sides. */
-  const fit = Math.min(1, viewport.width / 3.9);
-  return { scale, markY, pedestalTop, fit };
+  return { scale, markY };
 }
 
 /* --- Mark ----------------------------------------------------------------
@@ -203,6 +203,7 @@ function Mark({ glyphs, simSize, reducedMotion }: MarkProps) {
           uBead: { value: 0.02 },
           uPxPerUnit: { value: 100 },
           uRefDist: { value: CAMERA_POS.distanceTo(LOOK_AT) },
+          uPresence: { value: 1 },
           uDpr: { value: dpr },
           uResolution: { value: new THREE.Vector2(1, 1) },
           // Slate body, as in the reference: darker than the fog, so torn
@@ -230,6 +231,7 @@ function Mark({ glyphs, simSize, reducedMotion }: MarkProps) {
           uBead: { value: 0.02 },
           uPxPerUnit: { value: 100 },
           uRefDist: { value: CAMERA_POS.distanceTo(LOOK_AT) },
+          uPresence: { value: 1 },
           uDpr: { value: dpr },
           uColor: { value: cssColor('--c-glint', '#ffffff') },
         },
@@ -393,8 +395,8 @@ function Mark({ glyphs, simSize, reducedMotion }: MarkProps) {
     // Gusts arrive fast and die fast: a still cursor stirs nothing.
     w.v.lerp(tmp.gust, 1 - Math.exp(-14 * dt));
     vu.uWind.value.copy(w.v);
-    // A gust takes a real chunk of the mark, not a wisp.
-    vu.uWindRadius.value = scale * 0.42;
+    // A tight, local disturbance: the cursor brushes a patch, not half the mark.
+    vu.uWindRadius.value = scale * 0.22;
 
     vu.uTime.value = t;
     vu.uDelta.value = dt;
@@ -427,7 +429,13 @@ function Mark({ glyphs, simSize, reducedMotion }: MarkProps) {
     u.uPxPerUnit.value = size.height / viewport.height;
     u.uResolution.value.set(size.width * dpr, size.height * dpr);
 
+    // The mark arrives and leaves by density, in step with the stage (and
+    // opposite the background field): gone before it can scroll into the nav.
+    const presence = Math.min(1, Math.max(0, (scrollState.stage - 0.25) / 0.7));
+    u.uPresence.value = presence;
+
     const h = halo.uniforms;
+    h.uPresence.value = presence;
     h.uPositions.value = u.uPositions.value;
     h.uVelocities.value = u.uVelocities.value;
     h.uBead.value = u.uBead.value;
@@ -492,112 +500,190 @@ function Dust({ reducedMotion }: { reducedMotion: boolean }) {
   return <points geometry={geometry} material={material} frustumCulled={false} />;
 }
 
-/* --- Pedestal, rings, dome ---------------------------------------------- */
+/* --- World backdrop -----------------------------------------------------
+   Each social stands in its own pre-rendered world (art/scripts/
+   stage_world.py: Blender, Cycles, CC0 Poly Haven sky and snow). The render
+   uses this exact camera — fov 35° vertical, same position and target — and
+   is drawn on a plane locked to the camera at the same vertical field of
+   view, so the ice plinth in the image sits exactly under the live mark at
+   any aspect; wider screens simply see more of a 2.4:1 plate.
 
-function Chamber() {
-  const viewport = useThree((s) => s.viewport);
-  const colours = useMemo(
-    () => ({
-      stone: cssColor('--c-fog-lo', '#c9cfd8'),
-      groove: cssColor('--c-floor', '#8e97a5'),
-      glint: cssColor('--c-glint', '#ffffff'),
-    }),
-    [],
-  );
+   The plate crossfades to the next world as the mark changes (following
+   hover previews too), fades in with the stage, and drifts a few pixels
+   against the pointer for depth. A social without its own render yet
+   borrows the first one that exists. */
 
-  /* Ground shadow: a soft radial falloff that seats the pedestal on the
-     floor. Without it the plinth floats in the fog. */
-  const shadow = useMemo(
+const WORLD_PLATES: Partial<Record<GlyphKey, string>> = {
+  github: '/stage/github.webp',
+};
+const PLATE_ASPECT = 2.4;
+const PLATE_DISTANCE = 40;
+const CROSSFADE_SECONDS = 0.9;
+
+const PLATE_VERTEX = /* glsl */ `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+
+const PLATE_FRAGMENT = /* glsl */ `
+uniform sampler2D uA;
+uniform sampler2D uB;
+uniform float uMix;
+uniform float uOpacity;
+uniform vec2 uShift;
+uniform float uBufferHeight;
+uniform float uFeatherTop;
+uniform float uFeatherBottom;
+varying vec2 vUv;
+
+// 1 inside, easing to 0 across a band \`width\` deep from the edge; no band
+// at all when width is 0.
+float feather(float fromEdge, float width) {
+  return width <= 0.0 ? 1.0 : smoothstep(0.0, width, fromEdge);
+}
+
+void main() {
+  // A hair of overscan so the pointer drift never shows an edge.
+  vec2 uv = (vUv - 0.5) * 0.99 + 0.5 + uShift;
+  vec3 colour = mix(texture2D(uA, uv).rgb, texture2D(uB, uv).rgb, uMix);
+  // While the section is still moving in or out, the plate's leading edge
+  // dissolves into the fog instead of sliding over it as a hard line.
+  float y = gl_FragCoord.y / uBufferHeight;          // 0 bottom, 1 top
+  float edge = feather(1.0 - y, uFeatherTop) * feather(y, uFeatherBottom);
+  gl_FragColor = vec4(colour, uOpacity * edge);
+  #include <colorspace_fragment>
+  gl_FragColor.rgb *= gl_FragColor.a; // premultiplied, as the canvas is
+}
+`;
+
+/* How deep the dissolving edge is, as a fraction of the canvas: wide while
+   the section is well on its way, shrinking to nothing over the last fifth
+   of the approach so the plate is whole by the time it fills the screen. */
+function featherFor(gap: number) {
+  if (gap <= 0) return 0;
+  const visible = 1 - gap;
+  const settle = Math.min(1, gap / 0.2);
+  return Math.min(visible * 0.9, 0.5) * settle * settle * (3 - 2 * settle);
+}
+
+function Backdrop({ glyphs }: { glyphs: readonly GlyphKey[] }) {
+  const camera = useThree((s) => s.camera);
+  const gl = useThree((s) => s.gl);
+  const mesh = useRef<THREE.Mesh>(null);
+  const plates = useRef<(THREE.Texture | null)[]>(glyphs.map(() => null));
+  const fade = useRef({ from: 0, to: 0, mix: 1, opacity: 0 });
+  const pointer = useRef(new THREE.Vector2());
+  const drift = useRef(new THREE.Vector2());
+
+  const geometry = useMemo(() => {
+    const h = 2 * PLATE_DISTANCE * Math.tan(THREE.MathUtils.degToRad(35 / 2));
+    return new THREE.PlaneGeometry(h * PLATE_ASPECT, h);
+  }, []);
+  const material = useMemo(
     () =>
       new THREE.ShaderMaterial({
-        transparent: true,
+        uniforms: {
+          uA: { value: null },
+          uB: { value: null },
+          uMix: { value: 0 },
+          uOpacity: { value: 0 },
+          uShift: { value: new THREE.Vector2() },
+          uBufferHeight: { value: 1 },
+          uFeatherTop: { value: 0 },
+          uFeatherBottom: { value: 0 },
+        },
+        vertexShader: PLATE_VERTEX,
+        fragmentShader: PLATE_FRAGMENT,
+        /* Drawn in the OPAQUE pass so renderOrder puts it first: three
+           draws every transparent object after the opaque ones, which would
+           paint the plate over the beads. Custom blending still lets it
+           fade in with the stage. */
+        transparent: false,
+        blending: THREE.CustomBlending,
+        blendSrc: THREE.OneFactor,
+        blendDst: THREE.OneMinusSrcAlphaFactor,
+        depthTest: false,
         depthWrite: false,
-        uniforms: { uColor: { value: cssColor('--c-floor-deep', '#5d6676') } },
-        vertexShader: /* glsl */ `
-          varying vec2 vUv;
-          void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
-        `,
-        fragmentShader: /* glsl */ `
-          uniform vec3 uColor;
-          varying vec2 vUv;
-          void main() {
-            float d = distance(vUv, vec2(0.5)) * 2.0;
-            gl_FragColor = vec4(uColor, (1.0 - smoothstep(0.35, 1.0, d)) * 0.38);
-            #include <colorspace_fragment>
-          }
-        `,
       }),
     [],
   );
 
-  /* Only the far half of the dome: the near half sits between the camera
-     and the plinth and would rule lines straight across the mark. */
-  const dome = useMemo(() => {
-    const wire = new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(5.6, 2));
-    const src = wire.getAttribute('position');
-    const kept: number[] = [];
-    for (let i = 0; i < src.count; i += 2) {
-      if (src.getZ(i) < -0.4 && src.getZ(i + 1) < -0.4 && src.getY(i) > -0.2 && src.getY(i + 1) > -0.2) {
-        kept.push(src.getX(i), src.getY(i), src.getZ(i), src.getX(i + 1), src.getY(i + 1), src.getZ(i + 1));
-      }
+  useEffect(() => {
+    const loader = new THREE.TextureLoader();
+    const fallback = Object.values(WORLD_PLATES)[0];
+    const byUrl = new Map<string, THREE.Texture>();
+    let alive = true;
+    glyphs.forEach((glyph, i) => {
+      const url = WORLD_PLATES[glyph] ?? fallback;
+      if (!url) return;
+      const ready = (tex: THREE.Texture) => {
+        if (alive) plates.current[i] = tex;
+      };
+      const cached = byUrl.get(url);
+      if (cached) return ready(cached);
+      const tex = loader.load(url, ready);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.generateMipmaps = false;
+      tex.minFilter = THREE.LinearFilter;
+      byUrl.set(url, tex);
+    });
+    const onMove = (e: PointerEvent) =>
+      pointer.current.set((e.clientX / window.innerWidth) * 2 - 1, (e.clientY / window.innerHeight) * 2 - 1);
+    window.addEventListener('pointermove', onMove, { passive: true });
+    return () => {
+      alive = false;
+      window.removeEventListener('pointermove', onMove);
+      byUrl.forEach((t) => t.dispose());
+      geometry.dispose();
+      material.dispose();
+    };
+  }, [glyphs, geometry, material]);
+
+  useFrame((_, rawDelta) => {
+    const dt = Math.min(rawDelta, 1 / 30);
+    const plane = mesh.current;
+    if (!plane) return;
+    // Locked to the camera, PLATE_DISTANCE down its view axis.
+    plane.quaternion.copy(camera.quaternion);
+    plane.position.copy(camera.position).add(
+      new THREE.Vector3(0, 0, -PLATE_DISTANCE).applyQuaternion(camera.quaternion),
+    );
+
+    const f = fade.current;
+    const target = activeSocial();
+    if (target !== f.to) {
+      // Retargeting mid-fade keeps whichever world is more visible.
+      if (f.mix > 0.5) f.from = f.to;
+      f.to = target;
+      f.mix = 0;
     }
-    wire.dispose();
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(kept, 3));
-    return geo;
-  }, []);
+    f.mix = Math.min(1, f.mix + dt / CROSSFADE_SECONDS);
+    f.opacity = damp(f.opacity, scrollState.stage, 3, dt);
 
-  useEffect(
-    () => () => {
-      shadow.dispose();
-      dome.dispose();
-    },
-    [shadow, dome],
-  );
+    const a = plates.current[f.from] ?? plates.current[f.to];
+    const b = plates.current[f.to] ?? a;
+    const u = material.uniforms;
+    u.uA.value = a;
+    u.uB.value = b;
+    u.uMix.value = f.mix * f.mix * (3 - 2 * f.mix);
+    u.uOpacity.value = a ? f.opacity : 0;
+    // Where the canvas sits in the viewport right now (it scrolls with the
+    // section until the pin takes it, and again after the pin releases).
+    const rect = gl.domElement.getBoundingClientRect();
+    const vh = window.innerHeight;
+    u.uBufferHeight.value = gl.domElement.height;
+    u.uFeatherTop.value = featherFor(Math.min(1, Math.max(0, rect.top / vh)));
+    u.uFeatherBottom.value = featherFor(Math.min(1, Math.max(0, (vh - rect.bottom) / vh)));
 
-  const { pedestalTop, fit } = layout(viewport);
+    drift.current.lerp(pointer.current, 1 - Math.exp(-2.5 * dt));
+    u.uShift.value.set(-drift.current.x * 0.003, drift.current.y * 0.002);
+  });
 
   return (
-    <group position={[0, pedestalTop, 0]} scale={fit}>
-      <mesh position={[0, -0.18, 0]}>
-        <cylinderGeometry args={[1.5, 1.55, 0.34, 96, 1]} />
-        <meshStandardMaterial color={colours.stone} roughness={0.62} metalness={0.04} />
-      </mesh>
-
-      {/* Engraved inlay on the plinth's top face. */}
-      {[0.68, 1.04].map((r) => (
-        <mesh key={r} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.002, 0]}>
-          <ringGeometry args={[r, r + 0.03, 96]} />
-          <meshBasicMaterial color={colours.groove} transparent opacity={0.45} toneMapped={false} />
-        </mesh>
-      ))}
-
-      {/* Rim light: the brightest thing in the room, and the bloom's job. */}
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
-        <torusGeometry args={[1.52, 0.018, 8, 160]} />
-        <meshBasicMaterial color={colours.glint} toneMapped={false} />
-      </mesh>
-
-      {/* Light rings spreading across the floor. */}
-      {[
-        { r: 2.4, o: 0.7 },
-        { r: 3.4, o: 0.4 },
-      ].map(({ r, o }) => (
-        <mesh key={r} rotation={[Math.PI / 2, 0, 0]} position={[0, -0.36, 0]}>
-          <torusGeometry args={[r, 0.014, 6, 200]} />
-          <meshBasicMaterial color={colours.glint} transparent opacity={o} toneMapped={false} />
-        </mesh>
-      ))}
-
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.355, 0]}>
-        <planeGeometry args={[6.5, 6.5]} />
-        <primitive object={shadow} attach="material" />
-      </mesh>
-
-      <lineSegments geometry={dome} position={[0, -0.36, 0]}>
-        <lineBasicMaterial color={colours.glint} transparent opacity={0.22} depthWrite={false} />
-      </lineSegments>
-    </group>
+    <mesh ref={mesh} geometry={geometry} material={material} renderOrder={-10} frustumCulled={false} />
   );
 }
 
@@ -640,7 +726,9 @@ export function StageCanvas({ glyphs }: { glyphs: readonly GlyphKey[] }) {
     <div ref={wrap} className={styles.canvas} aria-hidden="true">
       <Canvas
         flat
-        dpr={dpr}
+        // Capped at 1.5×: the world plate is soft by nature and the beads
+        // read the same, while 2× doubles the fill cost of a full-screen stage.
+        dpr={[dpr[0], Math.min(dpr[1], 1.5)]}
         frameloop={inView ? 'always' : 'never'}
         gl={{ alpha: true, antialias: true, powerPreference: 'high-performance', stencil: false }}
         camera={{ fov: 35, near: 0.1, far: 60, position: CAMERA_POS.toArray() }}
@@ -649,7 +737,7 @@ export function StageCanvas({ glyphs }: { glyphs: readonly GlyphKey[] }) {
         <fog attach="fog" args={[tones.fog, 9, 22]} />
         <hemisphereLight args={[tones.sky, tones.floor, 1.6]} />
         <directionalLight position={[-2, 6, 4]} intensity={1.4} />
-        <Chamber />
+        <Backdrop glyphs={glyphs} />
         <Dust reducedMotion={reducedMotion} />
         <Mark glyphs={glyphs} simSize={SIM_SIZE[tier]} reducedMotion={reducedMotion} />
       </Canvas>

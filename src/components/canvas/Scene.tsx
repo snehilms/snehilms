@@ -1,8 +1,10 @@
 'use client';
 
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
+import { gsap } from '@/lib/gsap';
+import { scrollState } from '@/lib/scrollState';
 
 import { ParticleField } from './ParticleField';
 import { Atmosphere } from './Atmosphere';
@@ -23,6 +25,33 @@ import styles from './Scene.module.css';
    pointer-events is off so every click, selection and focus ring belongs to
    the DOM layer above.
    ========================================================================= */
+
+/* While the socials stage fills the viewport its opaque world plate hides
+   this canvas completely, yet the scene would keep rendering underneath at
+   full resolution with bloom: two full-screen WebGL passes per frame, which
+   showed up as dropped frames (and a laggy cursor) on the stage. Pause the
+   loop while it is hidden; resume the moment the stage starts to leave. The
+   watcher runs on GSAP's ticker, which keeps going while R3F's loop is off. */
+const HIDDEN_AT = 0.995;
+
+function PauseUnderStage() {
+  const setFrameloop = useThree((s) => s.setFrameloop);
+  useEffect(() => {
+    let paused = false;
+    const check = () => {
+      const covered = scrollState.stage >= HIDDEN_AT;
+      if (covered === paused) return;
+      paused = covered;
+      setFrameloop(covered ? 'never' : 'always');
+    };
+    gsap.ticker.add(check);
+    return () => {
+      gsap.ticker.remove(check);
+      setFrameloop('always');
+    };
+  }, [setFrameloop]);
+  return null;
+}
 
 export function Scene() {
   const { simSize, dpr, postprocessing, reducedMotion } = useDeviceTier();
@@ -45,6 +74,7 @@ export function Scene() {
           gl.toneMappingExposure = 1.05;
         }}
       >
+        <PauseUnderStage />
         <Suspense fallback={null}>
           {/* Only a loaded .glb core responds to these — every material
               written in this project is a ShaderMaterial and ignores lights. */}

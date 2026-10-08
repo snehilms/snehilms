@@ -66,7 +66,7 @@ export function Strata() {
   );
 
   return (
-    <Chapter id={chapter.id} index={chapter.index} kicker={chapter.kicker} caption={chapter.caption}>
+    <Chapter id={chapter.id} title={chapter.title} caption={chapter.caption}>
       <div ref={ref} className={styles.core}>
         {strata.map((layer, i) => (
           <div key={layer.label} className={styles.band}>

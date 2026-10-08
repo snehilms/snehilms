@@ -56,8 +56,7 @@ export function SocialStage() {
   const root = useRef<HTMLDivElement>(null);
   const section = useRef<HTMLElement>(null);
   const row = useRef<HTMLUListElement>(null);
-  const bracketL = useRef<HTMLSpanElement>(null);
-  const bracketR = useRef<HTMLSpanElement>(null);
+  const bead = useRef<HTMLSpanElement>(null);
   const footer = useRef<HTMLElement>(null);
 
   /* The selector's active item changes a handful of times per visit, so it
@@ -106,18 +105,16 @@ export function SocialStage() {
     show(Math.round(socialState.scrollIndex));
   };
 
-  /* Brackets travel to the active name. Two halves on transforms rather
-     than one frame on width, so the move stays on the compositor. */
+  /* One bead — a single particle off the stage — marks the active name and
+     glides under the next one. Moved by transform, centred on the name. */
   useLayoutEffect(() => {
     const list = row.current;
     const item = list?.children[active] as HTMLElement | undefined;
-    if (!list || !item || !bracketL.current || !bracketR.current) return;
+    const dot = bead.current;
+    if (!list || !item || !dot) return;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const left = item.offsetLeft;
-    const right = left + item.offsetWidth - bracketR.current.offsetWidth;
-    const vars = { duration: reduce ? 0 : 0.6, ease: 'expo.out', overwrite: true };
-    gsap.to(bracketL.current, { x: left, ...vars });
-    gsap.to(bracketR.current, { x: right, ...vars });
+    const x = item.offsetLeft + item.offsetWidth / 2 - dot.offsetWidth / 2;
+    gsap.to(dot, { x, duration: reduce ? 0 : 0.7, ease: 'expo.out', overwrite: true });
   }, [active]);
 
   useGSAP(
@@ -172,20 +169,18 @@ export function SocialStage() {
            bring the field back while the stage is still on screen. */
         const walkTrigger = walk.scrollTrigger!;
         pinned.current = walkTrigger;
-        const exit = gsap.fromTo(
-          scrollState,
-          { stage: 1 },
-          {
-            stage: 0,
-            ease: 'none',
-            immediateRender: false,
-            scrollTrigger: {
-              start: () => walkTrigger.end,
-              end: () => walkTrigger.end + foot.offsetHeight,
-              scrub: true,
-            },
+        const exit = gsap.timeline({
+          scrollTrigger: {
+            start: () => walkTrigger.end,
+            end: () => walkTrigger.end + foot.offsetHeight,
+            scrub: true,
           },
-        );
+        });
+        exit
+          .fromTo(scrollState, { stage: 1, outro: 0 }, { stage: 0, outro: 1, ease: 'none', immediateRender: false }, 0)
+          // The selector's fog veil only exists to lift it off the chamber
+          // floor; leaving, it would be clipped by the section's edge.
+          .fromTo(`.${styles.selector}`, { '--veil': 1 }, { '--veil': 0, ease: 'none', immediateRender: false }, 0);
 
         const colophon = gsap.from(`.${styles.colophonItem}`, {
           opacity: 0,
@@ -242,14 +237,9 @@ export function SocialStage() {
           {socialsSection.title}
         </h2>
 
-        {/* Range marks either side of the mark, at its centre line. */}
-        <span className={`${styles.mark} ${styles.markLeft}`} aria-hidden="true" />
-        <span className={`${styles.mark} ${styles.markRight}`} aria-hidden="true" />
-
         <div className={styles.selector}>
           <div className={styles.rowWrap}>
-            <span ref={bracketL} className={`${styles.bracket} ${styles.bracketL}`} aria-hidden="true" />
-            <span ref={bracketR} className={`${styles.bracket} ${styles.bracketR}`} aria-hidden="true" />
+            <span ref={bead} className={styles.bead} aria-hidden="true" />
             <ul ref={row} className={styles.row}>
               {socials.map((social, i) => {
                 const handlers = {
