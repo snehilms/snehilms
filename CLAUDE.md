@@ -156,19 +156,23 @@ While the gallery is up the bead field steps back (×0.1) as the scrim does: the
 section is tall, so the Experience formation otherwise hung beside the first crystal.
 `Chapter hold` is no longer used here.
 
-**The hover mesh is one directional, organic wave.** Owner's calls, in order:
-no glow at rest, no disc "punched" along the path, no stacked radiations, but
-the surrounding mesh must glow naturally, and small movements count too (a
-fixed distance threshold read as a dead zone). Any movement past a few pixels
-starts a single wave, its strength scaled by the net distance moved since the
-last wave (a nudge is faint, a sweep full; net, so a trembling hand cancels out), as a pinpoint where the pointer is, easing outward (to 0.3 plate heights over 1.5 s) along its recent
-heading (smoothed, so a jittery nudge cannot point it backwards). The mesh it passes over glows: brightest along a soft leading edge,
-fading behind it, with its reach warped by fbm noise and its brightness mottled,
-so it spreads like light through ice and never reads as a disc or a circle with
-a radius (owner's call after a thin-front-only version looked dead). The next
-waits until it is half spent (two uniform slots, never more). Each wave plays one
-`sound.sparkle()` chime (E-major pentatonic bell partials, panned, rate-limited),
-silent unless Sound is on.
+**The hover mesh is a ship's wake.** Owner's calls, in order: no glow at
+rest, no disc "punched" along the path, no stacked radiating rings, small
+movements count (a distance threshold read as a dead zone), "like a ship moving
+through water: the water beside it moves sideways and flows far beyond", and
+seamless, never pulsing ripple by ripple. So it is one continuous shape, not a
+train of ripples: the live pointer plus up to 39 points of its recent path
+(one per WAKE_LIFE/39 while it moves), newest first in `uWake`. Each point is
+pushed out to both sides of its heading (and a touch astern) by its age, and
+each arm is the chain of segments through those points, combined with max, not
+sum, so joints never brighten. The tip is the live pointer every frame;
+brightness is the square root of smoothed speed, so a nudge shows and the wake
+settles at rest. A pause (or a jump in and out of the crystal) breaks the chain
+instead of joining across it. Keep the heading as a raw fading sum of steps,
+normalised only on read: normalising the sum each frame let new steps barely
+turn it, and one arm hugged the path. `sound.sparkle()` chimes as a wake starts
+and at most every 0.4 s while it runs (E-major pentatonic bell partials,
+panned), silent unless Sound is on.
 
 **Text on the left, the bead field on the right.** Chapter headings are real h2s
 with the caption beneath them (no numbered eyebrow labels, no numbers in nav or

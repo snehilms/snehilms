@@ -11,10 +11,10 @@
    WIRE    The hover mesh: the ice block's evenly triangulated surface,
            pushed through the Blender camera and the rendered frame's pivot
            matrix, so it lands on the crystal in the picture, then laid flat
-           on the plate. Revealed only by the front of a wave sent out
-           when the pointer moves.
+           on the plate. Revealed only by the wake the pointer leaves
+           as it moves.
 
-   GLINT   A few surface vertices flash as four-point stars on that front.
+   GLINT   A few surface vertices flash as four-point stars on its crests.
 
    Normal blending only: additive light vanishes against fog.
    ========================================================================= */
@@ -83,25 +83,28 @@ const PROJECT = /* glsl */ `
   }
 `;
 
-/* The wave: the only thing that reveals the mesh (owner's calls, after the
-   igloo.inc reference). Moving the pointer sends ONE wave at a time from
-   where it is: it starts as a pinpoint and spreads outward in the direction
-   of travel. The mesh it passes over glows: brightest along its soft leading
-   edge, fading behind it, with its reach warped and its brightness mottled
-   by noise, so it spreads like light through ice and never reads as a disc
-   or a circle with a radius. Two slots only so a fading wave can finish while
-   the next begins; the emitter never overlaps them more than that.
-   xy = origin (plate uv), z = age 0..1 (1 = gone), w = strength. */
+/* The wake: the only thing that reveals the mesh (owner's calls: "like a
+   ship moving through water, the water beside it moves sideways and flows
+   far beyond", and seamless, never pulsing ripple by ripple). It is one
+   continuous shape, not a train of ripples: the pointer's recent path, newest
+   first, with the live pointer as its first point. Each point of the path is
+   pushed out to both sides of the way the pointer was heading (and a touch
+   astern) by how long ago the pointer was there, so the two arms of a V open
+   from the pointer and keep spreading behind it. Each arm is drawn as the
+   chain of segments joining those points, taking the nearest (max, never
+   sum: joints must not brighten). Brightness follows the pointer's smoothed
+   speed, so it swells and settles with the movement. Noise bends the arms
+   and mottles their light, so it reads as light moving through ice.
+   uWake[i]: xy = where the pointer was (plate uv), z = age 0..1 (1 = gone),
+   w = strength. uWakeDir[i]: its heading then, aspect-corrected. */
 const WAVE = /* glsl */ `
-  #define WAVES 2
-  uniform vec4 uWave[WAVES];
-  uniform vec2 uWaveDir[WAVES];  // unit direction of travel, aspect-corrected
-  uniform float uWaveRadius;     // how far a wave travels, in plate heights
-  uniform float uAspect;         // plate width / height
+  #define WAKE 40
+  uniform vec4 uWake[WAKE];
+  uniform vec2 uWakeDir[WAKE];
+  uniform float uWakeReach;  // how far the arms spread, in plate heights
+  uniform float uWakeBreak;  // an age gap this big means the pointer rested
+  uniform float uAspect;     // plate width / height
 
-  // Value noise and a two-octave fbm: what keeps the glow from reading as a
-  // circle. It warps how far the light reaches and mottles how bright each
-  // patch of mesh gets, the way light catches some facets and not others.
   float hash21(vec2 p) {
     p = fract(p * vec2(123.34, 456.21));
     p += dot(p, p + 45.32);
@@ -118,42 +121,57 @@ const WAVE = /* glsl */ `
     return vnoise(p) * 0.65 + vnoise(p * 2.3 + 17.0) * 0.35;
   }
 
+  // Where one side's arm passes for a point of the path: pushed out sideways
+  // (and a touch astern), out fast and then settling, like a bow wave.
+  vec2 armPoint(vec4 p, vec2 h, float sgn) {
+    float life = 1.0 - min(p.z, 1.0);
+    float spread = uWakeReach * (1.0 - life * life);
+    return p.xy * vec2(uAspect, 1.0) + (vec2(-h.y, h.x) * sgn - h * 0.22) * spread;
+  }
+
+  float segDist(vec2 x, vec2 a, vec2 b, out float t) {
+    vec2 ab = b - a;
+    float l = dot(ab, ab);
+    t = l > 1e-10 ? clamp(dot(x - a, ab) / l, 0.0, 1.0) : 0.0;
+    return length(x - a - ab * t);
+  }
+
   float wave(vec2 uv, out float frontOut) {
-    float m = 0.0;
-    float edge = 0.0;
     vec2 q = uv * vec2(uAspect, 1.0);
-    for (int i = 0; i < WAVES; i++) {
-      vec4 p = uWave[i];
-      float age = p.z;
-      if (age >= 1.0) continue;
-      vec2 dv = (uv - p.xy) * vec2(uAspect, 1.0);
-      float d = length(dv);
-      float life = 1.0 - age;
-      vec2 seed = p.xy * 37.0 + float(i) * 11.0;
-      // From a pinpoint, easing out: fast at first, settling as it fades.
-      float r = uWaveRadius * (1.0 - pow(life, 2.2));
-      // How far the light reaches varies by place: tongues and inlets, not
-      // a radius. The warp drifts as the wave travels.
-      float reach = r * (0.62 + 0.76 * fbm(q * 7.0 + seed + age * 0.6));
-      // Leading edge: soft and brightest, widening as it slows.
-      float bw = 0.018 + 0.05 * age;
-      // z*z, never pow(z, 2.0): pow of a negative base is NaN on Macs.
-      float z = (d - reach) / bw;
-      float lead = exp(-z * z);
-      // Behind it, a broad glow that thins toward the origin.
-      float trail = smoothstep(reach * 0.1, reach, d) * (1.0 - smoothstep(reach, reach + bw * 1.5, d));
-      // Mottled: some patches catch more light than others.
-      float mottle = 0.4 + 0.6 * fbm(q * 13.0 - seed);
-      // Directional, but with a soft, uneven shoulder rather than a cone edge.
-      float cosA = d > 1e-4 ? dot(dv / d, uWaveDir[i]) : 1.0;
-      float lobe = smoothstep(-0.25 + 0.35 * fbm(q * 5.0 + seed), 0.8, cosA);
-      // Eases in from nothing, so the origin never pops as a dot.
-      float fade = smoothstep(0.0, 0.1, age) * pow(life, 1.4) * p.w * lobe;
-      m = max(m, (lead * 1.0 + trail * 0.52) * mottle * fade);
-      edge = max(edge, lead * mottle * fade);
+    // Bent by the ice, not drawn with a ruler.
+    vec2 x = q + (vec2(fbm(q * 6.0), fbm(q * 6.0 + 31.0)) - 0.5) * 0.04;
+    float mottle = 0.4 + 0.6 * fbm(q * 13.0 + 5.0);
+    float crest = 0.0;
+    float body = 0.0;
+    for (int i = 0; i < WAKE - 1; i++) {
+      vec4 a = uWake[i];
+      vec4 b = uWake[i + 1];
+      // Newest first, so everything after a spent point is spent too.
+      if (a.z >= 1.0) break;
+      // Never join across a rest, or a jump in and out of the crystal.
+      if (b.z - a.z > uWakeBreak) continue;
+      vec2 jump = (b.xy - a.xy) * vec2(uAspect, 1.0);
+      if (dot(jump, jump) > 0.0144) continue;
+      for (int k = 0; k < 2; k++) {
+        float sgn = float(k) * 2.0 - 1.0;
+        float t;
+        float d = segDist(x, armPoint(a, uWakeDir[i], sgn), armPoint(b, uWakeDir[i + 1], sgn), t);
+        float age = min(mix(a.z, b.z, t), 1.0);
+        float life = 1.0 - age;
+        // The crest widens and softens as it runs out.
+        float bw = 0.008 + 0.03 * age;
+        // z*z, never pow(z, 2.0): pow of a negative base is NaN on Macs.
+        float z = d / bw;
+        float g = exp(-z * z);
+        // Fades in off the pointer, so the tip never sits as a hot dot.
+        float w = mix(a.w, b.w, t) * smoothstep(0.0, 0.12, age) * life * sqrt(life);
+        crest = max(crest, g * w);
+        // The water it has moved still glows a little either side of it.
+        body = max(body, (g + 0.35 * exp(-z * z * 0.12)) * w);
+      }
     }
-    frontOut = edge;
-    return m;
+    frontOut = min(crest, 1.0) * mottle;
+    return min(body, 1.0) * mottle;
   }
 `;
 
@@ -224,7 +242,7 @@ export const GLINT_VERTEX = /* glsl */ `
     vec4 world = uPose * vec4(position, 1.0);
     vec2 uv;
     vec3 local = toPlate(world, uv);
-    // A few stars ride the wave's front; each blinks on its own beat.
+    // A few stars ride the wake's crests; each blinks on its own beat.
     float pick = fract(seed * 7.13);
     float front;
     wave(uv, front);

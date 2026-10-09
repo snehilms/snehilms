@@ -46,17 +46,18 @@ type Meta = {
   envelope: { positions: number[]; indices: number[] };
 };
 
-/* The wave (owner's calls): moving the pointer sends one wave at a time,
-   from a pinpoint where the pointer is, outward along the way it is moving.
-   Nothing glows at rest or on arrival. Any movement counts, however small
-   (a fixed distance threshold read as a dead zone): a nudge sends a faint
-   wave, a sweep a full one. A new wave waits until the last is half spent. */
-const WAVES = 2;
-const WAVE_LIFE = 1.5;
-const WAVE_NUDGE = 0.004; // plate heights: a few pixels, just above jitter
-const WAVE_FULL = 0.08; // movement that sends a full-strength wave
-const WAVE_READY = 0.5; // the previous wave must be this far through its life
-const WAVE_IDLE = 0.25; // seconds still before movement so far is forgotten
+/* The wake (owner's calls: "like a ship moving through water", and seamless,
+   never pulsing ripple by ripple). The shader draws one continuous V from
+   the pointer's recent path: the live pointer first, then points laid down
+   as it moves, newest first. Brightness follows the pointer's smoothed speed,
+   so the wake swells with movement, however small, and settles at rest. */
+const WAKE = 40; // uniform slots: the live pointer + the path behind it
+const WAKE_LIFE = 1.4; // seconds a point of the path stays in the wake
+const WAKE_GAP = WAKE_LIFE / (WAKE - 1); // never recycle a live point
+const WAKE_STILL = 0.0015; // plate heights: less than this is not moving
+const WAKE_FULL = 0.5; // plate heights per second for a full-strength wake
+const WAKE_BREAK = 0.25; // seconds: a pause this long starts a new wake
+const WAKE_CHIME = 0.4; // seconds between chimes while the wake runs
 
 /* Transit: a crystal rolls a little and settles back as it rises through
    the screen, and fades into the fog at the top and bottom edges. */
@@ -162,9 +163,10 @@ export function IceCrystal({ index, src, focusIndex, fallback }: Props) {
       uHalf: { value: new THREE.Vector2(0.4, 0.5) },
     };
     const trail = {
-      uWave: { value: Array.from({ length: WAVES }, () => new THREE.Vector4(0, 0, 1, 0)) },
-      uWaveDir: { value: Array.from({ length: WAVES }, () => new THREE.Vector2(0, 1)) },
-      uWaveRadius: { value: 0.3 }, // how far a wave travels from its origin
+      uWake: { value: Array.from({ length: WAKE }, () => new THREE.Vector4(0, 0, 1, 0)) },
+      uWakeDir: { value: Array.from({ length: WAKE }, () => new THREE.Vector2(0, 1)) },
+      uWakeReach: { value: 0.2 }, // how far the arms spread, plate heights
+      uWakeBreak: { value: WAKE_BREAK / WAKE_LIFE },
       uAspect: { value: 0.8 },
     };
     const plate = new THREE.ShaderMaterial({
@@ -367,15 +369,18 @@ export function IceCrystal({ index, src, focusIndex, fallback }: Props) {
       hit: new THREE.Vector3(),
       normal: new THREE.Vector3(),
       inv: new THREE.Matrix4(),
-      waves: Array.from({ length: WAVES }, () => ({ u: 0, v: 0, born: -1e9, s: 0, dx: 0, dy: 1 })),
-      waveHead: 0,
-      lastU: -1,
+      path: Array.from({ length: WAKE - 1 }, () => ({ u: 0, v: 0, born: -1e9, s: 0, dx: 0, dy: 1 })),
+      pathHead: 0,
+      chimed: -1e9,
+      lastU: -1, // pointer last frame, plate uv; -1 = not on this crystal
       lastV: -1,
-      fromU: 0, // where the last wave started (or the pointer arrived or
-      fromV: 0, // came to rest): net movement from here sends the next
-      idle: 0,
-      headX: 0, // recent heading: newest steps count most
-      headY: 0,
+      liveU: 0, // the wake's tip: the pointer, or where it was last seen
+      liveV: 0,
+      speed: 0, // smoothed, plate heights per second
+      accX: 0, // recent steps, summed and fading
+      accY: 0,
+      headX: 0, // their direction: the heading
+      headY: 1,
       roll: new THREE.Quaternion(),
       zAxis: new THREE.Vector3(0, 0, 1),
       rate: 1,
@@ -440,9 +445,12 @@ export function IceCrystal({ index, src, focusIndex, fallback }: Props) {
     const hovered = archiveState.hovered === index || isOpen;
     hoverRef.current = damp(hoverRef.current, hovered ? 1 : 0, 6, dt);
 
-    /* Pointer → plate uv. Movement since the last wave (or since arriving)
-       starts the next one, from where the pointer is now, along the way it
-       has been going. */
+    /* Pointer → plate uv. The wake's tip follows the pointer every frame;
+       a point of its path is laid down at most every WAKE_GAP while it
+       moves. */
+    let step = 0;
+    let su = 0;
+    let sv = 0;
     if (archiveState.hovered === index) {
       const { x, y } = archiveState.pointer;
       tmp.ndc.set((x / size.width) * 2 - 1, -((y / size.height) * 2 - 1));
@@ -454,63 +462,64 @@ export function IceCrystal({ index, src, focusIndex, fallback }: Props) {
         tmp.hit.applyMatrix4(tmp.inv);
         const u = tmp.hit.x / meta.aspect + 0.5;
         const v = tmp.hit.y + 0.5;
-        if (tmp.lastU < 0) {
-          // Arriving only notes where the pointer is: no wave until it moves.
-          tmp.lastU = u;
-          tmp.lastV = v;
-          tmp.fromU = u;
-          tmp.fromV = v;
-          tmp.idle = 0;
-          tmp.headX = 0;
-          tmp.headY = 0;
-        } else {
-          const su = (u - tmp.lastU) * meta.aspect;
-          const sv = v - tmp.lastV;
-          tmp.lastU = u;
-          tmp.lastV = v;
-          const step = Math.hypot(su, sv);
-          if (step > 1e-6) {
-            tmp.idle = 0;
-          } else if ((tmp.idle += dt) > WAVE_IDLE) {
-            // Resting: what moved before must not fire a wave later.
-            tmp.fromU = u;
-            tmp.fromV = v;
-          }
-          // Net, not path length: a trembling hand cancels out instead of
-          // adding up to a wave.
-          const moved = Math.hypot((u - tmp.fromU) * meta.aspect, v - tmp.fromV);
-          const keep = Math.exp(-dt * 8);
-          tmp.headX = tmp.headX * keep + su;
-          tmp.headY = tmp.headY * keep + sv;
-          const heading = Math.hypot(tmp.headX, tmp.headY);
-          const last = tmp.waves[tmp.waveHead];
-          const ready = (time - last.born) / WAVE_LIFE > WAVE_READY;
-          if (ready && tmp.idle === 0 && moved > WAVE_NUDGE && heading > 1e-6) {
-            tmp.waveHead = (tmp.waveHead + 1) % WAVES;
-            const w = tmp.waves[tmp.waveHead];
-            w.u = u;
-            w.v = v;
-            w.born = time;
-            w.s = 0.45 + 0.55 * Math.min(moved / WAVE_FULL, 1);
-            w.dx = tmp.headX / heading;
-            w.dy = tmp.headY / heading;
-            tmp.fromU = u;
-            tmp.fromV = v;
-            sound.sparkle(w.s, tmp.ndc.x);
-          }
+        if (tmp.lastU >= 0) {
+          // Arriving only notes where the pointer is: no wake until it moves.
+          su = (u - tmp.lastU) * meta.aspect;
+          sv = v - tmp.lastV;
+          step = Math.hypot(su, sv);
         }
+        tmp.lastU = u;
+        tmp.lastV = v;
+        tmp.liveU = u;
+        tmp.liveV = v;
       }
     } else {
-      // Off the crystal, forget the pointer: coming back must not fire a wave
-      // for the distance travelled while away.
+      // Off the crystal, forget the pointer: coming back must not count the
+      // distance travelled while away. The tip stays where it was and fades.
       tmp.lastU = -1;
     }
-    const waveU = mats.trail.uWave.value;
-    const waveD = mats.trail.uWaveDir.value;
-    for (let i = 0; i < WAVES; i++) {
-      const w = tmp.waves[i];
-      waveU[i].set(w.u, w.v, Math.min((time - w.born) / WAVE_LIFE, 1), w.s);
-      waveD[i].set(w.dx, w.dy);
+    // Pointer events and frames don't line up, so read speed smoothed: a
+    // frame without an event must not flicker the wake.
+    tmp.speed = damp(tmp.speed, dt > 0 ? step / dt : 0, 7, dt);
+    if (step > 1e-6) {
+      // Recent steps, summed raw and fading: normalising the sum itself
+      // would let each new step barely turn it.
+      const keep = Math.exp(-dt * 10);
+      tmp.accX = tmp.accX * keep + su;
+      tmp.accY = tmp.accY * keep + sv;
+      const l = Math.hypot(tmp.accX, tmp.accY);
+      if (l > 1e-6) {
+        tmp.headX = tmp.accX / l;
+        tmp.headY = tmp.accY / l;
+      }
+    }
+    // A square root, so a nudge of a few pixels still shows.
+    const strength = Math.sqrt(Math.min(tmp.speed / WAKE_FULL, 1));
+    const newest = tmp.path[tmp.pathHead];
+    const fromNewest = Math.hypot((tmp.liveU - newest.u) * meta.aspect, tmp.liveV - newest.v);
+    if (time - newest.born >= WAKE_GAP && fromNewest > WAKE_STILL && strength > 0.02) {
+      // A first point after a pause starts a fresh wake: chime with it.
+      if (time - newest.born > WAKE_BREAK || time - tmp.chimed > WAKE_CHIME) {
+        tmp.chimed = time;
+        sound.sparkle(0.45 + 0.55 * strength, tmp.ndc.x);
+      }
+      tmp.pathHead = (tmp.pathHead + 1) % (WAKE - 1);
+      const w = tmp.path[tmp.pathHead];
+      w.u = tmp.liveU;
+      w.v = tmp.liveV;
+      w.born = time;
+      w.s = strength;
+      w.dx = tmp.headX;
+      w.dy = tmp.headY;
+    }
+    const wakeU = mats.trail.uWake.value;
+    const wakeD = mats.trail.uWakeDir.value;
+    wakeU[0].set(tmp.liveU, tmp.liveV, 0, strength);
+    wakeD[0].set(tmp.headX, tmp.headY);
+    for (let k = 1; k < WAKE; k++) {
+      const w = tmp.path[(tmp.pathHead - (k - 1) + (WAKE - 1)) % (WAKE - 1)];
+      wakeU[k].set(w.u, w.v, Math.min((time - w.born) / WAKE_LIFE, 1), w.s);
+      wakeD[k].set(w.dx, w.dy);
     }
 
     /* Pose of the frame on screen. */
