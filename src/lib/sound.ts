@@ -11,6 +11,8 @@
      drone  — five soft partials (A1, G2, G3, C4, E4) → lowpass → breathing gain
      air    — looping white noise → bandpass → high shelf → gain (driven by gust)
      pings  — short high sine "ice" glints, scheduled at a rate set by the gust
+     sparkle — a crystalline chime cluster for the crystals' hover mesh: bell
+              partials (fundamental + inharmonic 2.76x) on a high pentatonic set
      space  — a generated convolution tail shared by air and pings
      master → compressor → speakers
 
@@ -20,6 +22,10 @@
    ========================================================================= */
 
 const SOUND_KEY = 'cryo-sound';
+
+/** E major pentatonic from E6 up: consonant whatever order the notes fall in,
+    so a cluster of them always rings as one chord, never as a clash. */
+const SPARKLE_NOTES = [1318.5, 1480, 1661.2, 1975.5, 2217.5, 2637, 2960, 3322.4];
 
 const DRONE = [
   { f: 55, type: 'sine' as OscillatorType, g: 0.5 },
@@ -38,6 +44,7 @@ class SoundEngine {
   private send!: GainNode;
   private gust = 0;
   private presence = 0;
+  private lastSparkle = 0;
   enabled = false;
   private listeners = new Set<() => void>();
 
@@ -205,6 +212,51 @@ class SoundEngine {
     g.setTargetAtTime(0, now + 0.35, 0.6);
     for (let i = 0; i < Math.round(5 * strength); i++) {
       window.setTimeout(() => this.ping(0.6 + Math.random() * 0.4), i * 60 + Math.random() * 120);
+    }
+  }
+
+  /**
+   * The hover mesh radiating over a crystal: two to four glassy chimes,
+   * staggered a few tens of milliseconds apart, panned toward the pointer.
+   * Rate-limited, because pulses can arrive faster than chimes should.
+   */
+  sparkle(strength = 1, panX = 0) {
+    if (!this.ctx || !this.enabled) return;
+    const ctx = this.ctx;
+    const now = ctx.currentTime;
+    if (now - this.lastSparkle < 0.11) return;
+    this.lastSparkle = now;
+    const count = 2 + Math.round(Math.random() * 2 * strength);
+    let base = Math.floor(Math.random() * (SPARKLE_NOTES.length - 3));
+    for (let i = 0; i < count; i++) {
+      const t = now + i * (0.022 + Math.random() * 0.04);
+      base = Math.min(base + 1 + Math.round(Math.random()), SPARKLE_NOTES.length - 1);
+      const f = SPARKLE_NOTES[base] * (1 + (Math.random() - 0.5) * 0.004);
+      const decay = 0.55 + Math.random() * 0.7;
+      const peak = 0.014 * strength * (1 - i * 0.12);
+      const pan = ctx.createStereoPanner();
+      pan.pan.value = Math.max(-0.9, Math.min(0.9, panX * 0.7 + (Math.random() - 0.5) * 0.3));
+      pan.connect(this.master);
+      // Twice a ping's reverb send: the chime should hang in the air.
+      const wet = ctx.createGain();
+      wet.gain.value = 2;
+      pan.connect(wet).connect(this.send);
+      // Fundamental and the inharmonic partial that makes it glass, not a beep.
+      for (const [mult, level, len] of [
+        [1, 1, decay],
+        [2.76, 0.32, decay * 0.45],
+      ] as const) {
+        const o = ctx.createOscillator();
+        o.type = 'sine';
+        o.frequency.value = f * mult;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(peak * level, t + 0.003);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+        o.connect(g).connect(pan);
+        o.start(t);
+        o.stop(t + len + 0.05);
+      }
     }
   }
 

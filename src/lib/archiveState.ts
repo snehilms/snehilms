@@ -23,6 +23,12 @@ export const archiveState = {
   /** The DOM slots, registered by Archive. The gallery measures them every
       frame and puts each shard exactly behind its slot. */
   slots: [] as (HTMLElement | null)[],
+  /** Last pointer position over a slot, in client pixels. The ice crystals
+      trace their hover mesh along it. */
+  pointer: { x: 0, y: 0 },
+  /** Set when an ice crystal's files failed and its shard stands in, so the
+      gallery sizes that slot as a shard again. */
+  plateFailed: [] as boolean[],
 };
 
 /* --- Dossier store ------------------------------------------------------ */

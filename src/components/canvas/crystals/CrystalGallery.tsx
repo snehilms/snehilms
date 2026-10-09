@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 
 import { CrystalShard } from './CrystalShard';
+import { IceCrystal } from './IceCrystal';
 import { projects } from '@/config/content';
 import { archiveState, useDossier } from '@/lib/archiveState';
 import { damp } from '@/lib/scrollState';
@@ -24,6 +25,11 @@ import { damp } from '@/lib/scrollState';
 
 /* Distinct seeds give three visibly different shards from one generator. */
 const SEEDS = [7, 23, 61];
+
+/** An ice crystal's plate, as a share of its slot's height. The block fills
+    about 0.85 of its plate, so this keeps it between the slot's heading and
+    its readout rather than over them. */
+const PLATE_FILL = 0.74;
 
 export function CrystalGallery() {
   const viewport = useThree((s) => s.viewport);
@@ -53,6 +59,7 @@ export function CrystalGallery() {
       plane: new THREE.Plane(new THREE.Vector3(0, 0, 1), 0),
       ndc: new THREE.Vector2(),
       hit: new THREE.Vector3(),
+      forward: new THREE.Vector3(),
     }),
     [],
   );
@@ -73,11 +80,13 @@ export function CrystalGallery() {
 
     /* --- Registration: shard i behind slot i ---------------------------- */
     let measured = 0;
+    let slotHeight = 0;
     projects.forEach((_, i) => {
       const el = archiveState.slots[i];
       if (!el || !el.isConnected) return;
       const r = el.getBoundingClientRect();
       if (r.width === 0) return;
+      slotHeight = r.height;
       tmp.ndc.set(((r.left + r.width / 2) / size.width) * 2 - 1, -(((r.top + r.height / 2) / size.height) * 2 - 1));
       tmp.ray.setFromCamera(tmp.ndc, camera);
       if (tmp.ray.ray.intersectPlane(tmp.plane, tmp.hit)) {
@@ -90,11 +99,24 @@ export function CrystalGallery() {
         ? placed.current[0].distanceTo(placed.current[1])
         : spacing;
     const shardScale = Math.min(pitch * 0.27, 0.92);
+
+    /* Ice plates are sized in pixels, from the slot: world units per pixel
+       at the z = 0 plane, where the slots are registered. */
+    const cam = camera as THREE.PerspectiveCamera;
+    camera.getWorldDirection(tmp.forward);
+    const halfFov = Math.tan(THREE.MathUtils.degToRad(cam.fov) / 2);
+    const platePx = (slotHeight || size.height * 0.62) * PLATE_FILL;
+
     shardRefs.current.forEach((g, i) => {
       if (!g) return;
       if (measured !== columns) placed.current[i].set(xFor(i), 0, 0);
       g.position.copy(placed.current[i]);
-      g.scale.setScalar(shardScale);
+      if (projects[i].core.plate && !archiveState.plateFailed[i]) {
+        const depth = Math.max(tmp.hit.copy(placed.current[i]).sub(camera.position).dot(tmp.forward), 0.1);
+        g.scale.setScalar((platePx * 2 * depth * halfFov) / size.height);
+      } else {
+        g.scale.setScalar(shardScale);
+      }
     });
 
     /* Opening a dossier slides the chosen shard to centre frame, where the
@@ -117,12 +139,28 @@ export function CrystalGallery() {
           position={[xFor(i), 0, 0]}
           scale={scale}
         >
-          <CrystalShard
-            index={i}
-            seed={SEEDS[i % SEEDS.length]}
-            core={project.core}
-            focusIndex={focusIndex}
-          />
+          {project.core.plate ? (
+            <IceCrystal
+              index={i}
+              src={project.core.plate}
+              focusIndex={focusIndex}
+              fallback={
+                <CrystalShard
+                  index={i}
+                  seed={SEEDS[i % SEEDS.length]}
+                  core={project.core}
+                  focusIndex={focusIndex}
+                />
+              }
+            />
+          ) : (
+            <CrystalShard
+              index={i}
+              seed={SEEDS[i % SEEDS.length]}
+              core={project.core}
+              focusIndex={focusIndex}
+            />
+          )}
         </group>
       ))}
     </group>

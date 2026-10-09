@@ -16,6 +16,11 @@
   inset: 0;
   z-index: 1; /* above --z-canvas, below --z-content */
   pointer-events: none;
+  /* The Projects gallery thins the scrim while it is up (--scrim, set from
+     its presence in Archive): there the crystals are the content, and a
+     legibility haze over finished renders just washes them out. */
+  opacity: var(--scrim, 1);
+  will-change: opacity;
 
   background:
     linear-gradient(

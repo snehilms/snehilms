@@ -8,6 +8,7 @@ import { GPUComputationRenderer, type Variable } from 'three/examples/jsm/misc/G
 import { VELOCITY_SHADER, POSITION_SHADER, POINTS_VERTEX, POINTS_FRAGMENT } from './gpgpu/simulation.glsl';
 import { buildTargets, initialPositions, cloudToTexture } from './gpgpu/targets';
 import { scrollState, damp, clamp01 } from '@/lib/scrollState';
+import { archiveState } from '@/lib/archiveState';
 import { identity } from '@/config/content';
 import { cssColor } from './Atmosphere';
 
@@ -277,8 +278,16 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
     // The socials stage is its own room: the field leaves it entirely.
     stageRef.current = damp(stageRef.current, scrollState.stage, 3, dt);
     outroRef.current = damp(outroRef.current, scrollState.outro, 3, dt);
+    /* The Projects gallery belongs to the crystals: while it is up the field
+       steps back almost entirely. The section is tall, so without this the
+       blend from the Experience formation hung beside the first crystal. */
+    const gallery = archiveState.presenceSmooth;
     material.uniforms.uOpacity.value =
-      lerp(a.opacity, b.opacity, mix) * (1 - stageRef.current) * (1 - 0.93 * outroRef.current) * (portrait ? 0.6 : 1);
+      lerp(a.opacity, b.opacity, mix) *
+      (1 - stageRef.current) *
+      (1 - 0.93 * outroRef.current) *
+      (1 - 0.9 * gallery) *
+      (portrait ? 0.6 : 1);
     material.uniforms.uSize.value = lerp(a.size, b.size, mix);
 
     /* Mid-transition, loosen the springs and raise turbulence. The form has

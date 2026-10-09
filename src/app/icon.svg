@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- A faceted ice shard, after the Projects crystals. Colours are the
+       ground, ink, ink-3 and accent tokens, plus one lit facet. -->
+  <rect width="32" height="32" rx="7" fill="#dde1e7"/>
+  <path d="M17.5 4.5 23.5 11 22 24 14.5 28 8.5 20 10 9.5Z" fill="#323b49"/>
+  <path d="M17.5 4.5 23.5 11 16 14.5 10 9.5Z" fill="#8fa3b8"/>
+  <path d="M16 14.5 23.5 11 22 24Z" fill="#1c5a80"/>
+  <path d="M16 14.5 22 24 14.5 28Z" fill="#10151d"/>
+</svg>

@@ -66,7 +66,7 @@ def reset():
         prefs.compute_device_type = 'METAL'
         prefs.get_devices()
         for d in prefs.devices:
-            d.use = True
+            d.use = d.type == 'METAL'  # GPU only: CPU+GPU splits frames into mismatched slices
         scene.cycles.device = 'GPU'
     except Exception as e:  # CPU still renders, just slower
         print('GPU unavailable:', e)

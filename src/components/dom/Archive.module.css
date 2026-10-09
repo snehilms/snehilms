@@ -3,65 +3,49 @@
 
    Two layouts from one markup tree:
 
-   .slots   the gallery — a sticky row centred in a tall section, with each
-            slot framing the 3D shard behind it. The middle of every slot is
-            deliberately empty; that void IS the shard.
+   .slots   the gallery — one full-height stage per project, stacked, so the
+            crystals rise through the screen one after another as you scroll
+            (after igloo.inc's portfolio). The middle of every stage is
+            deliberately empty; that void IS the crystal. Labels sit around
+            it like a survey readout, joined to it by leader lines.
    .cards   the compact fallback below 900px, where the same button becomes a
             conventional glass card.
    ========================================================================= */
 
-/* Extra runway so the sticky row can hold centre for a real scroll distance
-   rather than flashing past. */
-.tall { min-height: 230svh; }
-
-/* The row fills what the held shell leaves under the heading. The chapter
-   shell (see Chapter `hold`) is what holds the screen now; a sticky row on
-   its own slid up over the heading on the way in. */
 .slots {
-  flex: 1;
-  min-height: 0;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--s-3);
+  display: flex;
+  flex-direction: column;
 }
 
-/* --- Slot ---------------------------------------------------------------- */
+/* --- Stage --------------------------------------------------------------- */
 
 .slot {
   display: block;
-  height: 100%;
+  width: 100%;
+  height: 100svh;
   text-align: left;
-  /* The shard lives behind this button. Nothing here may paint over it. */
+  /* The crystal lives behind this button. Nothing here may paint over it. */
   background: none;
 }
 
 .slotFrame {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  display: block;
   height: 100%;
-  padding: var(--s-2);
-  border: 1px solid transparent;
-  border-radius: var(--r-md);
   will-change: transform, opacity;
-  transition: border-color var(--d-base) var(--e-out),
-              background-color var(--d-base) var(--e-out);
 }
 
-.slot:hover .slotFrame,
-.slot:focus-visible .slotFrame {
-  border-color: var(--c-line);
-  background: rgb(236 239 243 / 0.36);
-}
+/* --- Head: codename and title, upper left, leader into the crystal -------- */
 
-/* --- Head ---------------------------------------------------------------- */
-
-.slotHead {
-  position: relative;
+.slot .slotHead {
+  position: absolute;
+  top: 20%;
+  left: 0;
   display: flex;
   flex-direction: column;
   gap: var(--s-opt);
+  max-width: 30%;
+  will-change: transform, opacity;
 }
 
 .codename {
@@ -72,38 +56,48 @@
 .slot:hover .codename { color: var(--c-accent); }
 
 .title {
-  font-size: var(--t-lead);
+  font-size: var(--t-h3);
   line-height: var(--lh-snug);
   letter-spacing: var(--ls-snug);
   font-weight: 600;
   color: var(--c-ink);
 }
 
-/* Hairline running from the label down toward the shard — the survey-marker
-   leader line from the reference. Scales on X only. */
+/* The survey leader from the reference: a hairline running right from under
+   the title, then dropping toward the crystal. Revealed by scaleX. */
 .leader {
   position: absolute;
   top: calc(100% + var(--s-2));
   left: 0;
-  width: var(--s-8);
+  width: 128%;
   height: 1px;
-  background: linear-gradient(90deg, var(--c-accent), transparent);
-  transform: scaleX(0.34);
+  background: linear-gradient(90deg, var(--c-ink-3), var(--c-line-strong));
   transform-origin: left center;
-  transition: transform var(--d-slow) var(--e-out);
   will-change: transform;
 }
 
-.slot:hover .leader,
-.slot:focus-visible .leader { transform: scaleX(1); }
+.leaderDrop {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: var(--s-12);
+  height: 1px;
+  background: linear-gradient(90deg, var(--c-line-strong), transparent);
+  transform: rotate(38deg);
+  transform-origin: left center;
+  will-change: transform;
+}
 
-/* --- Foot ---------------------------------------------------------------- */
+/* --- Readout, right ------------------------------------------------------ */
 
-.slotFoot {
-  display: flex;
+.slot .slotFoot { display: contents; }
+
+.slot .readout {
+  position: absolute;
+  top: 34%;
+  right: var(--s-6); /* clear of the progress rail in the gutter */
   align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--s-2);
+  will-change: transform, opacity;
 }
 
 .readout {
@@ -115,7 +109,7 @@
 .readoutRow {
   display: flex;
   gap: var(--s-1);
-  opacity: 0.55;
+  opacity: 0.6;
   transition: opacity var(--d-base) var(--e-out);
 }
 
@@ -123,6 +117,15 @@
 .slot:focus-visible .readoutRow { opacity: 1; }
 
 .readoutValue { color: var(--c-ink-3); }
+
+/* --- Call to action, lower right, its rule reaching back to the crystal -- */
+
+.slot .explore {
+  position: absolute;
+  right: var(--s-6);
+  bottom: 22%;
+  will-change: transform, opacity;
+}
 
 .explore {
   display: flex;
@@ -141,13 +144,22 @@
   width: var(--s-6);
   height: 1px;
   background: currentColor;
-  transform: scaleX(0.5);
   transform-origin: right center;
-  transition: transform var(--d-base) var(--e-out);
+  will-change: transform;
 }
 
-.slot:hover .exploreRule,
-.slot:focus-visible .exploreRule { transform: scaleX(1); }
+.slot .exploreRule {
+  width: var(--s-24);
+  background: linear-gradient(270deg, currentColor, transparent);
+}
+
+/* Focus ring for keyboard visitors: the stage is a button. */
+.slot:focus-visible { outline: none; }
+.slot:focus-visible .title {
+  outline: 1px solid var(--c-accent);
+  outline-offset: var(--s-1);
+  border-radius: var(--r-sm);
+}
 
 /* --- Compact fallback ---------------------------------------------------- */
 
@@ -164,6 +176,9 @@
 }
 
 .card .slotFrame {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   gap: var(--s-3);
   padding: var(--s-3);
   border-color: var(--c-line);
@@ -207,12 +222,21 @@
   color: var(--c-text-faint);
 }
 
+.card .slotHead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-opt);
+}
+
+.card .title { font-size: var(--t-lead); }
+
 /* In compact mode the leader line has nothing to point at. */
 .card .leader { display: none; }
 
 /* Side by side, the readout and the call to action fight for a narrow
    column and the "Open the architecture" cue wraps mid-phrase. Stack them instead. */
 .card .slotFoot {
+  display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--s-2);
@@ -226,5 +250,5 @@
 .card .exploreRule { transform-origin: left center; }
 
 @media (max-width: 1180px) {
-  .title { font-size: var(--t-body); }
+  .slot .slotHead { max-width: 34%; }
 }

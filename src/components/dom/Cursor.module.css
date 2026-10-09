@@ -22,6 +22,11 @@
   -webkit-backdrop-filter: blur(2px);
 }
 
+.ring.clear {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
 .dot {
   width: var(--s-opt);
   height: var(--s-opt);

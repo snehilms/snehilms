@@ -11,6 +11,7 @@ import { Atmosphere } from './Atmosphere';
 import { CameraRig } from './CameraRig';
 import { CrystalGallery } from './crystals/CrystalGallery';
 import { Effects } from './Effects';
+import { IceOverlay } from './crystals/IceOverlay';
 import { useDeviceTier } from '@/hooks/useDeviceTier';
 import styles from './Scene.module.css';
 
@@ -83,7 +84,9 @@ export function Scene() {
 
           <Atmosphere />
           <ParticleField simSize={simSize} reducedMotion={reducedMotion} />
-          <CrystalGallery />
+          <IceOverlay renderMain={!postprocessing}>
+            <CrystalGallery />
+          </IceOverlay>
           <CameraRig reducedMotion={reducedMotion} />
           {postprocessing && <Effects />}
         </Suspense>

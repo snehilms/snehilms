@@ -48,6 +48,9 @@ export type Core = {
   model?: string;
   /** Uniform scale applied to a loaded model so it fits inside the shard. */
   modelScale?: number;
+  /** A path-traced ice crystal (art/scripts/crystal_core.py), by base path:
+      '/crystals/v8' loads v8.mp4, v8.webp and v8.json. Replaces the shard. */
+  plate?: string;
 };
 
 export type Project = {
@@ -181,7 +184,7 @@ export const projects: Project[] = [
       { label: 'VENUE', value: 'SPOT + PRED' },
       { label: 'D', value: '01.2026' },
     ],
-    core: { kind: 'ladder' },
+    core: { kind: 'ladder', plate: '/crystals/v8' },
     architecture: {
       lanes: ['INGEST', 'BOOK', 'STRATEGY', 'EXECUTION'],
       nodes: [
@@ -233,7 +236,7 @@ export const projects: Project[] = [
       { label: 'MODEL', value: 'GPT-3.5' },
       { label: 'D', value: '07.2023' },
     ],
-    core: { kind: 'graph' },
+    core: { kind: 'graph', plate: '/crystals/orrery' },
     architecture: {
       lanes: ['INTERFACE', 'ORCHESTRATION', 'REASONING', 'QUANT'],
       nodes: [
@@ -285,7 +288,7 @@ export const projects: Project[] = [
       { label: 'TRANSPORT', value: 'WEBSOCKET' },
       { label: 'D', value: '02.2023' },
     ],
-    core: { kind: 'ribbon' },
+    core: { kind: 'ribbon', plate: '/crystals/pencil' },
     architecture: {
       lanes: ['CLIENT', 'GATEWAY', 'ROOM', 'TRANSPORT'],
       nodes: [
