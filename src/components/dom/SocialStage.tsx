@@ -265,14 +265,13 @@ export function SocialStage() {
                         href={social.href}
                         target={social.href.startsWith('mailto:') ? undefined : '_blank'}
                         rel="noreferrer"
-                        data-cursor="hover"
                         {...handlers}
                       >
                         {social.label}
                         <span className="u-sr">, {social.handle}</span>
                       </a>
                     ) : (
-                      <button type="button" className={styles.link} data-cursor="hover" {...handlers}>
+                      <button type="button" className={styles.link} {...handlers}>
                         {social.label}
                         <span className="u-sr">, {social.handle}</span>
                       </button>
@@ -291,7 +290,6 @@ export function SocialStage() {
               rel="noreferrer"
               tabIndex={-1}
               aria-hidden="true"
-              data-cursor="hover"
             >
               <span>{current.handle}</span>
               <ArrowIcon />

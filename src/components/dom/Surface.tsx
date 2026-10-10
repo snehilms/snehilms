@@ -58,7 +58,7 @@ function MagneticLink({ href, children }: { href: string; children: React.ReactN
   );
 
   return (
-    <a ref={ref} className={styles.email} href={href} data-cursor="hover">
+    <a ref={ref} className={styles.email} href={href}>
       {children}
     </a>
   );

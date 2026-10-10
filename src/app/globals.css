@@ -114,7 +114,6 @@
   --z-content: 10;
   --z-nav:     40;
   --z-dossier: 80;
-  --z-cursor:  90;
   --z-loader:  100;
 }
 
@@ -211,34 +210,6 @@ html { scrollbar-width: none; }
 /* Per-character / per-line mask reveal */
 .u-mask { overflow: hidden; display: block; }
 .u-mask > * { display: block; will-change: transform; }
-
-/* ============================================================================
-   CURSOR
-
-   The OS cursor is suppressed only where the custom one actually renders:
-   a fine pointer, hover capability, and motion not reduced — by the OS
-   or by the visitor's choice (html[data-motion], see lib/motionPref.ts).
-   This lives in the global sheet because CSS Modules cannot own a selector
-   with no local class in it.
-   ========================================================================= */
-
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  :root:not([data-motion='reduced']) body,
-  :root:not([data-motion='reduced']) a,
-  :root:not([data-motion='reduced']) button,
-  :root:not([data-motion='reduced']) [data-cursor='hover'] {
-    cursor: none;
-  }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  :root[data-motion='full'] body,
-  :root[data-motion='full'] a,
-  :root[data-motion='full'] button,
-  :root[data-motion='full'] [data-cursor='hover'] {
-    cursor: none;
-  }
-}
 
 /* ============================================================================
    ACCESSIBILITY

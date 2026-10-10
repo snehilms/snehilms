@@ -173,7 +173,7 @@ Motion is continuous, never cut: entrances rise out of line masks once, continuo
 A cold, low-chroma slate-and-fog palette with a single glacial-ink accent; the only pure white in the system is light.
 
 ### Primary
-- **Glacial Ink** (accent): the one colour that means "act here". The accented second headline line, the email hover, the social handle, focus rings, selection, the caret, the cursor dot, status pulse, node accents. Measured 5.7:1 on `ground`, so it is legal for text at every size.
+- **Glacial Ink** (accent): the one colour that means "act here". The accented second headline line, the email hover, the social handle, focus rings, selection, the caret, status pulse, node accents. Measured 5.7:1 on `ground`, so it is legal for text at every size.
 - **Deep Current** (accent-2): a near sibling used for codenames, depth labels, dossier notes and stat rules. 5.1:1 on `ground`; text-legal.
 - **Meltwater** (accent-3) and **Shelf Ice** (accent-4): fills only, never text (accent-3 measures 2.2:1). They end gradients on the chapter rail fill, the strata depth bars, feedback edges in diagrams, and tint fast-moving beads.
 
@@ -210,7 +210,7 @@ A cold, low-chroma slate-and-fog palette with a single glacial-ink accent; the o
 ### Hierarchy
 - **Display** (600, fluid 44px to 136px, line-height 0.92, -0.035em, uppercase): the three-line hero headline only, second line in accent.
 - **Headline** (600, fluid 32px to 64px, 0.92, -0.035em): the email CTA and stat values (tabular numerals).
-- **Title** (600, fluid 24px to 36px, 1.12, -0.035em): dossier titles. The thaw lead and surface prompt use this size at weight 400 with 1.24 leading and -0.015em.
+- **Title** (600, fluid 24px to 36px, 1.12, -0.035em): dossier titles. The surface prompt uses this size at weight 400 with 1.24 leading and -0.015em; Experience company names use it at 600.
 - **Lead** (500 to 600, fluid 18px to 24px, 1.12 to 1.45, -0.015em): archive slot titles, strata band labels, social selector names, the hero tagline (1.45).
 - **Body** (400, fluid 15px to 18px, 1.62): prose, capped at 60 to 62ch.
 - **Small** (400, fluid 13px to 15px): blurbs, chips, nav links, captions, colophon paragraphs (with bold run-in leads), the social handle (in mono at 0.04em).
@@ -228,7 +228,7 @@ Sections are transparent, full-viewport bands (`min-height: 100svh`, vertical pa
 
 Spacing is a hard 8px ladder (`s-1` 8px through `s-32` 256px). `s-opt` (4px) exists for optical nudges, chip insets and label stacks only, never for layout.
 
-Composition is asymmetric: reading content sits left, the field and marks occupy the right two-thirds, and a 98-degree fog scrim hazes the reading column while leaving the field clear. On desktop the scrim's bottom haze is only a thin lift (42% fog fading out by 18% of the height), so the slate floor stays visible below the horizon. Below 900px the scrim flattens to an even veil for text, the chapter rail hides, and the archive's sticky three-slot gallery becomes a stacked list of glass cards. Thaw is a 1.55 / 1 two-column grid with a sticky stat rail that collapses to one column at 960px. Nav links hide below 1080px.
+Composition is asymmetric: reading content sits left, the field and marks occupy the right two-thirds, and a 98-degree fog scrim hazes the reading column while leaving the field clear. On desktop the scrim's bottom haze is only a thin lift (42% fog fading out by 18% of the height), so the slate floor stays visible below the horizon. Below 900px the scrim flattens to an even veil for text, the chapter rail hides, and the archive's sticky three-slot gallery becomes a stacked list of glass cards. Experience, on wide screens with motion, is a held chapter (420svh, the shell sticky for four screens): the stations take turns in one reading slot capped at 34rem, with the career timeline under them and the bead sculptures filling the right of the frame; elsewhere it is a stacked list, each station with a line drawing of its sculpture. Nav links hide below 1080px.
 
 The archive runs 230svh so its sticky row holds centre; the socials stage is a pinned 100svh chamber.
 
@@ -241,7 +241,7 @@ Depth is atmospheric first and shadowed rarely. The canvas supplies it: a fog ch
 - **Soft lift** (`box-shadow: 0 16px 48px -16px rgb(29 36 48 / 0.34)`): the dossier panel, the one true overlay.
 
 ### Materials
-- **Lit bead.** Each particle is an opaque sphere sprite shaded under a fixed overhead key: lit side `fog-lo`, shaded side `ink-3`, a small specular, a glacial tint (`accent-3`) when moving fast, an overhead falloff by world height (x0.78 at the bottom to x1.06 at the top), and up to 75% fold into `ground` with distance. Beads write depth and are discarded, not blended: a chapter at 0.3 opacity keeps 30% of the beads, each fully solid. The per-chapter art table drives density (signal 1.0, thaw 0.42, archive 0.20 and pushed back in depth, strata 0.4, surface 0.95). On portrait screens the whole field is pushed back (z -3.2) and thinned (density x0.6) so it never sits under the text column.
+- **Lit bead.** Each particle is an opaque sphere sprite shaded under a fixed overhead key: lit side `fog-lo`, shaded side `ink-3`, a small specular, a glacial tint (`accent-3`) when moving fast, an overhead falloff by world height (x0.78 at the bottom to x1.06 at the top), and up to 75% fold into `ground` with distance. Beads write depth and are discarded, not blended: a chapter at 0.3 opacity keeps 30% of the beads, each fully solid. The per-chapter art table drives density (signal 1.0, experience 0.97 because the career sculptures are its subject, archive 0.20 and pushed back in depth, strata 0.4, surface 0.95). On portrait screens the whole field is pushed back (z -3.2) and thinned (density x0.6) so it never sits under the text column.
 - **Frosted ice glass.** Archive shards refract a procedural pale environment (slate low, haze high, white band and key, pale cyan rim) at IOR 1.34 with slight per-channel dispersion, absorb toward glacial blue with thickness (Beer-Lambert), and carry a dark `ink-3` inner network with `accent` nodes. Normal blending, layered back faces, core, front faces, network.
 - **Light.** Bloom has a high threshold (0.86) so only light sources bloom: the horizon, facet glints, stage rings. No chromatic aberration: it split grey beads into blue/red fringes on scroll. Fast beads catch a frost sheen (`--c-fog-hi`), never a hue.
 
@@ -278,6 +278,16 @@ Gentle, consistent rounding: tags and focus rings 8px, cards and diagram frames 
 - **Top nav:** fixed and transparent at the top; once condensed it takes frost and a hairline bottom border. The brand mark is a 40px hairline square in mono.
 - **Chapter rail:** fixed right, a 1px spine whose accent fill is scrubbed by scroll, with ticks and mono labels revealed by opacity and transform on the active chapter. Hidden below 900px.
 
+### Experience Signal Path
+The career told as a signal path, oldest first: Yield3 · Propellyr Chaintech (2022–24), Flint Labs (2024–26), Scrypt (2026–). On arrival the hero's bead sphere unravels into a stream: seven fine strands bundled like fibre, pinched at both ends, rippling slowly, with one glacial-ink packet travelling along it. At each station the stream gathers into a bead sculpture of the work, lit as a solid (each bead blends its surface normal with its own roundness, after igloo.inc's particle objects), posed 3/4 and turning a little:
+- **Pipeline (Yield3 · Propellyr):** two source spheres send streams through a short queue into a three-disc database stack; light pulses run down the pipes. Labels: On-chain, Off-chain, RabbitMQ, Iceberg.
+- **Order book (Flint Labs):** a ladder of solid slabs, eight ask levels in slate above and eight bid levels in glacial ink below, a dashed spread and a last-trade knot on the price axis, and a mono price column (illustrative levels, not market data). Sizes churn on every level; the best ask and best bid take turns being traded away with a flash down the spread, then refill. Labels: Asks, Spread, Bids.
+- **Vault (Scrypt):** a bolted vault door with dense rims and a sparse face, swinging open on its hinge as the station forms, its six-spoke wheel turning, payout streams flowing to three stacks of four coins. Labels: Custody, Payouts.
+
+Each sculpture answers the cursor: light gathers under it; the pipeline's pulses run faster; the order book's level under it lights and swells; the vault door swings wider and its wheel spins up. Under reduced motion their ambient motion runs at half speed.
+
+The reading side: the company name at title size, a roster row per employer (role in sans, period in mono), one figure at headline size that counts up with the scroll, and two or three facts under drawn hairlines, each tagged in mono accent with its employer where a station spans two. Labels pinned to the sculptures are mono, `ink-3`, with an accent ring and a breath of fog behind the letters. Under the stations a career timeline: a hairline rail filled in Meltwater-to-Glacial-Ink, the three stations as small rings with their years, an ink bead travelling in step with the stream; rings are buttons that jump to their station. Scroll snaps to the stations. Under reduced motion and below 900px there is no hold: a stacked list, each station with a 48-unit line drawing of its sculpture (ink-3 stroke, live part in accent).
+
 ### Socials Stage (signature)
 A pinned full-viewport chamber holding one bead mark (sized at a quarter of the viewport height, capped by width) floating clear above the far rim of a pale stone pedestal with `floor` grooves, white light rings spreading across the floor, a soft `floor-deep` ground shadow and the back half of a white triangulated wireframe dome (22% opacity). The DOM adds only two range marks (plain 1px `ink-3` rules at half opacity, no returns) at the mark's centre line, a selector row of four names near the bottom (body size, faint, ink when active) with a single 6px ink bead under the active or focused name that glides there by transform, and the handle beneath in `ink-3` mono with a diagonal SVG arrow, underlining on hover. A name with no destination (currently X) is a select-only button and its handle is plain `text-faint` mono, never styled as a link. The selector stands on the slate floor, so a soft radial veil of `fog-hi` (0.88 at centre, fading out) sits behind the band; it lifts the floor under the inactive names to at least 4.78:1 against `text-faint` (measured), keeping the faint/ink hierarchy instead of darkening every name.
 
@@ -287,9 +297,9 @@ Motion grammar: on entry (scrubbed) the background field thins and the mark cond
 
 ### Motion grammar (all components)
 - Text enters once, rising out of a line mask (SplitText, `expo.out`, 118% travel), triggered on scroll and never replayed.
-- Anything continuous scrubs with scroll: the hero's exit, the thaw stat rail, strata depth bars, the rail fill, the stage.
+- Anything continuous scrubs with scroll: the hero's exit, the Experience stations and timeline, strata depth bars, the rail fill, the stage.
 - Durations are 0.24s, 0.48s and 0.96s with `cubic-bezier(0.16, 1, 0.3, 1)` for state changes and `cubic-bezier(0.76, 0, 0.24, 1)` for loops.
-- Reduced motion: CSS transitions and animations collapse to 0.01ms, reveal and scrub timelines are skipped, smooth scrolling is off, the custom cursor is hidden and diagram packets stop.
+- Reduced motion: CSS transitions and animations collapse to 0.01ms, reveal and scrub timelines are skipped, smooth scrolling is off and diagram packets stop.
 
 ## Do's and Don'ts
 

@@ -144,21 +144,118 @@ export type ChapterId = (typeof chapters)[number]['id'];
    room with its own canvas. */
 export const socialsSection = { id: 'socials', title: 'Socials' } as const;
 
-export const about = {
-  lead: 'I build the unglamorous middle — the order books, the schedulers, the serialization — and then I make the surface feel effortless.',
-  body: [
-    'Most of what I do never gets seen. Feed handlers that do not drop a tick under burst. Schedulers that hold a fixed rate while the room fills up. Serialization that cuts bandwidth without costing tail latency.',
-    'The other half is the part people touch. I care about the 16ms budget, about motion that carries meaning instead of decoration, and about interfaces that tell you where you are without a tooltip.',
-    'Across trading engines, LLM tooling and realtime multiplayer, the lesson repeats: the systems that survive are the ones that were boring on purpose in exactly the right places.',
-  ],
-  /* From the resume (Flint Labs, 2024–26). Verified figures only — these are
-     the first thing a reader checks. */
-  stats: [
-    { value: '$25B+', label: 'Volume through the perps exchange I scaled' },
-    { value: '300K+', label: 'Traders on that exchange' },
-    { value: '−80%', label: 'Matching-engine latency' },
-  ],
-} as const;
+/* ============================================================================
+   EXPERIENCE
+
+   The career as a signal path. One stream of beads runs through the chapter
+   and gathers, station by station, into a picture of the work: a pipeline
+   pouring into a store, an order book, a vault paying out. Oldest first.
+
+   From the resume. Every figure is verified, and every fact carries the
+   company it belongs to: the first station spans two employers, and nothing
+   of one is credited to the other.
+   ========================================================================= */
+
+export type ExperienceGlyph = 'pipeline' | 'book' | 'vault';
+
+export type ExperienceStation = {
+  id: string;
+  /** Short span for the timeline under the stations. */
+  years: string;
+  companies: { name: string; role: string; period: string }[];
+  /** The bead formation this station gathers into. */
+  glyph: ExperienceGlyph;
+  /** The headline figure, counted up as the station arrives. */
+  metric: { prefix: string; value: number; suffix: string; label: string };
+  facts: { text: string; from?: string }[];
+  /** Small labels pinned to the formation, so it reads without a legend.
+      `anchor` names a point the formation defines (gpgpu/careerGlyphs.ts). */
+  marks: { anchor: string; text: string }[];
+  /** The order book's price column: illustrative levels, not market data. */
+  ladder?: { bestAsk: number; bestBid: number; tick: number; decimals: number };
+};
+
+export const experience: ExperienceStation[] = [
+  {
+    id: 'yield3',
+    years: '2022–24',
+    companies: [
+      { name: 'Yield3', role: 'Software Developer', period: 'Jun 2023 – Jan 2024' },
+      { name: 'Propellyr Chaintech', role: 'Software Development Intern', period: 'Jul – Sep 2022' },
+    ],
+    glyph: 'pipeline',
+    metric: {
+      prefix: '+',
+      value: 200,
+      suffix: '%',
+      label: 'Faster ingestion and insight from a streaming ETL pipeline at Yield3',
+    },
+    facts: [
+      {
+        from: 'Propellyr',
+        text: 'Event-driven ingestion of millions of daily on-chain and off-chain events, with near-zero dropped',
+      },
+      {
+        from: 'Yield3',
+        text: 'LLM inference on Kubernetes with Trino and DuckDB: concurrent OLAP query latency down 75%',
+      },
+      {
+        from: 'Yield3',
+        text: 'An agentic LLM analytics engine for portfolio optimisation, used in investor fundraising',
+      },
+    ],
+    marks: [
+      { anchor: 'onchain', text: 'On-chain' },
+      { anchor: 'offchain', text: 'Off-chain' },
+      { anchor: 'queue', text: 'RabbitMQ' },
+      { anchor: 'store', text: 'Iceberg' },
+    ],
+  },
+  {
+    id: 'flint',
+    years: '2024–26',
+    companies: [{ name: 'Flint Labs', role: 'Fullstack Developer', period: 'Jan 2024 – Jul 2026' }],
+    glyph: 'book',
+    ladder: { bestAsk: 64215.0, bestBid: 64214.5, tick: 0.5, decimals: 1 },
+    metric: {
+      prefix: '$',
+      value: 25,
+      suffix: 'B+',
+      label: 'Cumulative volume through the on-chain perpetuals exchange I helped scale',
+    },
+    facts: [
+      { text: '300K+ traders on a fault-tolerant, low-latency exchange in Go and Next.js' },
+      { text: 'Redis order book and batched matching engine: latency down 80%, database load down 30%' },
+      { text: 'Sub-100ms WebSocket feeds for ticks, order books and P&L, with zero drift from chain' },
+    ],
+    marks: [
+      { anchor: 'asks', text: 'Asks' },
+      { anchor: 'spread', text: 'Spread' },
+      { anchor: 'bids', text: 'Bids' },
+    ],
+  },
+  {
+    id: 'scrypt',
+    years: '2026–',
+    companies: [{ name: 'Scrypt', role: 'Fullstack Engineer', period: 'Aug 2026 – present' }],
+    glyph: 'vault',
+    metric: {
+      prefix: '−',
+      value: 20,
+      suffix: '%',
+      label: 'Payout errors, after automating rebate and commission payouts',
+    },
+    facts: [
+      { text: 'An enterprise platform for decentralised asset management, owned from ambiguous brief to production' },
+      { text: 'Institutional clients investing digital assets securely' },
+      { text: 'CRM integration that turned days of reconciliation into transparent, automatic earnings tracking' },
+    ],
+    marks: [
+      { anchor: 'custody', text: 'Custody' },
+      { anchor: 'payouts', text: 'Payouts' },
+    ],
+  },
+];
 
 /* ============================================================================
    PROJECTS

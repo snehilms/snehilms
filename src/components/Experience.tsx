@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import { SmoothScroll } from './dom/SmoothScroll';
 import { Scrim } from './dom/Scrim';
 import { Preloader } from './dom/Preloader';
-import { Cursor } from './dom/Cursor';
 import { Dossier } from './dom/Dossier';
 import { Nav } from './dom/Nav';
 import { ChapterRail } from './dom/ChapterRail';
@@ -53,7 +52,6 @@ export function Experience() {
       <ChapterRail />
       <SystemToggles />
       <Dossier />
-      <Cursor />
       <Preloader />
     </SmoothScroll>
   );

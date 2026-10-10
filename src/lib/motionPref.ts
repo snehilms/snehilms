@@ -11,6 +11,9 @@
    - sets <html data-motion="full|reduced">, which the CSS honours, and
    - answers `matchMedia('(prefers-reduced-motion: …)')` with the chosen
      value, so every JS reader agrees without knowing this file exists.
+     Only the motion feature is swapped (for an always-true or always-false
+     width test); the rest of a compound query, such as a min-width, is
+     still the browser's to answer, live.
    Changing the choice reloads the page: every timeline is built for one
    mode, and rebuilding them live is not worth the risk of a half-switched
    page.
@@ -27,10 +30,8 @@ document.documentElement.setAttribute('data-motion',c);
 var real=window.matchMedia.bind(window);
 window.matchMedia=function(q){
 if(q.indexOf('prefers-reduced-motion')<0)return real(q);
-var wantReduce=q.indexOf('no-preference')<0;
-var m=(c==='reduced')===wantReduce;
-return{matches:m,media:q,onchange:null,addListener:function(){},removeListener:function(){},
-addEventListener:function(){},removeEventListener:function(){},dispatchEvent:function(){return false}};
+return real(q.replace(/\\(\\s*prefers-reduced-motion\\s*:\\s*(no-preference|reduce)\\s*\\)/g,function(_,v){
+return (v==='reduce')===(c==='reduced')?'(min-width: 0px)':'(max-width: 0px)';}));
 };
 }catch(e){}})();`;
 

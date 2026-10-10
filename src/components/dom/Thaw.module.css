@@ -1,81 +1,365 @@
-.grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
-  gap: var(--s-16);
-  align-items: start;
-}
+/* ============================================================================
+   THAW — EXPERIENCE
 
-/* --- Prose -------------------------------------------------------------- */
+   Two layouts from one markup.
 
-.prose {
+   The list (default: phones, reduced motion): stations stacked oldest first,
+   each with a line drawing of its sculpture. Nothing moves but the shared
+   chapter entrance.
+
+   The hold (data-layout="pinned", set by Thaw on wide screens with motion):
+   the section runs four screens tall and its shell sticks to the viewport.
+   The stations share one slot in the reading column and take turns in it;
+   the timeline sits under them; the sculptures fill the right of the frame
+   from the canvas, with their labels pinned on by `.marks`.
+   ========================================================================= */
+
+/* --- Shared station typography ------------------------------------------- */
+
+.stations {
+  list-style: none;
   display: flex;
   flex-direction: column;
-  gap: var(--s-4);
-  max-width: 60ch;
+  gap: var(--s-12);
+  max-width: 36rem;
 }
 
-.lead {
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.company {
   font-size: var(--t-h3);
-  line-height: 1.24;
-  letter-spacing: var(--ls-snug);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-tight);
   color: var(--c-ink);
-  margin-bottom: var(--s-3);
-  text-wrap: pretty;
-}
-
-.body {
-  font-size: var(--t-body);
-  line-height: var(--lh-body);
-  color: var(--c-text-dim);
-  text-wrap: pretty;
-}
-
-/* --- Stat rail ---------------------------------------------------------- */
-
-.rail {
-  position: sticky;
-  top: var(--s-20);
-  will-change: transform;
-}
-
-.stats {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-6);
-}
-
-.stat {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-opt);
-  padding-top: var(--s-3);
+  text-wrap: balance;
   will-change: transform, opacity;
 }
 
-.statRule {
+.joiner { color: var(--c-text-ghost); }
+
+.roster {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-opt);
+  will-change: transform, opacity;
+}
+
+.rosterRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-1) var(--s-2);
+  font-size: var(--t-sm);
+  color: var(--c-text-dim);
+}
+
+.rosterAt { color: var(--c-text-faint); }
+
+.period {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.06em;
+  color: var(--c-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The one figure per station: large, tabular, on its own line, with what
+   it measures set small beneath it. */
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  margin-top: var(--s-3);
+  will-change: transform, opacity;
+}
+
+.metricValue {
+  font-size: var(--t-h2);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+  color: var(--c-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.metricLabel {
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  color: var(--c-text-faint);
+  max-width: 34ch;
+  text-wrap: pretty;
+}
+
+.facts {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--s-3);
+}
+
+.fact {
+  position: relative;
+  padding-block: var(--s-1) var(--s-2);
+}
+
+/* Each fact sits under a hairline that draws itself in. */
+.factRule {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, var(--c-accent-2), var(--c-line) 70%, transparent);
+  background: linear-gradient(90deg, var(--c-line-strong), var(--c-line) 70%, transparent);
   transform-origin: left center;
   will-change: transform;
 }
 
-.statValue {
-  font-size: var(--t-h2);
-  line-height: var(--lh-tight);
-  letter-spacing: var(--ls-tight);
-  font-weight: 600;
-  color: var(--c-ink-2);
-  font-variant-numeric: tabular-nums;
+.factText {
+  display: block;
+  font-size: var(--t-sm);
+  line-height: var(--lh-body);
+  color: var(--c-text-dim);
+  max-width: 52ch;
+  text-wrap: pretty;
+  will-change: transform, opacity;
 }
 
-@media (max-width: 960px) {
-  .grid { grid-template-columns: 1fr; gap: var(--s-10); }
-  .rail { position: static; }
-  .stats { flex-direction: row; flex-wrap: wrap; gap: var(--s-4) var(--s-8); }
-  .stat { flex: 1 1 140px; }
+/* Which employer a fact belongs to, where a station spans two. */
+.from {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--c-accent-2);
+  margin-right: var(--s-1);
+}
+
+/* --- The list's line drawings -------------------------------------------- */
+
+.icon {
+  width: var(--s-8);
+  height: var(--s-8);
+  margin-bottom: var(--s-1);
+}
+
+.iconSvg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--c-ink-3);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.iconLive { stroke: var(--c-accent); }
+
+/* The timeline and the labels only mean something while the chapter holds. */
+.timeline,
+.marks { display: none; }
+
+/* Labels on the sculptures wherever there is room beside the text: held, or
+   listed on a wide screen. */
+@media (min-width: 900px) {
+  .marks {
+    display: block;
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+  }
+}
+
+/* --- The hold -------------------------------------------------------------- */
+
+.chapter[data-layout='pinned'] {
+  min-height: 420svh;
+  justify-content: flex-start;
+  padding-block: 0;
+}
+
+/* Chapter's shell: it holds the viewport while the section scrolls on. */
+.chapter[data-layout='pinned'] > div {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  /* Clears the fixed nav bar. */
+  padding-top: calc(var(--s-12) + var(--s-2));
+  padding-bottom: var(--s-5);
+}
+
+/* Chapter's header rule: a tighter gap below it while held. */
+.chapter[data-layout='pinned'] > div > div:first-of-type { margin-bottom: var(--s-5); }
+
+.chapter[data-layout='pinned'] .stage {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 34rem) 1fr;
+  grid-template-rows: minmax(0, 1fr) auto;
+  row-gap: var(--s-4);
+}
+
+.chapter[data-layout='pinned'] .stations {
+  position: relative;
+  display: block;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/* All stations share one slot and take turns in it. */
+.chapter[data-layout='pinned'] .station {
+  position: absolute;
+  inset: 0 0 auto 0;
+}
+
+.chapter[data-layout='pinned'] .icon { display: none; }
+
+/* --- Timeline: a rail with the three stations on it, filled in step with
+   the stream, and one bead travelling along it. --------------------------- */
+
+.chapter[data-layout='pinned'] .timeline {
+  display: block;
+  grid-column: 1;
+  grid-row: 2;
+  padding-bottom: var(--s-4);
+  will-change: opacity;
+}
+
+.track {
+  position: relative;
+  height: 1px;
+  background: var(--c-line-strong);
+}
+
+.trackFill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--c-accent-3), var(--c-accent));
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.bead {
+  position: absolute;
+  top: calc(var(--s-opt) * -1);
+  left: calc(var(--s-opt) * -1);
+  width: var(--s-1);
+  height: var(--s-1);
+  border-radius: var(--r-full);
+  background: var(--c-ink);
+  will-change: transform;
+}
+
+.node {
+  position: absolute;
+  top: 0;
+  left: calc(var(--at) * 100%);
+  transform: translate(-50%, calc(var(--s-2) * -1));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-1);
+  padding: var(--s-1) var(--s-2);
+  background: none;
+  border: 0;
+  border-radius: var(--r-sm);
+  color: var(--c-text-faint);
+  cursor: pointer;
+  transition: color var(--d-fast) var(--e-out);
+}
+
+.nodeDot {
+  width: var(--s-1);
+  height: var(--s-1);
+  border-radius: var(--r-full);
+  border: 1px solid var(--c-line-strong);
+  background: var(--c-ground);
+  transition: border-color var(--d-fast) var(--e-out), background var(--d-fast) var(--e-out);
+}
+
+.nodeYears {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.node:hover,
+.node[aria-current] { color: var(--c-ink); }
+
+.node:hover .nodeDot,
+.node[aria-current] .nodeDot {
+  border-color: var(--c-accent);
+  background: var(--c-accent-4);
+}
+
+/* --- Labels pinned to the sculptures (positions from ParticleField). ----- */
+
+.mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Centre the dot on the anchor. */
+  margin: calc(var(--s-1) * -1) 0 0 calc(var(--s-opt) * -1);
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  font-weight: 500;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--c-ink-3);
+  white-space: nowrap;
+  opacity: 0;
+  /* A breath of fog behind the letters, so they hold over beads. */
+  text-shadow: 0 0 var(--s-1) var(--c-fog-hi), 0 0 var(--s-opt) var(--c-fog-hi);
+  will-change: transform, opacity;
+}
+
+/* The order book's price column: right-aligned against the axis. */
+.price {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-top: calc(var(--s-1) * -1);
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text-faint);
+  white-space: nowrap;
+  opacity: 0;
+  text-shadow: 0 0 var(--s-1) var(--c-fog-hi);
+  will-change: transform, opacity;
+}
+
+.priceText {
+  display: block;
+  transform: translateX(-100%);
+}
+
+.markDot {
+  width: var(--s-1);
+  height: var(--s-1);
+  border-radius: var(--r-full);
+  border: 1px solid var(--c-accent);
+  background: var(--c-fog-hi);
+}
+
+/* Short screens: the held station gives up some size before it overflows. */
+@media (max-height: 820px) {
+  .chapter[data-layout='pinned'] .metricValue { font-size: var(--t-h3); }
+  .chapter[data-layout='pinned'] .metric,
+  .chapter[data-layout='pinned'] .facts { margin-top: var(--s-2); }
+  .chapter[data-layout='pinned'] .fact:nth-child(n + 3) { display: none; }
 }

@@ -34,7 +34,7 @@ surfaces into a lit chamber where the engineer's marks stand on a pedestal.
 They leave remembering the marks tearing apart and re-forming.
 
 FIRST VIEWPORT: Unchanged composition this pass: a top-lit bead sphere shell
-right of centre in fog (the SK initials resolve in Thaw), three-line headline left in ink, availability pill top
+right of centre in fog (it unravels into the Experience chapter's held signal path: a fibre-bundle stream that gathers into bead sculptures of each role), three-line headline left in ink, availability pill top
 right. Signature moment, the socials stage: pinned full viewport, one bead mark
 at about 53vmin floating over a pedestal with light rings; scroll steps
 GitHub, LinkedIn, X, Email, each change a tear-and-reform; a selector marked by a single gliding bead

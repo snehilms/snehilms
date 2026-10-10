@@ -43,7 +43,11 @@ disagree with this project, **this file and the established codebase win**:
   an inline <head> script patches `matchMedia` and sets html[data-motion] before
   hydration; CSS reduced-motion rules are guarded by data-motion). To test motion
   in a browser, use that toggle (it reloads) or an init-script override matching
-  on `no-preference` — "prefers-reduced-motion" itself contains "reduce".
+  on `no-preference` — "prefers-reduced-motion" itself contains "reduce". The
+  patch swaps only the motion feature, so a compound query such as
+  `(min-width: 900px) and (prefers-reduced-motion: no-preference)` still
+  answers its width part truthfully (it used to answer the whole query by the
+  motion choice alone, which held the Experience chapter on phones).
 - **Sound** is synthesised Web Audio (lib/sound.ts): drone + gust-driven air and
   ice glints, modelled on measured spectra of the igloo.inc reference, not
   sampled. Off until the visitor turns it on; resumes on first gesture next visit.
@@ -75,6 +79,42 @@ change a handful of times (active chapter, open dossier via `useDossier()`).
 different heights (the archive is 230svh), so the particle field and camera read
 `scrollState.chapterSmooth` — measured against section centres in `SmoothScroll.tsx`
 — where 2.0 means chapter 2 is centred. Raw `progress` only drives the atmosphere.
+
+**Experience is a held signal path.** On wide screens with motion, Thaw sets
+`data-layout="pinned"` on its section (420svh, Chapter's shell sticky) and its
+ScrollTrigger writes `experienceState.progress`; SmoothScroll treats the
+section (data-span="whole", set in BOTH layouts) as "on" for its whole length,
+so `chapterT` sits flat at 1 there, and the field walks its own chain instead.
+The list layout (phones, reduced motion, which the owner's Mac has on) drives
+the same progress from the viewport centre passing each station's middle, so
+each sculpture still sits beside its station; without that the list showed a
+half-formed stream for every station. The chain: stream → pipeline → stream → book → stream
+→ vault → stream (`chainCoord` in lib/experienceState.ts, plateaus at the
+station centres 0.2/0.5/0.8, which are also the snap points). So the velocity
+pass blends up to THREE targets (uWeights/uKinds; kind 1 is the procedural
+stream, 2–4 the glyphs), and the render pass reads the same slot uniforms by
+reference. The glyphs (gpgpu/careerGlyphs.ts) are surface-sampled 3D sculptures
+with a second texture per glyph (tag, param, octahedral normal) so beads are
+lit as solids and their parts animate on the GPU (the order book's sizes churn
+and its best levels trade away and refill; the vault door swings with the
+vault's presence); poses are mat3 uniforms that also place the DOM labels and
+the book's price column. Each glyph answers the cursor (`uHover`, the cursor
+on the field's local z=0 plane): light gathers under it, the pipeline's pulses
+run faster, the book row under it lights and swells, the vault door swings
+wider and its wheel spins up. Their clocks (uBook, uFlow, uPay, the wheel) are
+integrated so quickening never jumps them, and under reduced motion they run
+at half speed rather than freezing (ambient, not travel; the owner's Mac has
+reduce on). Flint's glyph was a depth-over-time terrain first; the owner said
+it did not read as an order book, so it is a literal ladder with prices now. Lessons: anything a glyph or the stream does must be
+slow, because beads spring after moving targets with per-bead eagerness and a
+fast target smears a fine strand into a sheet (drawn shapes also get a stiffer
+spring and calmer turbulence); anything that must move FAST is applied at draw
+time instead (the vault wheel turns in POINTS_VERTEX, `spinWheel`, over a still
+simulated wheel: turning its targets smeared the spokes into a disc); the pointer well lives in the field's LOCAL
+space (`worldToLocal`), or it sits 2.75 units from the cursor; and a staggered
+`fromTo` inside a timeline only renders its first element's start immediately,
+so set start states explicitly. Never credit one employer's work to another:
+a station spanning two tags each fact with its company.
 
 **The canvas never unmounts** and has `pointer-events: none`. Interaction belongs to
 DOM elements: the archive shards are driven by real `<button>` slots, not raycasting.

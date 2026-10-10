@@ -9,7 +9,8 @@ import * as THREE from 'three';
 
    The narrative, in geometry:
      0  SIGNAL   sphere shell      — a frozen core, still transmitting
-     1  THAW     initials          — a shape resolves out of the ice
+     1  THAW     the stream        — procedural (simulation.glsl.ts), and a
+                                   chain of career glyphs (careerGlyphs.ts)
      2  ARCHIVE  lattice of cells  — the storage grid, work preserved
      3  STRATA   horizontal bands  — a core sample, read top to bottom
      4  SURFACE  opening ring      — the shelf breaks, channel opens
@@ -56,73 +57,6 @@ export function sphereShell(count: number, radius: number = FIELD.radius): Cloud
     out[o + 0] = Math.cos(theta) * r * jitter;
     out[o + 1] = y * jitter;
     out[o + 2] = Math.sin(theta) * r * jitter;
-    out[o + 3] = 1;
-  }
-  return out;
-}
-
-/* --- 01 · THAW --------------------------------------------------------- */
-/** Rasterise text on a 2D canvas, then sample its opaque pixels as points. */
-export function textCloud(
-  text: string,
-  count: number,
-  opts: { worldWidth?: number; depth?: number; weight?: number } = {},
-): Cloud {
-  const worldWidth: number = opts.worldWidth ?? FIELD.width;
-  const depth: number = opts.depth ?? 0.55;
-  const weight: number = opts.weight ?? 800;
-  const W = 1024;
-  const H = 512;
-
-  const canvas = document.createElement('canvas');
-  canvas.width = W;
-  canvas.height = H;
-  const ctx = canvas.getContext('2d', { willReadFrequently: true });
-
-  // No 2D context (exotic browser, hardened privacy mode) — fall back to a
-  // shape rather than rendering nothing.
-  if (!ctx) return sphereShell(count, FIELD.radius * 0.8);
-
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, W, H);
-
-  const stack = `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif`;
-
-  // Fit the string to ~82% of the canvas width.
-  let fontSize = 420;
-  ctx.font = `${weight} ${fontSize}px ${stack}`;
-  const measured = ctx.measureText(text).width;
-  fontSize = Math.min(fontSize * ((W * 0.82) / measured), H * 0.74);
-
-  ctx.font = `${weight} ${fontSize}px ${stack}`;
-  ctx.fillStyle = '#fff';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(text, W / 2, H / 2);
-
-  const pixels = ctx.getImageData(0, 0, W, H).data;
-
-  // Collect every lit pixel, then sample down to `count`.
-  const candidates: number[] = [];
-  for (let i = 0; i < W * H; i++) {
-    if (pixels[i * 4] > 128) candidates.push(i);
-  }
-  if (candidates.length === 0) return sphereShell(count, FIELD.radius * 0.8);
-
-  const rand = mulberry32(23);
-  const worldHeight = worldWidth * (H / W);
-  const out = new Float32Array(count * 4);
-
-  for (let i = 0; i < count; i++) {
-    const p = candidates[(rand() * candidates.length) | 0];
-    const px = p % W;
-    const py = (p / W) | 0;
-
-    // Sub-pixel jitter stops the cloud from looking like a screen door.
-    const o = i * 4;
-    out[o + 0] = ((px + rand()) / W - 0.5) * worldWidth;
-    out[o + 1] = -((py + rand()) / H - 0.5) * worldHeight;
-    out[o + 2] = (rand() - 0.5) * depth;
     out[o + 3] = 1;
   }
   return out;
@@ -251,14 +185,17 @@ export function cloudToTexture(cloud: Cloud, size: number): THREE.DataTexture {
   return tex;
 }
 
-/** Builds every target for a given simulation resolution, in chapter order. */
-export function buildTargets(size: number, initials: string): THREE.DataTexture[] {
+/** Builds every chapter target for a given simulation resolution, in
+    chapter order. Chapter 1 is the stream, which the simulation computes
+    itself, so its slot holds the sphere as a placeholder it never samples. */
+export function buildTargets(size: number): THREE.DataTexture[] {
   const count = size * size;
+  const sphere = cloudToTexture(sphereShell(count), size);
   return [
-    sphereShell(count),
-    textCloud(initials, count),
-    latticeCloud(count),
-    strataCloud(count),
-    ringCloud(count),
-  ].map((cloud) => cloudToTexture(cloud, size));
+    sphere,
+    sphere,
+    cloudToTexture(latticeCloud(count), size),
+    cloudToTexture(strataCloud(count), size),
+    cloudToTexture(ringCloud(count), size),
+  ];
 }

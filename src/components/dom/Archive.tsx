@@ -140,7 +140,6 @@ export function Archive() {
             }}
             type="button"
             className={compact ? styles.card : styles.slot}
-            data-cursor={compact || !project.core.plate ? undefined : 'inspect'}
             onPointerEnter={(e) => {
               archiveState.hovered = i;
               archiveState.pointer.x = e.clientX;

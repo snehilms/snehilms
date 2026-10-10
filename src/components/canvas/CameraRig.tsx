@@ -12,7 +12,7 @@ import { scrollState, damp } from '@/lib/scrollState';
    distinct chapters read as one descent rather than five slides.
    ========================================================================= */
 
-/* Depth at each chapter boundary. Pulling in for the initials (01) and the
+/* Depth at each chapter boundary. Pulling in for the career glyphs (01) and the
    archive lattice (02), then retreating as the ring opens out (04). */
 const DOLLY = [9.4, 7.6, 8.2, 8.6, 10.2];
 

@@ -92,38 +92,46 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
 
   /* Chapter-space probe.
 
-     Measures the centre of every chapter section once per refresh, then maps
-     the viewport centre onto that ladder. The result is piecewise-linear in
+     Measures where every chapter is "on" once per refresh, then maps the
+     viewport centre onto that ladder. The result is piecewise-linear in
      chapter units, so "formation 2 is fully formed" and "chapter 2 is on
-     screen" are the same instant regardless of how tall any section is. */
+     screen" are the same instant regardless of how tall any section is.
+
+     A chapter is on at its centre, except one marked data-span="whole" (the
+     Experience chapter, held or listed): it is on for its whole length, so
+     chapterT stays flat at its index there and the chapter's own progress
+     drives what happens inside it. */
   useEffect(() => {
-    let centres: number[] = [];
+    let spans: [number, number][] = [];
 
     const measure = () => {
-      centres = chapters.map((chapter) => {
+      const half = window.innerHeight / 2;
+      spans = chapters.map((chapter) => {
         const el = document.getElementById(chapter.id);
-        if (!el) return 0;
+        if (!el) return [0, 0];
         const rect = el.getBoundingClientRect();
-        return rect.top + window.scrollY + rect.height / 2;
+        const top = rect.top + window.scrollY;
+        if (el.dataset.span === 'whole') return [top + half, top + rect.height - half];
+        const centre = top + rect.height / 2;
+        return [centre, centre];
       });
     };
 
     const compute = () => {
-      if (centres.length < 2) return 0;
+      if (spans.length < 2) return 0;
 
       const focus = window.scrollY + window.innerHeight / 2;
-      if (focus <= centres[0]) return 0;
-      if (focus >= centres[centres.length - 1]) return centres.length - 1;
-
-      for (let i = 0; i < centres.length - 1; i++) {
-        const a = centres[i];
-        const b = centres[i + 1];
-        if (focus >= a && focus <= b) {
-          const span = b - a;
-          return span === 0 ? i : i + (focus - a) / span;
+      if (focus <= spans[0][1]) return 0;
+      for (let i = 0; i < spans.length; i++) {
+        const [a, b] = spans[i];
+        if (focus >= a && focus <= b) return i;
+        const next = spans[i + 1];
+        if (next && focus > b && focus < next[0]) {
+          const span = next[0] - b;
+          return span <= 0 ? i : i + (focus - b) / span;
         }
       }
-      return 0;
+      return spans.length - 1;
     };
 
     measure();
@@ -184,8 +192,10 @@ export function scrollTo(target: string | number) {
   } else {
     const rect = destination.getBoundingClientRect();
     const top = rect.top + window.scrollY;
+    // A held chapter starts at its top: that is where its story begins.
+    const held = destination.dataset.layout === 'pinned';
     y =
-      rect.height > window.innerHeight * 1.25
+      !held && rect.height > window.innerHeight * 1.25
         ? top + rect.height / 2 - window.innerHeight / 2
         : top;
   }

@@ -70,7 +70,6 @@ export function SystemToggles() {
         aria-pressed={soundOn}
         aria-label={soundLabel}
         onClick={() => (soundOn ? sound.disable() : sound.enable())}
-        data-cursor="hover"
       >
         <SoundBars on={soundOn} />
         <span className={styles.tag} aria-hidden="true">
@@ -85,7 +84,6 @@ export function SystemToggles() {
           aria-pressed={!reduced}
           aria-label={`${motionLabel}. ${reduced ? 'Turn on full motion' : 'Reduce motion'} (reloads)`}
           onClick={() => setMotionChoice(reduced ? 'full' : 'reduced')}
-          data-cursor="hover"
         >
           <span className={styles.dot} data-on={!reduced} aria-hidden="true" />
           <span className={styles.tag} aria-hidden="true">
