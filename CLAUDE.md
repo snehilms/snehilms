@@ -81,12 +81,15 @@ different heights (the archive is 230svh), so the particle field and camera read
 `scrollState.chapterSmooth` — measured against section centres in `SmoothScroll.tsx`
 — where 2.0 means chapter 2 is centred. Raw `progress` only drives the atmosphere.
 
-**Experience is a held signal path.** On wide screens with motion, Thaw sets
+**Experience is a held signal path.** On every screen at least 900px wide,
+reduced motion included (owner's call: the held view is wanted on the owner's
+Mac, which has Reduce Motion on; everything in it is scroll-driven, and under
+reduced motion its text fades without sliding), Thaw sets
 `data-layout="pinned"` on its section (420svh, Chapter's shell sticky) and its
 ScrollTrigger writes `experienceState.progress`; SmoothScroll treats the
 section (data-span="whole", set in BOTH layouts) as "on" for its whole length,
 so `chapterT` sits flat at 1 there, and the field walks its own chain instead.
-The list layout (phones, reduced motion, which the owner's Mac has on) drives
+The list layout (phones) drives
 the same progress from the viewport centre passing each station's middle, so
 each sculpture still sits beside its station; without that the list showed a
 half-formed stream for every station. The chain: stream → pipeline → book → vault → stream (which then flows on into the first crystal's engine) (`chainCoord` in lib/experienceState.ts, wide plateaus at the
@@ -212,9 +215,13 @@ hand-over moves no bead. As `uPour` rises the bundle slides along itself like a
 belt; past its pinched left end each bead follows one cubic curve that bends
 down and enters the engine from above as a fine thread (any real width packed
 65k beads into a solid rope), and beads that reach the engine are absorbed by
-density in POINTS_VERTEX. The slot weight and the pour are keyed to the
-crystal's own screen position, not chapter space, or most of it happened below
-the fold. The field stays where the stream stood and only its sway stops (the
+density in POINTS_VERTEX. The slot weight is keyed to the crystal's own
+screen position, not chapter space, or most of it happened below the fold. The
+pour itself is not scrubbed (owner's call: past a point it should be sucked in
+on its own): it arms once the ice's top edge is over the bottom of the screen
+(`POUR_ARM`), plays by time (`POUR_SECONDS`, accelerating), and plays back out
+only once the crystal has sunk well below that point (`POUR_DISARM`), so it
+never flickers at the line. The field stays where the stream stood and only its sway stops (the
 sink is computed in the field's own space; a turning field swung it off the
 engine). Leaving Projects the sink is let go bead by bead (`uTake`), nearest
 the engine first: a part-way blend there held every bead halfway, in one lump. Where the
@@ -290,9 +297,12 @@ below zero), never `normalize` a vector that can be zero, keep final colours
 read the default framebuffer in a microtask after each frame's draw and count
 near-black samples.
 
-**Intro tweens use `fromTo` with every property pinned, including `y`.** A plain
-`from` re-read a stale pixel offset and left the hero headline parked under its
-mask.
+**Reveal tweens use `fromTo` with every property pinned, including `y`.** A plain
+`from` takes whatever the element shows when it is built as its resting state.
+It re-read a stale pixel offset and left the hero headline parked under its
+mask; and with reduced motion the reveal setup ran twice, so the second build
+read the first one's hidden start as "rest" and every chapter heading stayed
+invisible (Oct 2026).
 
 **`useGSAP` scopes selector strings to its `scope`.** Elements outside the scope
 (e.g. a section from the rail) must be resolved with `getElementById` first, or the

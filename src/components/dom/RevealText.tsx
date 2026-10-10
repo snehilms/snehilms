@@ -72,10 +72,14 @@ export function RevealText({
           const targets =
             mode === 'chars' ? split.chars : mode === 'words' ? split.words : split.lines;
 
-          gsap.from(targets, {
+          // End state pinned (fromTo): see Chapter.
+          gsap.fromTo(targets, {
             yPercent: 118,
             // A hair of rotation on per-character reveals reads as weight.
             rotate: mode === 'chars' ? 2.4 : 0,
+          }, {
+            yPercent: 0,
+            rotate: 0,
             duration,
             delay,
             stagger,

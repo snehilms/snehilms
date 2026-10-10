@@ -3,11 +3,11 @@
 
    Two layouts from one markup.
 
-   The list (default: phones, reduced motion): stations stacked oldest first,
+   The list (default: phones): stations stacked oldest first,
    each with a line drawing of its sculpture. Nothing moves but the shared
    chapter entrance.
 
-   The hold (data-layout="pinned", set by Thaw on wide screens with motion):
+   The hold (data-layout="pinned", set by Thaw on every wide screen):
    the section runs four screens tall and its shell sticks to the viewport.
    The stations share one slot in the reading column and take turns in it;
    the timeline sits under them; the sculptures fill the right of the frame

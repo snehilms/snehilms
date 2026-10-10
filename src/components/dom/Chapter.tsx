@@ -42,13 +42,16 @@ export function Chapter({ id, title, caption, children, className, hold }: Props
         scrollTrigger: { trigger: head, start: 'top 88%', once: true },
       });
 
-      tl.from(head.children, {
-        yPercent: 70,
-        opacity: 0,
-        duration: 0.9,
-        stagger: 0.06,
-        ease: 'expo.out',
-      }).from(rule, { scaleX: 0, duration: 1.3, ease: 'expo.inOut' }, 0);
+      /* fromTo with the end state pinned, never `from`: a from-tween takes
+         whatever the element shows when it is built as its resting state,
+         and with reduced motion the setup ran twice, so the second build
+         read the first one's hidden start as "rest" and every heading
+         stayed invisible. */
+      tl.fromTo(
+        head.children,
+        { yPercent: 70, opacity: 0 },
+        { yPercent: 0, opacity: 1, duration: 0.9, stagger: 0.06, ease: 'expo.out' },
+      ).fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 1.3, ease: 'expo.inOut' }, 0);
 
       return () => {
         tl.scrollTrigger?.kill();

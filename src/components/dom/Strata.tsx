@@ -36,16 +36,17 @@ export function Strata() {
             scrollTrigger: { trigger: row, start: 'top 84%', once: true },
           });
 
-          tl.from(row.querySelector(`.${styles.bandMeta}`), {
-            xPercent: -24,
-            opacity: 0,
-            duration: 1,
-            ease: 'expo.out',
-          })
-            .from(bar, { scaleY: 0, duration: 1.3, ease: 'expo.inOut' }, 0)
-            .from(
+          // End states pinned (fromTo): see Chapter.
+          tl.fromTo(
+            row.querySelector(`.${styles.bandMeta}`),
+            { xPercent: -24, opacity: 0 },
+            { xPercent: 0, opacity: 1, duration: 1, ease: 'expo.out' },
+          )
+            .fromTo(bar, { scaleY: 0 }, { scaleY: 1, duration: 1.3, ease: 'expo.inOut' }, 0)
+            .fromTo(
               chips,
-              { yPercent: 70, opacity: 0, duration: 0.7, stagger: 0.035, ease: 'expo.out' },
+              { yPercent: 70, opacity: 0 },
+              { yPercent: 0, opacity: 1, duration: 0.7, stagger: 0.035, ease: 'expo.out' },
               0.15,
             );
 

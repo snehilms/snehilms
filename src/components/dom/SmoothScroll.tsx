@@ -83,10 +83,28 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     const onResize = () => ScrollTrigger.refresh();
     window.addEventListener('resize', onResize);
 
+    /* Re-measure whenever the page's height changes, not just the window.
+       The held Experience chapter grows from its list height to four
+       screens after its triggers exist; under reduced motion nothing else
+       re-measured, so its triggers kept the list's span and the held
+       stations never showed. Debounced, and only on a real change. */
+    let height = document.body.scrollHeight;
+    let pending = 0;
+    const grew = new ResizeObserver(() => {
+      const h = document.body.scrollHeight;
+      if (Math.abs(h - height) < 1) return;
+      height = h;
+      window.clearTimeout(pending);
+      pending = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+    });
+    grew.observe(document.body);
+
     return () => {
       st.kill();
       gsap.ticker.remove(settle);
       window.removeEventListener('resize', onResize);
+      grew.disconnect();
+      window.clearTimeout(pending);
     };
   }, []);
 

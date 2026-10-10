@@ -182,14 +182,19 @@ export function SocialStage() {
           // floor; leaving, it would be clipped by the section's edge.
           .fromTo(`.${styles.selector}`, { '--veil': 1 }, { '--veil': 0, ease: 'none', immediateRender: false }, 0);
 
-        const colophon = gsap.from(`.${styles.colophonItem}`, {
-          opacity: 0,
-          y: 24,
-          duration: 0.8,
-          stagger: 0.06,
-          ease: 'power3.out',
-          scrollTrigger: { start: () => walkTrigger.end + window.innerHeight * 0.1, once: true },
-        });
+        // End state pinned (fromTo): see Chapter.
+        const colophon = gsap.fromTo(
+          `.${styles.colophonItem}`,
+          { opacity: 0, y: 24 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.06,
+            ease: 'power3.out',
+            scrollTrigger: { start: () => walkTrigger.end + window.innerHeight * 0.1, once: true },
+          },
+        );
 
         return () => {
           pinned.current = null;

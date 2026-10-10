@@ -160,10 +160,11 @@ export function Dossier() {
           { opacity: 1, y: 0, scale: 1, duration: 0.9 },
           '-=0.3',
         )
-        .from(`.${styles.lane}`, { opacity: 0, y: -12, duration: 0.6, stagger: 0.05 }, '-=0.55')
-        .from(
+        .fromTo(`.${styles.lane}`, { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.05 }, '-=0.55')
+        .fromTo(
           `.${styles.node}`,
-          { opacity: 0, y: 22, scale: 0.94, duration: 0.7, stagger: 0.035 },
+          { opacity: 0, y: 22, scale: 0.94 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.7, stagger: 0.035 },
           '-=0.4',
         );
 
@@ -180,8 +181,9 @@ export function Dossier() {
         );
       });
 
-      tl.from(`.${styles.packet}`, { opacity: 0, duration: 0.6, stagger: 0.03 }, '>-0.3')
-        .from(`.${styles.note}`, { opacity: 0, y: 16, duration: 0.7, stagger: 0.08 }, '<0.1');
+      // End states pinned (fromTo): see Chapter.
+      tl.fromTo(`.${styles.packet}`, { opacity: 0 }, { opacity: 1, duration: 0.6, stagger: 0.03 }, '>-0.3')
+        .fromTo(`.${styles.note}`, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.08 }, '<0.1');
 
       return () => tl.kill();
     },

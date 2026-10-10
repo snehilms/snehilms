@@ -25,13 +25,12 @@ export function Nav() {
       if (!el) return;
 
       // Entrance is deferred past the preloader handoff.
-      gsap.from(el, {
-        yPercent: -140,
-        opacity: 0,
-        duration: 1.1,
-        delay: 2.4,
-        ease: 'expo.out',
-      });
+      // End state pinned (fromTo): see Chapter.
+      gsap.fromTo(
+        el,
+        { yPercent: -140, opacity: 0 },
+        { yPercent: 0, opacity: 1, duration: 1.1, delay: 2.4, ease: 'expo.out' },
+      );
 
       const st = ScrollTrigger.create({
         start: 'top -80',

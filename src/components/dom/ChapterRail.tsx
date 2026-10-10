@@ -30,7 +30,8 @@ export function ChapterRail() {
       const el = ref.current;
       if (!el) return;
 
-      gsap.from(el, { opacity: 0, x: 24, duration: 1, delay: 2.6, ease: 'expo.out' });
+      // End state pinned (fromTo): see Chapter.
+      gsap.fromTo(el, { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 1, delay: 2.6, ease: 'expo.out' });
 
       const fillTrigger = ScrollTrigger.create({
         trigger: document.documentElement,

@@ -68,6 +68,13 @@ const ART = [
    4 vault (see experienceState.ts for where each one holds). */
 const CHAIN = [1, 2, 3, 4, 1] as const;
 
+/* The pour into the first crystal (NDC height of its engine): it arms once
+   the ice's top edge is over the bottom of the screen, disarms well below
+   that, and then takes this long to drain. */
+const POUR_ARM = -1.3;
+const POUR_DISARM = -1.7;
+const POUR_SECONDS = 1.5;
+
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
@@ -93,6 +100,9 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
   const outroRef = useRef(0);
   const doorRef = useRef(1);
   const wheelRef = useRef(0);
+  // The pour into the first crystal: armed by scroll, then played by time.
+  const pourRef = useRef(0);
+  const pourArmed = useRef(false);
   const scratch = useMemo(
     () => ({
       m4: new THREE.Matrix4(),
@@ -327,16 +337,26 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
     /* On the way in, the pour follows the crystal itself, not chapter space
        (keyed to chapter space, most of it poured in below the fold). The
        sink takes over from the closing stream while the crystal is still
-       below the fold (they are the same shape until the pour moves), then
-       the stream flows on into the engine as it rises from the bottom
-       edge, and has drained before the crystal reaches the middle. */
+       below the fold (they are the same shape until the pour moves). The
+       flow itself is not scrubbed (owner's call: once scrolled far enough
+       it should be sucked in on its own): when the crystal's top edge is
+       up over the bottom of the screen the pour arms and plays by time,
+       accelerating like suction, and it plays back out only once the
+       crystal has sunk well below that point again, so it never flickers
+       at the line. Far past it (or far before) it is simply done. */
     let pourIn = raw;
-    let flowIn = index >= 2 ? 1 : 0;
+    let engineY = -10;
     if (pour && index === 1) {
       scratch.v.set(archiveState.sink.x, archiveState.sink.y, archiveState.sink.z).project(camera);
-      pourIn = Math.max(smoothstep(-2.2, -1.5, scratch.v.y), smoothstep(0.6, 0.9, raw));
-      flowIn = Math.max(smoothstep(-1.4, -0.45, scratch.v.y), smoothstep(0.85, 1, raw));
+      engineY = scratch.v.y;
+      pourIn = Math.max(smoothstep(-2.2, -1.5, engineY), smoothstep(0.6, 0.9, raw));
     }
+    if (index >= 2 || (index === 1 && (engineY > POUR_ARM || raw > 0.85))) pourArmed.current = true;
+    else if (index < 1 || engineY < POUR_DISARM) pourArmed.current = false;
+    if (index >= 2 && raw > 0.3) pourRef.current = 1;
+    else if (index < 1) pourRef.current = 0;
+    else pourRef.current = Math.min(Math.max(pourRef.current + (pourArmed.current ? dt : -dt) / POUR_SECONDS, 0), 1);
+    const flowIn = pourRef.current * pourRef.current;
     const span = pour && index === 1 ? pourIn : pour && index === 2 ? smoothstep(0.4, 1, raw) : raw;
     const mix = span * span * (3 - 2 * span);
 

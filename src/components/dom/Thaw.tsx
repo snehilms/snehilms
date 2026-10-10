@@ -20,13 +20,17 @@ import styles from './Thaw.module.css';
    timeline under the stations carries a bead in step with the stream, and
    small labels are pinned to each sculpture.
 
-   Scroll snaps to the stations. Everywhere else (phones, reduced motion) it
-   is simply a list, oldest first, each station with a line drawing of its
-   sculpture: no hold, no scrub.
+   Scroll snaps to the stations. It holds on every wide screen, reduced
+   motion included (owner's call: the owner's Mac has Reduce Motion on, and
+   the held view is the one wanted): everything in it is driven by the
+   reader's own scroll,
+   and under reduced motion the station text only fades, never slides. On
+   phones it is simply a list, oldest first, each station with a line
+   drawing of its sculpture: no hold, no scrub.
    ========================================================================= */
 
-const HOLD = '(min-width: 900px) and (prefers-reduced-motion: no-preference)';
-const LIST = '(max-width: 899px), (prefers-reduced-motion: reduce)';
+const HOLD = '(min-width: 900px)';
+const LIST = '(max-width: 899px)';
 
 const formatCount = (v: number) => String(Math.round(v));
 
@@ -136,6 +140,10 @@ export function Thaw() {
 
       mm.add(HOLD, () => {
         section.dataset.layout = 'pinned';
+        // Under reduced motion the station text fades in place.
+        const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const rise = still ? 0 : 28;
+        const sink = still ? 0 : -18;
 
         const stations = gsap.utils.toArray<HTMLElement>('[data-station]', root);
         const nodes = gsap.utils.toArray<HTMLButtonElement>('[data-node]', root);
@@ -202,11 +210,11 @@ export function Thaw() {
           /* Hidden up front, explicitly: a staggered fromTo inside a
              timeline only renders its first element's start immediately,
              and the other stations' text sat on top of the first. */
-          gsap.set(parts, { opacity: 0, y: 28 });
+          gsap.set(parts, { opacity: 0, y: rise });
           gsap.set(rules, { scaleX: 0 });
           tl.to(parts, { opacity: 1, y: 0, duration: 0.07, stagger: 0.01, ease: 'power2.out' }, c - 0.12);
           tl.to(rules, { scaleX: 1, duration: 0.08, stagger: 0.012, ease: 'power2.inOut' }, c - 0.09);
-          tl.to(parts, { opacity: 0, y: -18, duration: 0.05, stagger: 0.006, ease: 'power1.in' }, c + 0.075);
+          tl.to(parts, { opacity: 0, y: sink, duration: 0.05, stagger: 0.006, ease: 'power1.in' }, c + 0.075);
           tl.to(rules, { scaleX: 0, duration: 0.05, ease: 'power1.in' }, c + 0.08);
         });
 
