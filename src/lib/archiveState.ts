@@ -29,6 +29,12 @@ export const archiveState = {
   /** Set when an ice crystal's files failed and its shard stands in, so the
       gallery sizes that slot as a shard again. */
   plateFailed: [] as boolean[],
+  /** True below the gallery breakpoint, where projects are cards, not crystals. */
+  compact: false,
+  /** Where the bead field pours into the first crystal's engine: its centre
+      in world space and a radius for the core, written by the gallery every
+      frame; `valid` only while that crystal is really drawn. */
+  sink: { x: 0, y: 0, z: 0, r: 0.4, valid: false },
 };
 
 /* --- Dossier store ------------------------------------------------------ */

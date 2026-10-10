@@ -119,6 +119,20 @@ export function CrystalGallery() {
       }
     });
 
+    /* The bead field pours into the first crystal's engine on the way in
+       (ParticleField): publish where it is and how big its core reads. */
+    const first = shardRefs.current[0];
+    const sink = archiveState.sink;
+    sink.valid = !!first && !archiveState.compact && !!projects[0].core.plate && !archiveState.plateFailed[0];
+    if (first && sink.valid) {
+      first.getWorldPosition(tmp.hit);
+      sink.x = tmp.hit.x;
+      sink.y = tmp.hit.y;
+      sink.z = tmp.hit.z;
+      // The engine's heart: the stream converges this tight before it is absorbed.
+      sink.r = first.scale.x * 0.11;
+    }
+
     /* Opening a dossier slides the chosen shard to centre frame, where the
        panel's backdrop-blur turns it into the panel's own light source. */
     const targetX = focusIndex === -1 ? 0 : -placed.current[focusIndex].x;

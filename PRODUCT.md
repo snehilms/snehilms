@@ -42,7 +42,7 @@ igloo.inc.
   persistent WebGL canvas behind DOM chapters; see CLAUDE.md for invariants.
 - All copy, projects, architecture graphs and links live in
   `src/config/content.ts`.
-- Five chapters: Intro, Experience, Projects (three), Stack, Contact; then
+- Four chapters: Intro, Experience, Projects (three), Stack; then
   the Socials stage.
 - Socials: GitHub, LinkedIn, X, email.
 

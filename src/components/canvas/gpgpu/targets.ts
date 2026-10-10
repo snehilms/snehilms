@@ -3,7 +3,7 @@ import * as THREE from 'three';
 /* ============================================================================
    MORPH TARGETS
 
-   Five point clouds, one per chapter, each packed into an RGBA float texture
+   Four point clouds, one per chapter, each packed into an RGBA float texture
    the simulation springs toward. Every generator returns exactly `count`
    points so any target can cross-fade into any other without reindexing.
 
@@ -13,7 +13,6 @@ import * as THREE from 'three';
                                    chain of career glyphs (careerGlyphs.ts)
      2  ARCHIVE  lattice of cells  — the storage grid, work preserved
      3  STRATA   horizontal bands  — a core sample, read top to bottom
-     4  SURFACE  opening ring      — the shelf breaks, channel opens
    ========================================================================= */
 
 export const FIELD = {
@@ -129,32 +128,6 @@ export function strataCloud(count: number, bands = 4): Cloud {
   return out;
 }
 
-/* --- 04 · SURFACE ------------------------------------------------------ */
-/** An open annulus, tilted toward the camera. The shelf breaking apart. */
-export function ringCloud(count: number, inner = 2.5, outer = 4.5): Cloud {
-  const rand = mulberry32(71);
-  const out = new Float32Array(count * 4);
-  const tilt = -Math.PI * 0.22;
-
-  for (let i = 0; i < count; i++) {
-    const angle = rand() * TAU;
-    // sqrt keeps the radial distribution uniform by area, not by radius.
-    const t = Math.sqrt(rand());
-    const radius = inner + t * (outer - inner);
-
-    const x = Math.cos(angle) * radius;
-    const z = Math.sin(angle) * radius;
-    const y = (rand() - 0.5) * 0.36 + Math.sin(angle * 3) * 0.14;
-
-    const o = i * 4;
-    out[o + 0] = x;
-    out[o + 1] = y * Math.cos(tilt) - z * Math.sin(tilt);
-    out[o + 2] = y * Math.sin(tilt) + z * Math.cos(tilt);
-    out[o + 3] = 1;
-  }
-  return out;
-}
-
 /* --- Initial state ----------------------------------------------------- */
 /** The field starts already formed as the opening sphere, bead for bead the
     same positions as its target, so a reload shows the sphere at once rather
@@ -185,6 +158,5 @@ export function buildTargets(size: number): THREE.DataTexture[] {
     sphere,
     cloudToTexture(latticeCloud(count), size),
     cloudToTexture(strataCloud(count), size),
-    cloudToTexture(ringCloud(count), size),
   ];
 }

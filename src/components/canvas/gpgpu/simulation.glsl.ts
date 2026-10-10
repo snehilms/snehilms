@@ -43,6 +43,11 @@ uniform float uWheel;
 uniform float uDoorOpen;
 uniform vec3 uHover;       // the cursor on the glyph plane, field space
 uniform float uHoverAmt;   // 0..1, how much the cursor is on a glyph
+uniform vec3 uSink;        // the first crystal's engine, field space (kind 5)
+uniform float uSinkR;      // its core's radius
+uniform float uSinkW;      // how much the field is pouring into it
+uniform float uPour;       // 0..1, how far the stream has flowed into it
+uniform float uTake;       // 1 leaving Projects: the sink is let go bead by bead
 uniform float uBook;       // the order book's clock (integrated: it quickens)
 
 uniform float uStiffness;
@@ -72,12 +77,13 @@ float hash12(vec2 p) {
    drift around it as mist. Every motion here is slow on purpose: beads
    spring after their targets with different eagerness, so a fast-moving
    target smears a fine strand into a sheet. */
-vec3 streamTarget(vec2 uv) {
-  float h1 = hash12(uv * 391.7);
+// The stream's bead at position x along it (its own place, or wherever the
+// pour has carried it along the bundle).
+vec3 streamAt(vec2 uv, float x) {
+  float h1 = x / 5.6 + 0.5;
   float h2 = hash12(uv * 173.3 + 11.0);
   float h3 = hash12(uv * 257.1 + 23.0);
   float h4 = hash12(uv * 89.9 + 37.0);
-  float x = (h1 - 0.5) * 5.6;
   float k = floor(h2 * 7.0) - 3.0;
   float env = smoothstep(0.0, 0.3, h1) * smoothstep(1.0, 0.7, h1);
   vec3 c = vec3(
@@ -91,7 +97,43 @@ vec3 streamTarget(vec2 uv) {
   return c + vec3(0.0, cos(ang), sin(ang)) * radius * sqrt(fract(h3 * 7.0));
 }
 
+vec3 streamTarget(vec2 uv) {
+  return streamAt(uv, (hash12(uv * 391.7) - 0.5) * 5.6);
+}
+
+/* The sink: the closing stream flows on into the first project crystal's
+   engine. The bundle slides along itself like a belt; past its pinched left
+   end each bead follows one curve that bends down and enters the engine from
+   above, narrowing to a thread; beads that reach the engine are absorbed at
+   draw time (POINTS_VERTEX), so the field drains into the ice as it flows.
+   At uPour = 0 this is exactly the stream, so the stream hands over to it
+   without a bead moving. */
+vec3 bezier3(vec3 a, vec3 b, vec3 c, vec3 d, float t) {
+  float u = 1.0 - t;
+  return a * (u * u * u) + b * (3.0 * u * u * t) + c * (3.0 * u * t * t) + d * (t * t * t);
+}
+
+vec3 sinkTarget(vec2 uv) {
+  vec3 s0 = vec3(-2.8, 0.36 * sin(-2.8 * 0.62 - uTime * 0.09), 0.0);
+  vec3 s1 = s0 + vec3(-0.9, 0.0, 0.0);
+  vec3 s3 = uSink;
+  vec3 s2 = s3 + vec3(0.0, uSinkR * 5.0, 0.0);
+  // Roughly the curve's length: between its chord and its control polygon.
+  float len = 0.5 * (distance(s0, s1) + distance(s1, s2) + distance(s2, s3) + distance(s0, s3));
+  float along = hash12(uv * 391.7) * 5.6 - uPour * (5.6 + len + 0.6);
+  if (along >= 0.0) return streamAt(uv, along - 2.8);
+  float t = min(-along / max(len, 1e-3), 1.0);
+  float h3 = hash12(uv * 257.1 + 23.0);
+  float h4 = hash12(uv * 89.9 + 37.0);
+  float ang = h4 * 43.98;
+  // A fine thread, tightening as it goes in: every bead of the field runs
+  // down this one curve, so any real width packs it into a solid rope.
+  vec3 spread = vec3(cos(ang), sin(ang), sin(ang * 1.7)) * sqrt(h3) * mix(0.035, 0.01, t);
+  return bezier3(s0, s1, s2, s3, t) + spread;
+}
+
 vec3 slotTarget(sampler2D tex, sampler2D attr, float kind, vec2 uv) {
+  if (kind > 4.5) return sinkTarget(uv);
   if (kind > 0.5 && kind < 1.5) return streamTarget(uv);
   vec3 p = texture2D(tex, uv).xyz;
   if (kind < 1.5) return p;
@@ -116,13 +158,29 @@ void main() {
   vec3 vel  = velData.xyz;
   float seed = posData.w;
 
-  vec3 target = slotTarget(uTargetA, uAttrA, uKinds.x, uv) * uWeights.x;
-  if (uWeights.y > 0.0001) target += slotTarget(uTargetB, uAttrB, uKinds.y, uv) * uWeights.y;
-  if (uWeights.z > 0.0001) target += slotTarget(uTargetC, uAttrC, uKinds.z, uv) * uWeights.z;
+  /* Leaving Projects the sink is let go bead by bead, not as a blend: a
+     part-way blend held every bead halfway, in one lump. Each bead commits
+     once the weight passes a threshold set by its distance from the engine.
+     On the way in no such care is needed: the sink starts as the stream. */
+  vec3 w = uWeights;
+  vec3 isSink = step(vec3(4.5), uKinds);
+  float sinkW = dot(w, isSink);
+  if (uTake > 0.5 && sinkW > 0.0001) {
+    float first = clamp(length(uSink - pos) / max(uSinkR * 16.0, 1e-3), 0.0, 1.0) * 0.75;
+    float taken = smoothstep(first, first + 0.25, sinkW);
+    float rest = 1.0 - sinkW;
+    w = mix(w * (rest > 1e-4 ? (1.0 - taken) / rest : 0.0), vec3(taken), isSink);
+  }
+
+  vec3 target = slotTarget(uTargetA, uAttrA, uKinds.x, uv) * w.x;
+  if (w.y > 0.0001) target += slotTarget(uTargetB, uAttrB, uKinds.y, uv) * w.y;
+  if (w.z > 0.0001) target += slotTarget(uTargetC, uAttrC, uKinds.z, uv) * w.z;
 
   // Per-particle eagerness staggers arrival so the cloud lands as a wave
   // instead of snapping into place all at once.
-  float eagerness = 0.55 + seed * 0.90;
+  // Flowing into the crystal, beads keep close to the moving belt so the
+  // stream stays a stream; a little spread still lets it trail.
+  float eagerness = mix(0.55 + seed * 0.90, 1.3 + seed * 0.8, uSinkW);
 
   vec3 acceleration = (target - pos) * uStiffness * eagerness;
 
@@ -220,6 +278,9 @@ uniform float uHoverAmt;
 uniform float uBook;
 uniform float uFlow;       // the pipeline's clock
 uniform float uPay;        // the payouts' clock
+uniform vec3 uSink;
+uniform float uSinkR;
+uniform float uSinkW;
 uniform float uPacketX;
 
 attribute vec2  aRef;
@@ -245,8 +306,9 @@ float comet(float x) {
 void glyphLook(sampler2D attr, float kind, float w, vec3 pos,
                inout vec3 nSum, inout float nW, inout float tint, inout float signal) {
   if (w < 0.001 || kind < 0.5) return;
-  if (kind < 1.5) {
-    // The stream carries one packet of signal along its length.
+  if (kind < 1.5 || kind > 4.5) {
+    // The stream carries one packet of signal along its length (and keeps
+    // it while it flows into the crystal, so the hand-over shows no seam).
     float d = (pos.x - uPacketX) / 0.3;
     tint += w * exp(-d * d) * 0.9;
     return;
@@ -294,7 +356,7 @@ void glyphLook(sampler2D attr, float kind, float w, vec3 pos,
 // back into the door's closed frame, turn it about the axle, and swing it
 // back out with the door.
 vec3 spinWheel(vec3 pos, sampler2D attr, float kind, float w) {
-  if (w < 0.001 || kind < 3.5) return pos;
+  if (w < 0.001 || kind < 3.5 || kind > 4.5) return pos;
   vec4 a = texture2D(attr, aRef);
   if (!isTag(a.x, TAG_VAULT_WHEEL)) return pos;
   vec3 hinge = vec3(VAULT_HINGE_X, 0.0, 0.0);
@@ -344,6 +406,12 @@ void main() {
 
   float size = uSize * aScale * energy * uReveal * uPixelRatio * (10.0 / dist);
   gl_PointSize = min(size, uMaxSize * uPixelRatio);
+
+  // Poured into the crystal's engine: a bead that has arrived is absorbed,
+  // whole (by density, never translucency), so the field vanishes into the
+  // ice as it lands instead of hanging beside it.
+  float arrived = 1.0 - smoothstep(0.7, 1.3, length(pos - uSink) / max(uSinkR, 1e-3));
+  if (min(uSinkW * 4.0, 1.0) * arrived > fract(aSeed * 13.73)) gl_PointSize = 0.0;
 }
 `;
 

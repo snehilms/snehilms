@@ -24,8 +24,9 @@ export const experienceState = {
    stream → pipeline → book → vault → stream. Each glyph holds through a
    wide plateau around its station so it can be read, then morphs straight
    into the next. The stream only opens and closes the chapter: a detour
-   through it between stations took longer than the gap allowed and read as
-   filler (owner's call). */
+   through it between stations read as filler (owner's call). The closing
+   stream is the one that then flows on into the first project crystal's
+   engine (ParticleField, the sink). */
 export const STATION_CENTRES = [0.2, 0.5, 0.8] as const;
 
 const CHAIN_KEYS: [number, number][] = [

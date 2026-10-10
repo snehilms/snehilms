@@ -62,14 +62,12 @@ const ART = [
   // between chapters it never sweeps across a heading or a card.
   { offsetX: 3.4, offsetY: -0.6, offsetZ: -4.2, opacity: 0.06, size: 1.8, yaw: 0.16 }, // 02 projects
   { offsetX: 2.9, offsetY: 0.0, offsetZ: -1.8, opacity: 0.2, size: 2.0, yaw: 0.1 }, // 03 stack
-  // The prompt and address take the left half; the ring takes the right,
-  // as the sphere does in the hero, so the two ends of the page rhyme.
-  { offsetX: 2.7, offsetY: -0.6, offsetZ: -1.4, opacity: 0.9, size: 2.1, yaw: 0.28 }, // 04 contact
 ] as const;
 
 /* The Experience chain, by slot kind: 1 stream, 2 pipeline, 3 book,
    4 vault (see experienceState.ts for where each one holds). */
 const CHAIN = [1, 2, 3, 4, 1] as const;
+
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
@@ -164,6 +162,11 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
       uHover: { value: new THREE.Vector3() },
       uHoverAmt: { value: 0 },
       uBook: { value: 0 },
+      uSink: { value: new THREE.Vector3() },
+      uSinkR: { value: 0.4 },
+      uSinkW: { value: 0 },
+      uPour: { value: 0 },
+      uTake: { value: 0 },
     };
 
     Object.assign(velocityVar.material.uniforms, {
@@ -308,14 +311,34 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
     scrollState.chapterSmooth = damp(scrollState.chapterSmooth, scrollState.chapterT, 3.2, dt);
 
     /* Chapter position → slots. Chapters blend two clouds; chapter 1 is
-       itself a chain (stream → pipeline → book → vault → stream) walked by the held chapter's own progress, so where it meets
+       itself a chain (stream → pipeline → book → vault) walked by the held chapter's own progress, so where it meets
        a neighbour three clouds are in play at once. */
     const segments = targets.length - 1;
     const scaled = Math.min(Math.max(scrollState.chapterSmooth, 0), segments);
     const index = Math.min(Math.floor(scaled), segments - 1);
     const raw = scaled - index;
-    // Smoothstep the crossfade so targets settle instead of arriving linearly.
-    const mix = raw * raw * (3 - 2 * raw);
+    /* Smoothstep the crossfade so targets settle instead of arriving
+       linearly. Pouring into the first crystal, the field must be wholly in
+       its engine by the time that crystal is up (a third of the way into
+       the tall Projects chapter, not its centre), and stay there until the
+       gallery is leaving: a target still part-way between two formations
+       held the beads in a lump beside the ice. */
+    const pour = archiveState.sink.valid;
+    /* On the way in, the pour follows the crystal itself, not chapter space
+       (keyed to chapter space, most of it poured in below the fold). The
+       sink takes over from the closing stream while the crystal is still
+       below the fold (they are the same shape until the pour moves), then
+       the stream flows on into the engine as it rises from the bottom
+       edge, and has drained before the crystal reaches the middle. */
+    let pourIn = raw;
+    let flowIn = index >= 2 ? 1 : 0;
+    if (pour && index === 1) {
+      scratch.v.set(archiveState.sink.x, archiveState.sink.y, archiveState.sink.z).project(camera);
+      pourIn = Math.max(smoothstep(-2.2, -1.5, scratch.v.y), smoothstep(0.6, 0.9, raw));
+      flowIn = Math.max(smoothstep(-1.4, -0.45, scratch.v.y), smoothstep(0.85, 1, raw));
+    }
+    const span = pour && index === 1 ? pourIn : pour && index === 2 ? smoothstep(0.4, 1, raw) : raw;
+    const mix = span * span * (3 - 2 * span);
 
     experienceState.smooth = damp(experienceState.smooth, experienceState.progress, 3.2, dt);
     const chain = chainCoord(experienceState.smooth);
@@ -331,9 +354,17 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
       const g = kind === 2 ? sim.glyphs.pipeline : kind === 3 ? sim.glyphs.book : kind === 4 ? sim.glyphs.vault : null;
       return { tex: g ? g.position : targets[1], attr: g ? g.attr : sim.noAttr, kind };
     };
-    let slotA = plain(index);
-    let slotB = plain(index + 1);
-    let slotC = plain(index + 1);
+    /* Into Projects, the field pours into the first crystal's engine (kind
+       5, the sink) instead of forming the old lattice beside it, and on the
+       way out it streams back from there. Only where that crystal is drawn;
+       elsewhere (cards on phones, a failed render) the lattice stands. */
+    const sink = archiveState.sink;
+    const sinking = sink.valid;
+    const sinkSlot = { tex: targets[2], attr: sim.noAttr, kind: 5 };
+    const chapterSlot = (i: number) => (i === 2 && sinking ? sinkSlot : plain(i));
+    let slotA = chapterSlot(index);
+    let slotB = chapterSlot(index + 1);
+    let slotC = chapterSlot(index + 1);
     let w = [1 - mix, mix, 0];
     if (index === 0) {
       slotB = linked(s1);
@@ -342,7 +373,7 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
     } else if (index === 1) {
       slotA = linked(s1);
       slotB = linked(s2);
-      slotC = plain(2);
+      slotC = chapterSlot(2);
       w = [(1 - mix) * (1 - linkMix), (1 - mix) * linkMix, mix];
     }
     u.uTargetA.value = slotA.tex;
@@ -359,7 +390,17 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
       (slotA.kind === kind ? w[0] : 0) + (slotB.kind === kind ? w[1] : 0) + (slotC.kind === kind ? w[2] : 0);
     const glyphWeight = presence(2) + presence(3) + presence(4);
     // The stream and the glyphs are drawn shapes: noise must not smear them.
-    const drawn = Math.min(glyphWeight + presence(1), 1);
+    const sunk = presence(5);
+    const drawn = Math.min(glyphWeight + presence(1) + sunk, 1);
+    u.uSinkW.value = sunk;
+    u.uPour.value = flowIn;
+    u.uTake.value = index >= 2 ? 1 : 0;
+    if (sinking && groupRef.current) {
+      // The sink in the field's own space, from the group as it last stood.
+      u.uSink.value.set(sink.x, sink.y, sink.z);
+      groupRef.current.worldToLocal(u.uSink.value);
+      u.uSinkR.value = sink.r;
+    }
 
     /* Each glyph holds a 3/4 pose and turns a little about it, like a piece
        on a slow turntable: never far enough to go edge-on. */
@@ -412,8 +453,14 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
 
     /* Blend the art-direction table across the same segment the morph uses,
        so the field's presence and its shape always change together. */
-    const a = ART[index];
-    const b = ART[index + 1];
+    /* Pouring into the crystal, the field stays where the vault stood
+       (owner's call: don't move it to the centre; the beads travel, not the
+       field) and its sway stops: the sink is computed in the field's own
+       space, and a turning field would swing it off the engine. */
+    const sinkArt = { ...ART[1], opacity: 0.97, size: ART[2].size, yaw: 0 };
+    const artFor = (i: number) => (i === 2 && sinking ? sinkArt : ART[i]);
+    const a = artFor(index);
+    const b = artFor(index + 1);
     const artOffsetX = lerp(a.offsetX, b.offsetX, mix);
     const artOffsetY = lerp(a.offsetY, b.offsetY, mix);
     /* Portrait screens: text spans the full width, so the field moves back
@@ -425,10 +472,12 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
     // The socials stage is its own room: the field leaves it entirely.
     stageRef.current = damp(stageRef.current, scrollState.stage, 3, dt);
     outroRef.current = damp(outroRef.current, scrollState.outro, 3, dt);
-    /* The Projects gallery belongs to the crystals: while it is up the field
-       steps back almost entirely. The section is tall, so without this the
-       blend from the Experience formation hung beside the first crystal. */
-    const gallery = archiveState.presenceSmooth;
+    /* The Projects gallery belongs to the crystals. Where the field pours
+       into the first one, it stays dense on the way in and the sink absorbs
+       it bead by bead as it lands (POINTS_VERTEX); otherwise it steps back
+       almost entirely while the gallery is up, or the Experience formation
+       hung beside the first crystal. */
+    const gallery = sinking ? 0 : archiveState.presenceSmooth;
     material.uniforms.uOpacity.value =
       lerp(a.opacity, b.opacity, mix) *
       (1 - stageRef.current) *
@@ -443,7 +492,9 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
        from one sculpture to the next fairly directly. Full chapter-change
        turbulence swirled the order book so it seemed to twist on the way. */
     const transitionHeat = Math.max(
-      Math.sin(raw * Math.PI),
+      // Pouring into or out of the crystal, the stream should read as a
+      // stream: little chapter-change scatter.
+      Math.sin(raw * Math.PI) * (pour && (index === 1 || index === 2) ? 0.25 : 1),
       index <= 1 ? 0.3 * Math.sin(linkRaw * Math.PI) * (1 - Math.abs(scaled - 1)) : 0,
     );
     dispersionRef.current = damp(dispersionRef.current, transitionHeat, 6, dt);
@@ -471,7 +522,7 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
     vu.uPointer.value.copy(pointerWorld.current);
     if (groupRef.current) groupRef.current.worldToLocal(vu.uPointer.value);
     // Gentler over the career glyphs: they must stay legible under the cursor.
-    vu.uPointerStrength.value = reducedMotion ? 0 : 5.5 * revealRef.current * (1 - 0.75 * drawn);
+    vu.uPointerStrength.value = reducedMotion ? 0 : 5.5 * revealRef.current * (1 - 0.75 * drawn) * (1 - sunk);
 
     vu.uTime.value = time;
     vu.uDelta.value = dt;
@@ -490,10 +541,10 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
        eventually presents every flat formation edge-on to the camera. */
     if (groupRef.current) {
       const g = groupRef.current;
-      const yaw = Math.sin(time * 0.17) * artYaw + scrollState.pointerSmooth.x * 0.22;
+      const yaw = (Math.sin(time * 0.17) * artYaw + scrollState.pointerSmooth.x * 0.22) * (1 - sunk);
 
       g.rotation.y = damp(g.rotation.y, yaw, 2.4, dt);
-      g.rotation.x = damp(g.rotation.x, -scrollState.pointerSmooth.y * 0.14, 2.4, dt);
+      g.rotation.x = damp(g.rotation.x, -scrollState.pointerSmooth.y * 0.14 * (1 - sunk), 2.4, dt);
 
       g.position.x = damp(g.position.x, artOffsetX, 2.6, dt);
       g.position.y = damp(g.position.y, artOffsetY, 2.6, dt);

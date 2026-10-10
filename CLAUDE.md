@@ -2,9 +2,10 @@
 
 Immersive software-engineer portfolio in the Igloo.inc / Hatom.com vein. Next.js 15
 (App Router), React 19.2, React Three Fiber 9, GSAP 3 + ScrollTrigger + SplitText,
-Lenis. One persistent WebGL canvas with five DOM chapters scrolling over it:
-intro → experience → projects → stack → contact (components keep their old
-world names: Hero, Thaw, Archive, Strata, Surface), then the socials stage.
+Lenis. One persistent WebGL canvas with four DOM chapters scrolling over it:
+intro → experience → projects → stack (components keep their old world names:
+Hero, Thaw, Archive, Strata), then the socials stage, which carries the email
+too. The Contact chapter (Surface) was removed at the owner's call (Oct 2026).
 
 All copy, projects, architecture graphs and links live in `src/config/content.ts`.
 No component hardcodes content.
@@ -88,7 +89,7 @@ so `chapterT` sits flat at 1 there, and the field walks its own chain instead.
 The list layout (phones, reduced motion, which the owner's Mac has on) drives
 the same progress from the viewport centre passing each station's middle, so
 each sculpture still sits beside its station; without that the list showed a
-half-formed stream for every station. The chain: stream → pipeline → book → vault → stream (`chainCoord` in lib/experienceState.ts, wide plateaus at the
+half-formed stream for every station. The chain: stream → pipeline → book → vault → stream (which then flows on into the first crystal's engine) (`chainCoord` in lib/experienceState.ts, wide plateaus at the
 station centres 0.2/0.5/0.8, which are also the snap points; glyphs morph
 straight into each other: a detour through the stream between stations read
 as filler and took longer than the gap, owner's call). So the velocity
@@ -136,7 +137,12 @@ git-ignored `art/src/`) from the stage's exact camera, and publishes
 at the same vertical fov, so the rendered ice plinth registers with the live mark
 at any aspect. The plate is drawn in the OPAQUE pass (custom premultiplied
 blending, renderOrder first): as a transparent object three would draw it after,
-and over, the beads. Moving the mark's layout means re-rendering (PEDESTAL_TOP).
+and over, the beads. Moving the mark's layout means re-rendering (PEDESTAL_TOP). The podium
+breathes (owner's call, "so the background seems a living thing"): it is part
+of the plate, so the plate shader lifts a soft-edged patch around it
+(`podium()` in PLATE_FRAGMENT, `uLift`, a few pixels on a ~6.5 s breath) while
+walls, posts and sky stay still; re-rendering the plate means re-checking that
+patch still frames the podium.
 
 **Project crystals with `core.plate` are path traced, not shaded live.**
 `art/scripts/crystal_core.py` builds the object frozen in ice in Cycles (chipped
@@ -193,9 +199,27 @@ through the screen as you scroll, rolling a little (`ROLL`) and cross-dissolving
 with the next from a third of a screen out; scrolling spins its sway up via video
 playbackRate. Labels sit around it (title upper left with a leader that drops into
 the ice, readout right, call to action lower right, both inset clear of the rail).
-While the gallery is up the bead field steps back (×0.1) as the scrim does: the
-section is tall, so the Experience formation otherwise hung beside the first crystal.
-`Chapter hold` is no longer used here.
+On the way in, the vault turns back into the stream at the end of Experience,
+and the stream flows on into the first crystal's engine (owner's calls, in
+order: "integrate into the engine"; "no stream, just suck in"; a ball gathered
+at screen centre and drained into the ice "looked very weird"; the vault
+breaking up straight into the engine was not it either: "the vault particles
+changing to stream and then getting absorbed and sucked inside the engine in a
+flowing stream way"). Chapter 2's target is the SINK (kind 5), from
+`archiveState.sink` (the first crystal's world position and plate size,
+published by the gallery each frame). At `uPour` 0 it IS the stream, so the
+hand-over moves no bead. As `uPour` rises the bundle slides along itself like a
+belt; past its pinched left end each bead follows one cubic curve that bends
+down and enters the engine from above as a fine thread (any real width packed
+65k beads into a solid rope), and beads that reach the engine are absorbed by
+density in POINTS_VERTEX. The slot weight and the pour are keyed to the
+crystal's own screen position, not chapter space, or most of it happened below
+the fold. The field stays where the stream stood and only its sway stops (the
+sink is computed in the field's own space; a turning field swung it off the
+engine). Leaving Projects the sink is let go bead by bead (`uTake`), nearest
+the engine first: a part-way blend there held every bead halfway, in one lump. Where the
+crystal is not drawn (cards on phones, a failed render) the old lattice and the
+×0.1 step-back stand. `Chapter hold` is no longer used here.
 
 **The hover mesh is a ship's wake.** Owner's calls, in order: no glow at
 rest, no disc "punched" along the path, no stacked radiating rings, small

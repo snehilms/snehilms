@@ -537,7 +537,18 @@ uniform vec2 uShift;
 uniform float uBufferHeight;
 uniform float uFeatherTop;
 uniform float uFeatherBottom;
+uniform float uLift;
 varying vec2 vUv;
+
+// Where the podium (and its reflection) sits in the plate, 1 inside with a
+// soft edge: only this patch breathes, never the walls, the posts or the sky.
+// Its top edge eases out over the band behind the podium's rim, so the thin
+// dome lines there stretch by a hair rather than tear.
+float podium(vec2 p) {
+  float wx = 1.0 - smoothstep(0.125, 0.19, abs(p.x - 0.5));
+  float wy = smoothstep(0.06, 0.13, p.y) * (1.0 - smoothstep(0.34, 0.41, p.y));
+  return wx * wy;
+}
 
 // 1 inside, easing to 0 across a band \`width\` deep from the edge; no band
 // at all when width is 0.
@@ -548,6 +559,8 @@ float feather(float fromEdge, float width) {
 void main() {
   // A hair of overscan so the pointer drift never shows an edge.
   vec2 uv = (vUv - 0.5) * 0.99 + 0.5 + uShift;
+  // The podium rises and settles: sampling from below lifts it.
+  uv.y -= uLift * podium(vUv);
   vec3 colour = mix(texture2D(uA, uv).rgb, texture2D(uB, uv).rgb, uMix);
   // While the section is still moving in or out, the plate's leading edge
   // dissolves into the fog instead of sliding over it as a hard line.
@@ -569,7 +582,14 @@ function featherFor(gap: number) {
   return Math.min(visible * 0.9, 0.5) * settle * settle * (3 - 2 * settle);
 }
 
-function Backdrop({ glyphs }: { glyphs: readonly GlyphKey[] }) {
+/* The podium breathes: a slow rise and settle of a few pixels (about 0.5%
+   of the plate's height), two sines so it never quite repeats. The mark
+   above it holds still, so the gap between them gently changes and the
+   mark reads as floating. Ambient, so under reduced motion it runs at half
+   speed rather than stopping. */
+const PODIUM_LIFT = 0.005;
+
+function Backdrop({ glyphs, reducedMotion }: { glyphs: readonly GlyphKey[]; reducedMotion: boolean }) {
   const camera = useThree((s) => s.camera);
   const gl = useThree((s) => s.gl);
   const mesh = useRef<THREE.Mesh>(null);
@@ -577,6 +597,7 @@ function Backdrop({ glyphs }: { glyphs: readonly GlyphKey[] }) {
   const fade = useRef({ from: 0, to: 0, mix: 1, opacity: 0 });
   const pointer = useRef(new THREE.Vector2());
   const drift = useRef(new THREE.Vector2());
+  const breath = useRef(0);
 
   const geometry = useMemo(() => {
     const h = 2 * PLATE_DISTANCE * Math.tan(THREE.MathUtils.degToRad(35 / 2));
@@ -594,6 +615,7 @@ function Backdrop({ glyphs }: { glyphs: readonly GlyphKey[] }) {
           uBufferHeight: { value: 1 },
           uFeatherTop: { value: 0 },
           uFeatherBottom: { value: 0 },
+          uLift: { value: 0 },
         },
         vertexShader: PLATE_VERTEX,
         fragmentShader: PLATE_FRAGMENT,
@@ -680,6 +702,10 @@ function Backdrop({ glyphs }: { glyphs: readonly GlyphKey[] }) {
 
     drift.current.lerp(pointer.current, 1 - Math.exp(-2.5 * dt));
     u.uShift.value.set(-drift.current.x * 0.003, drift.current.y * 0.002);
+
+    breath.current += dt * (reducedMotion ? 0.5 : 1);
+    const t = breath.current;
+    u.uLift.value = PODIUM_LIFT * (0.5 + 0.38 * Math.sin((t * Math.PI * 2) / 6.5) + 0.12 * Math.sin(t * 1.7 + 1.3));
   });
 
   return (
@@ -737,7 +763,7 @@ export function StageCanvas({ glyphs }: { glyphs: readonly GlyphKey[] }) {
         <fog attach="fog" args={[tones.fog, 9, 22]} />
         <hemisphereLight args={[tones.sky, tones.floor, 1.6]} />
         <directionalLight position={[-2, 6, 4]} intensity={1.4} />
-        <Backdrop glyphs={glyphs} />
+        <Backdrop glyphs={glyphs} reducedMotion={reducedMotion} />
         <Dust reducedMotion={reducedMotion} />
         <Mark glyphs={glyphs} simSize={SIM_SIZE[tier]} reducedMotion={reducedMotion} />
       </Canvas>

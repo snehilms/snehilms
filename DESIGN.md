@@ -135,11 +135,6 @@ components:
   social-handle-unlinked:
     textColor: "{colors.text-faint}"
     typography: "{typography.small}"
-  email-cta:
-    textColor: "{colors.ink}"
-    typography: "{typography.headline}"
-  email-cta-hover:
-    textColor: "{colors.accent}"
 ---
 
 # Design System: Cryo Archive
@@ -203,8 +198,8 @@ A cold, low-chroma slate-and-fog palette with a single glacial-ink accent; the o
 
 ### Hierarchy
 - **Display** (600, fluid 44px to 136px, line-height 0.92, -0.035em, uppercase): the three-line hero headline only, second line in accent.
-- **Headline** (600, fluid 32px to 64px, 0.92, -0.035em): the email CTA and stat values (tabular numerals).
-- **Title** (600, fluid 24px to 36px, 1.12, -0.035em): dossier titles. The surface prompt uses this size at weight 400 with 1.24 leading and -0.015em; Experience company names use it at 600.
+- **Headline** (600, fluid 32px to 64px, 0.92, -0.035em): headline figures (tabular numerals).
+- **Title** (600, fluid 24px to 36px, 1.12, -0.035em): dossier titles. Experience company names use this size at 600.
 - **Lead** (500 to 600, fluid 18px to 24px, 1.12 to 1.45, -0.015em): archive slot titles, strata band labels, social selector names, the hero tagline (1.45).
 - **Body** (400, fluid 15px to 18px, 1.62): prose, capped at 60 to 62ch.
 - **Small** (400, fluid 13px to 15px): blurbs, chips, nav links, captions, colophon paragraphs (with bold run-in leads), the social handle (in mono at 0.04em).
@@ -231,11 +226,11 @@ The archive runs 230svh so its sticky row holds centre; the socials stage is a p
 Depth is atmospheric first and shadowed rarely. The canvas supplies it: a fog chamber whose bright horizon band sits a little over a third of the way up the frame (uv 0.37), with a real slate floor below it falling from `floor` to `floor-deep` over a short span (0.12 uv), beads that dissolve toward the fog colour with distance, and a vignette settling the corners a shade toward slate. In the DOM, depth is frost (20px backdrop blur with 120% saturation over a translucent pale fill) plus hairlines. Two soft shadows exist, both tinted from the palette, both blurred, never hard-offset.
 
 ### Shadow Vocabulary
-- **Accent halo** (`box-shadow: 0 0 0 1px rgb(28 90 128 / 0.22), 0 8px 24px -8px rgb(28 90 128 / 0.32)`): hover state on the email call to action only.
+- **Accent halo** (`box-shadow: 0 0 0 1px rgb(28 90 128 / 0.22), 0 8px 24px -8px rgb(28 90 128 / 0.32)`): reserved; nothing uses it since the nav pill and email call to action were removed.
 - **Soft lift** (`box-shadow: 0 16px 48px -16px rgb(29 36 48 / 0.34)`): the dossier panel, the one true overlay.
 
 ### Materials
-- **Lit bead.** Each particle is an opaque sphere sprite shaded under a fixed overhead key: lit side `fog-lo`, shaded side `ink-3`, a small specular, a glacial tint (`accent-3`) when moving fast, an overhead falloff by world height (x0.78 at the bottom to x1.06 at the top), and up to 75% fold into `ground` with distance. Beads write depth and are discarded, not blended: a chapter at 0.3 opacity keeps 30% of the beads, each fully solid. The per-chapter art table drives density (signal 1.0, experience 0.97 because the career sculptures are its subject, archive 0.20 and pushed back in depth, strata 0.4, surface 0.95). On portrait screens the whole field is pushed back (z -3.2) and thinned (density x0.6) so it never sits under the text column.
+- **Lit bead.** Each particle is an opaque sphere sprite shaded under a fixed overhead key: lit side `fog-lo`, shaded side `ink-3`, a small specular, a glacial tint (`accent-3`) when moving fast, an overhead falloff by world height (x0.78 at the bottom to x1.06 at the top), and up to 75% fold into `ground` with distance. Beads write depth and are discarded, not blended: a chapter at 0.3 opacity keeps 30% of the beads, each fully solid. The per-chapter art table drives density (signal 1.0, experience 0.97 because the career sculptures are its subject, archive 0.20 and pushed back in depth, strata 0.4). On portrait screens the whole field is pushed back (z -3.2) and thinned (density x0.6) so it never sits under the text column.
 - **Frosted ice glass.** Archive shards refract a procedural pale environment (slate low, haze high, white band and key, pale cyan rim) at IOR 1.34 with slight per-channel dispersion, absorb toward glacial blue with thickness (Beer-Lambert), and carry a dark `ink-3` inner network with `accent` nodes. Normal blending, layered back faces, core, front faces, network.
 - **Light.** Bloom has a high threshold (0.86) so only light sources bloom: the horizon, facet glints, stage rings. No chromatic aberration: it split grey beads into blue/red fringes on scroll. Fast beads catch a frost sheen (`--c-fog-hi`), never a hue.
 
@@ -255,7 +250,6 @@ Gentle, consistent rounding: tags and focus rings 8px, cards and diagram frames 
 ### Buttons and Links
 - **Nav link:** small sans, `text-dim`, fully rounded, 8px by 16px; hover lifts to body text over a 5% ink wash.
 - **Dossier close:** hairline pill; hover goes to ink text, accent border and an 8% accent wash.
-- **Email CTA:** headline-size ink text with a 1px accent underline that draws from 0 to 100% width on hover while the text turns accent; sits in a generous magnetic hit zone.
 - **Focus:** a 2px accent outline with a 4px offset and 8px radius, everywhere.
 
 ### Chips

@@ -8,13 +8,13 @@ import { scrollState, damp } from '@/lib/scrollState';
    CAMERA RIG
 
    The camera never cuts. It dollies continuously through the whole journey
-   and drifts with the pointer — that unbroken motion is what makes five
-   distinct chapters read as one descent rather than five slides.
+   and drifts with the pointer — that unbroken motion is what makes the
+   distinct chapters read as one descent rather than separate slides.
    ========================================================================= */
 
 /* Depth at each chapter boundary. Pulling in for the career glyphs (01) and the
-   archive lattice (02), then retreating as the ring opens out (04). */
-const DOLLY = [9.4, 7.6, 8.2, 8.6, 10.2];
+   archive lattice (02), easing back for the strata (03). */
+const DOLLY = [9.4, 7.6, 8.2, 8.6];
 
 /** `t` is in chapter units (0 → chapters-1), not page progress. */
 function sampleDolly(t: number) {

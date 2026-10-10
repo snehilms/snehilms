@@ -48,6 +48,7 @@ export function Archive() {
     const mq = window.matchMedia(`(max-width: ${GALLERY_MIN_WIDTH - 1}px)`);
     const sync = () => {
       setCompact(mq.matches);
+      archiveState.compact = mq.matches;
       if (mq.matches) archiveState.presence = 0;
     };
     sync();

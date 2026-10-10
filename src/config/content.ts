@@ -128,11 +128,6 @@ export const chapters = [
     title: 'Stack',
     caption: 'The tools I reach for, from the interface down to the platform.',
   },
-  {
-    id: 'contact',
-    title: 'Contact',
-    caption: 'Email is fastest. Every other channel is just below.',
-  },
 ] as const;
 
 export type ChapterId = (typeof chapters)[number]['id'];

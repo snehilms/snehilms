@@ -12,7 +12,6 @@ import { Hero } from './dom/Hero';
 import { Thaw } from './dom/Thaw';
 import { Archive } from './dom/Archive';
 import { Strata } from './dom/Strata';
-import { Surface } from './dom/Surface';
 import { SocialStage } from './dom/SocialStage';
 import { SystemToggles } from './dom/SystemToggles';
 
@@ -44,7 +43,6 @@ export function Experience() {
         <Thaw />
         <Archive />
         <Strata />
-        <Surface />
         <SocialStage />
       </main>
 
