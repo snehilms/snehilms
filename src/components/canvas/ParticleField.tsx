@@ -15,7 +15,7 @@ import {
   GLYPH_ANCHORS,
   VAULT,
 } from './gpgpu/careerGlyphs';
-import { scrollState, damp, clamp01, smoothstep } from '@/lib/scrollState';
+import { scrollState, damp, smoothstep } from '@/lib/scrollState';
 import { archiveState } from '@/lib/archiveState';
 import { experienceState, chainCoord } from '@/lib/experienceState';
 import { cssColor } from './Atmosphere';
@@ -87,12 +87,13 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
   const size = useThree((s) => s.size);
 
   const groupRef = useRef<THREE.Group>(null);
-  const revealRef = useRef(0);
+  // Full size from the first frame: the sphere is simply there on load.
+  const revealRef = useRef(1);
   const pointerWorld = useRef(new THREE.Vector3(0, 0, 0));
   const dispersionRef = useRef(0);
   const stageRef = useRef(0);
   const outroRef = useRef(0);
-  const doorRef = useRef(0);
+  const doorRef = useRef(1);
   const wheelRef = useRef(0);
   const scratch = useMemo(
     () => ({
@@ -237,7 +238,7 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
           uSize: { value: 2.6 },
           uTime: { value: 0 },
           uPixelRatio: { value: 1 },
-          uReveal: { value: 0 },
+          uReveal: { value: 1 },
           uOpacity: { value: 0.92 },
           /* Size falls off as 10/distance, so a particle that drifts near
              the camera explodes into a screen-filling disc — and additive
@@ -246,7 +247,7 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
 
              The ceiling clips only the extreme tail of the size
              distribution. The fade covers everything within 5.2 units of the
-             camera, which is exactly where the intro cloud starts and
+             camera, which beads only pass through mid-transition and
              nowhere the settled formations ever reach: the hero sphere's
              nearest point sits around 6.7 units out. */
           uMaxSize: { value: 9 },
@@ -272,23 +273,6 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
   useEffect(() => {
     material.uniforms.uPixelRatio.value = Math.min(gl.getPixelRatio(), 2);
   }, [gl, material, viewport.dpr]);
-
-  /* --- Intro: the field gathers in from the dark ---------------------- */
-  useEffect(() => {
-    let raf = 0;
-    const start = performance.now();
-    const duration = reducedMotion ? 400 : 2600;
-
-    const tick = () => {
-      const t = clamp01((performance.now() - start) / duration);
-      // expo.out — matches EASE.expo so DOM and WebGL intros share a curve.
-      revealRef.current = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-      if (t < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-
-    return () => cancelAnimationFrame(raf);
-  }, [reducedMotion]);
 
   /* --- Teardown ------------------------------------------------------- */
   useEffect(() => {
@@ -413,9 +397,11 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
        rather than freezing, and the cursor still wakes them. */
     const live = reducedMotion ? 0.5 : 1;
 
-    // The vault door swings open as the vault forms, and wider for the
-    // cursor; its wheel always turns, faster for the cursor.
-    doorRef.current = damp(doorRef.current, smoothstep(0.55, 1, presence(4)) * (1 + 0.9 * hover * presence(4)), 2.4, dt);
+    /* The vault forms with its door already ajar; only the cursor swings it
+       wider. Swinging it open as the vault formed read as the whole
+       sculpture reorienting just after it arrived. Its wheel always turns,
+       faster for the cursor. */
+    doorRef.current = damp(doorRef.current, 1 + 0.9 * hover * presence(4), 2.4, dt);
     u.uDoorOpen.value = VAULT.open * doorRef.current;
     wheelRef.current += dt * (0.35 + 1.6 * hover) * live;
     u.uWheel.value = wheelRef.current;
@@ -453,7 +439,13 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
 
     /* Mid-transition, loosen the springs and raise turbulence. The form has
        to come apart before it can credibly reassemble as something else. */
-    const transitionHeat = Math.max(Math.sin(raw * Math.PI), index <= 1 ? Math.sin(linkRaw * Math.PI) * (1 - Math.abs(scaled - 1)) : 0);
+    /* Between career glyphs only a breath of scatter: beads should travel
+       from one sculpture to the next fairly directly. Full chapter-change
+       turbulence swirled the order book so it seemed to twist on the way. */
+    const transitionHeat = Math.max(
+      Math.sin(raw * Math.PI),
+      index <= 1 ? 0.3 * Math.sin(linkRaw * Math.PI) * (1 - Math.abs(scaled - 1)) : 0,
+    );
     dispersionRef.current = damp(dispersionRef.current, transitionHeat, 6, dt);
 
     // Enough scatter to sell the reform, not so much that the field

@@ -95,12 +95,6 @@ components:
     padding: "8px 16px"
   nav-link-hover:
     textColor: "{colors.ink-2}"
-  status-pill:
-    backgroundColor: "{colors.glass}"
-    textColor: "{colors.text-faint}"
-    typography: "{typography.cue}"
-    rounded: "{rounded.full}"
-    padding: "8px 16px"
   skill-chip:
     backgroundColor: "{colors.glass}"
     textColor: "{colors.text-dim}"
@@ -156,7 +150,7 @@ components:
 
 The whole site happens inside one pale, cold chamber lit from overhead: brightest under the ceiling, a white horizon band where the light pools, then a slate floor falling away below. Every artefact in it is a solid. The particle field and the social marks are built from opaque, lit beads of rime; the archive crystals are frosted ice glass with dark slate cores and a frozen ink network. Nothing glows on black. Things read by value against fog, and distance folds them back into the fog colour.
 
-The DOM is quiet instrumentation laid over that room. Type is the system sans, set large, uppercase only for the hero headline, and calm everywhere else; short interface cues (role line, availability, scroll and explore prompts, footer line) are a quiet medium-weight sans, and mono is reserved strictly for measurements, handles, codenames and readouts. Surfaces are transparent so the canvas stays the background at all times; legibility comes from more fog (a directional haze scrim), not from opaque panels. One glacial-ink accent means "act here". White is used as light (rings, rims, glints, the horizon), never as a text colour.
+The DOM is quiet instrumentation laid over that room. Type is the system sans, set large, uppercase only for the hero headline, and calm everywhere else; short interface cues (scroll and explore prompts, footer line) are a quiet medium-weight sans, and mono is reserved strictly for measurements, handles, codenames and readouts. Surfaces are transparent so the canvas stays the background at all times; legibility comes from more fog (a directional haze scrim), not from opaque panels. One glacial-ink accent means "act here". White is used as light (rings, rims, glints, the horizon), never as a text colour.
 
 Motion is continuous, never cut: entrances rise out of line masks once, continuous elements scrub with scroll, and the signature socials stage pins, walks four marks with snap, and tears each mark apart and re-forms it into the next.
 
@@ -214,7 +208,7 @@ A cold, low-chroma slate-and-fog palette with a single glacial-ink accent; the o
 - **Lead** (500 to 600, fluid 18px to 24px, 1.12 to 1.45, -0.015em): archive slot titles, strata band labels, social selector names, the hero tagline (1.45).
 - **Body** (400, fluid 15px to 18px, 1.62): prose, capped at 60 to 62ch.
 - **Small** (400, fluid 13px to 15px): blurbs, chips, nav links, captions, colophon paragraphs (with bold run-in leads), the social handle (in mono at 0.04em).
-- **Cue** (sans 500, fluid 13px to 15px, 0.02em, sentence case, `text-faint`): short interface prompts and status: the nav role line, the availability pill, "Scroll to thaw", "Click to explore", the footer line. Where a cue sits on the slate floor it steps up to `ink-3` (the scroll cue).
+- **Cue** (sans 500, fluid 13px to 15px, 0.02em, sentence case, `text-faint`): short interface prompts: "Scroll to experience", "Click to explore", the footer line. Where a cue sits on the slate floor it steps up to `ink-3` (the scroll cue).
 - **Label** (mono 500, fluid 11px to 12px, 0.18em, uppercase, `text-faint`): measurements, codenames, readouts, stat labels, depth values, dossier meta.
 
 ### Named Rules
@@ -237,7 +231,7 @@ The archive runs 230svh so its sticky row holds centre; the socials stage is a p
 Depth is atmospheric first and shadowed rarely. The canvas supplies it: a fog chamber whose bright horizon band sits a little over a third of the way up the frame (uv 0.37), with a real slate floor below it falling from `floor` to `floor-deep` over a short span (0.12 uv), beads that dissolve toward the fog colour with distance, and a vignette settling the corners a shade toward slate. In the DOM, depth is frost (20px backdrop blur with 120% saturation over a translucent pale fill) plus hairlines. Two soft shadows exist, both tinted from the palette, both blurred, never hard-offset.
 
 ### Shadow Vocabulary
-- **Accent halo** (`box-shadow: 0 0 0 1px rgb(28 90 128 / 0.22), 0 8px 24px -8px rgb(28 90 128 / 0.32)`): hover state on the brand mark and the status pill only.
+- **Accent halo** (`box-shadow: 0 0 0 1px rgb(28 90 128 / 0.22), 0 8px 24px -8px rgb(28 90 128 / 0.32)`): hover state on the email call to action only.
 - **Soft lift** (`box-shadow: 0 16px 48px -16px rgb(29 36 48 / 0.34)`): the dossier panel, the one true overlay.
 
 ### Materials
@@ -260,7 +254,6 @@ Gentle, consistent rounding: tags and focus rings 8px, cards and diagram frames 
 
 ### Buttons and Links
 - **Nav link:** small sans, `text-dim`, fully rounded, 8px by 16px; hover lifts to body text over a 5% ink wash.
-- **Status pill:** frost fill, hairline border, fully round, a sans cue and an accent pulse dot; hover swaps the border to accent and adds the accent halo.
 - **Dossier close:** hairline pill; hover goes to ink text, accent border and an 8% accent wash.
 - **Email CTA:** headline-size ink text with a 1px accent underline that draws from 0 to 100% width on hover while the text turns accent; sits in a generous magnetic hit zone.
 - **Focus:** a 2px accent outline with a 4px offset and 8px radius, everywhere.
@@ -275,7 +268,7 @@ Gentle, consistent rounding: tags and focus rings 8px, cards and diagram frames 
 - **Dossier panel:** a glass panel (`glass-hi` to fog-hi gradient, 20px frost, `line-strong` border, 24px radius, soft lift) over a 62% fog backdrop blurred 18px, so the clicked shard still lights it from behind. Holds an architecture diagram with pale node boxes, kind-coded accent bars and a travelling ink packet.
 
 ### Navigation
-- **Top nav:** fixed and transparent at the top; once condensed it takes frost and a hairline bottom border. The brand mark is a 40px hairline square in mono.
+- **Top nav:** the chapter links alone, centred (no brand mark, name or status pill: owner's call); fixed and transparent at the top, taking frost and a hairline bottom border once condensed; hidden below 1080px, where the links would not fit.
 - **Chapter rail:** fixed right, a 1px spine whose accent fill is scrubbed by scroll, with ticks and mono labels revealed by opacity and transform on the active chapter. Hidden below 900px.
 
 ### Experience Signal Path

@@ -26,52 +26,8 @@
   padding-inline: var(--gutter);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: var(--s-4);
-}
-
-/* --- Brand -------------------------------------------------------------- */
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: var(--s-2);
-  text-align: left;
-}
-
-.mark {
-  display: grid;
-  place-items: center;
-  width: var(--s-5);
-  height: var(--s-5);
-  border: 1px solid var(--c-line-strong);
-  border-radius: var(--r-sm);
-  font-family: var(--font-mono);
-  font-size: var(--t-sm);
-  letter-spacing: 0.06em;
-  color: var(--c-ink-3);
-  transition: border-color var(--d-fast) var(--e-out),
-              box-shadow var(--d-fast) var(--e-out),
-              color var(--d-fast) var(--e-out);
-}
-
-.brand:hover .mark {
-  border-color: var(--c-accent);
-  box-shadow: var(--shadow-accent);
-  color: var(--c-ink);
-}
-
-.brandText {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.brandName {
-  font-size: var(--t-sm);
-  font-weight: 600;
-  letter-spacing: var(--ls-snug);
-  line-height: 1.1;
 }
 
 /* --- Links -------------------------------------------------------------- */
@@ -103,51 +59,9 @@
   letter-spacing: var(--ls-snug);
 }
 
-/* --- Status ------------------------------------------------------------- */
-
-.status {
-  display: flex;
-  align-items: center;
-  gap: var(--s-1);
-  padding: var(--s-1) var(--s-2);
-  border: 1px solid var(--c-line);
-  border-radius: var(--r-full);
-  background: var(--c-glass);
-  backdrop-filter: var(--blur-glass);
-  -webkit-backdrop-filter: var(--blur-glass);
-  white-space: nowrap;
-  transition: border-color var(--d-fast) var(--e-out), box-shadow var(--d-fast) var(--e-out);
-}
-
-.status:hover {
-  border-color: var(--c-accent);
-  box-shadow: var(--shadow-accent);
-}
-
-.pulse {
-  width: var(--s-1);
-  height: var(--s-1);
-  border-radius: var(--r-full);
-  background: var(--c-accent);
-  box-shadow: 0 0 0 3px rgb(28 90 128 / 0.16);
-  animation: pulse 2.4s var(--e-in-out) infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: 0.38; transform: scale(0.72); }
-}
-
 /* --- Responsive --------------------------------------------------------- */
 
+/* With only links in it, the bar has nothing to show once they hide. */
 @media (max-width: 1080px) {
-  .links { display: none; }
-}
-
-@media (max-width: 720px) {
-  /* :global — u-cue is a global utility; a bare .u-cue here is renamed
-     by CSS Modules and never matches. */
-  .status :global(.u-cue) { display: none; }
-  .status { padding: var(--s-1); }
-  .brandText { display: none; }
+  .root { display: none; }
 }

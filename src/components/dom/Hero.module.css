@@ -6,7 +6,9 @@
   flex-direction: column;
   /* Bottom padding reserves the band the scroll hint occupies, so the
      tagline can never collide with it at any viewport height. */
-  padding-block: var(--s-16) clamp(var(--s-12), 14vh, var(--s-20));
+  /* The name sits a little way down the fold (owner's call), not hard
+     under the nav. */
+  padding-block: clamp(var(--s-16), 20vh, var(--s-24)) clamp(var(--s-12), 14vh, var(--s-20));
   pointer-events: none;
 }
 
@@ -17,7 +19,7 @@
   max-width: var(--max-w);
   margin-inline: auto;
   padding-inline: var(--gutter);
-  /* Name at the head of the fold, motto and facts at its foot. */
+  /* Name at the head of the fold, motto at its foot. */
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -74,10 +76,8 @@
 /* --- Bottom row --------------------------------------------------------- */
 
 .bottom {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: var(--s-8);
+  display: flex;
+  align-items: flex-end;
 }
 
 .tagline {
@@ -89,24 +89,6 @@
   color: var(--c-text);
   text-wrap: balance;
   will-change: transform, opacity;
-}
-
-.meta {
-  display: flex;
-  gap: var(--s-6);
-}
-
-.metaItem {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-opt);
-  white-space: nowrap;
-  will-change: transform, opacity;
-}
-
-.metaItem dd {
-  font-size: var(--t-sm);
-  color: var(--c-text);
 }
 
 /* --- Scroll hint -------------------------------------------------------- */
@@ -151,11 +133,6 @@
 }
 
 /* --- Responsive --------------------------------------------------------- */
-
-@media (max-width: 860px) {
-  .bottom { grid-template-columns: 1fr; gap: var(--s-4); }
-  .meta { flex-wrap: wrap; gap: var(--s-3) var(--s-4); }
-}
 
 @media (max-width: 520px) {
   .hint { display: none; }

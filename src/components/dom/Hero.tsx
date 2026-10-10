@@ -67,17 +67,11 @@ export function Hero() {
               { yPercent: 0, y: 0, opacity: 1, duration: 1.1, ease: 'expo.out' },
               '-=0.95',
             )
-            .fromTo(
-              `.${styles.metaItem}`,
-              { yPercent: 60, y: 0, opacity: 0 },
-              { yPercent: 0, y: 0, opacity: 1, duration: 0.9, stagger: 0.07, ease: 'expo.out' },
-              '-=0.85',
-            )
             .fromTo(`.${styles.hint}`, { opacity: 0 }, { opacity: 1, duration: 0.8 }, '-=0.6');
 
           /* Departure. Scrubbed, so scroll position always maps to the exact
-             same frame of the exit. Short on purpose: lingering, the motto and
-             the facts drifted up across the bead sphere and collided with it. */
+             same frame of the exit. Short on purpose: lingering, the motto
+             drifted up across the bead sphere and collided with it. */
           const exit = gsap.to(`.${styles.parallax}`, {
             yPercent: -10,
             opacity: 0,
@@ -135,17 +129,6 @@ export function Hero() {
             to={identity.motto.to}
             delay={MOTTO_TURN}
           />
-
-          <dl className={styles.meta}>
-            <div className={styles.metaItem}>
-              <dt className="u-mono">Based</dt>
-              <dd>{identity.location}</dd>
-            </div>
-            <div className={styles.metaItem}>
-              <dt className="u-mono">Status</dt>
-              <dd>{identity.availability}</dd>
-            </div>
-          </dl>
         </div>
       </div>
 

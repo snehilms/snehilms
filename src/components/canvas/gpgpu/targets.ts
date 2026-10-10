@@ -156,25 +156,14 @@ export function ringCloud(count: number, inner = 2.5, outer = 4.5): Cloud {
 }
 
 /* --- Initial state ----------------------------------------------------- */
-/** Far, sparse, and slow — so the intro is a gathering, not a reveal.
+/** The field starts already formed as the opening sphere, bead for bead the
+    same positions as its target, so a reload shows the sphere at once rather
+    than beads gathering in from across the screen (owner's call).
     `w` carries a stable per-particle seed the simulation reads every frame. */
 export function initialPositions(count: number): Cloud {
+  const out = sphereShell(count);
   const rand = mulberry32(97);
-  const out = new Float32Array(count * 4);
-
-  for (let i = 0; i < count; i++) {
-    const theta = rand() * TAU;
-    const phi = Math.acos(2 * rand() - 1);
-    // Close enough that the gather completes while the preloader is still
-    // covering the screen — the visitor never sees the unformed state.
-    const radius = 6 + rand() * 4;
-
-    const o = i * 4;
-    out[o + 0] = Math.sin(phi) * Math.cos(theta) * radius;
-    out[o + 1] = Math.sin(phi) * Math.sin(theta) * radius * 0.6;
-    out[o + 2] = Math.cos(phi) * radius;
-    out[o + 3] = rand(); // seed
-  }
+  for (let i = 0; i < count; i++) out[i * 4 + 3] = rand();
   return out;
 }
 

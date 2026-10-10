@@ -79,7 +79,6 @@ export type Stratum = {
 
 export const identity = {
   name: 'SNEHIL S KUMAR',
-  initials: 'SK',
   role: 'Software Engineer',
   /* Hero headline is split on \n — each line gets its own mask reveal. */
   headline: 'SNEHIL\nS KUMAR',
@@ -91,9 +90,9 @@ export const identity = {
     'Web3 Developer',
     'AI Engineer',
     'Finance Enthusiast',
-    'Taekwondo Champion',
     'AWS Architect',
-    'Swimmer',
+    // One word for the swimming and the taekwondo: subtle, and true of both.
+    'Athlete',
   ],
   /* Hero subheading. Shown as `from`, then glitches word by word into `to`.
      Words are aligned by position: equal words ("of all trades,") hold still,
@@ -103,7 +102,6 @@ export const identity = {
     to: 'Master of all trades, grandmaster at some, enlightened at one.',
   },
   location: 'Remote · IST (UTC+5:30)',
-  availability: 'Open to select work — 2026',
   email: 'snehilms@gmail.com',
 } as const;
 

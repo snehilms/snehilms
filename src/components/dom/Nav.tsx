@@ -3,15 +3,16 @@
 import { useRef, useState } from 'react';
 import { gsap, useGSAP, ScrollTrigger } from '@/lib/gsap';
 import { scrollTo } from './SmoothScroll';
-import { chapters, identity, socialsSection } from '@/config/content';
+import { chapters, socialsSection } from '@/config/content';
 import styles from './Nav.module.css';
 
 /* ============================================================================
    NAV
 
-   Sits above the canvas but stays out of its way: the bar itself is
+   Sits above the canvas but stays out of its way: the chapter links alone,
+   centred (no brand mark, name or status pill: owner's call). The bar is
    transparent until the visitor leaves the hero, at which point a glass
-   plane fades in behind it so text stays legible over bright particles.
+   plane fades in behind it so the links stay legible over bright particles.
    ========================================================================= */
 
 export function Nav() {
@@ -48,14 +49,6 @@ export function Nav() {
   return (
     <header ref={ref} className={`${styles.root} ${condensed ? styles.condensed : ''}`}>
       <div className={styles.inner}>
-        <button className={styles.brand} onClick={() => scrollTo(`#${chapters[0].id}`)} aria-label="Back to top">
-          <span className={styles.mark}>{identity.initials}</span>
-          <span className={styles.brandText}>
-            <span className={styles.brandName}>{identity.name}</span>
-            <span className="u-cue">{identity.role}</span>
-          </span>
-        </button>
-
         <nav className={styles.links} aria-label="Chapters">
           {[...chapters, socialsSection].map((section) => (
             <button
@@ -67,11 +60,6 @@ export function Nav() {
             </button>
           ))}
         </nav>
-
-        <a className={styles.status} href={`mailto:${identity.email}`}>
-          <span className={styles.pulse} aria-hidden="true" />
-          <span className="u-cue">{identity.availability}</span>
-        </a>
       </div>
     </header>
   );
