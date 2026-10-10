@@ -21,27 +21,27 @@ export const experienceState = {
 };
 
 /* Station centres along the held chapter, and the chain the field walks:
-   stream → pipeline → stream → book → stream → vault → stream. Each glyph
-   holds through a plateau around its station so it can be read; between
-   stations the glyph unwinds into the stream and the next one gathers. */
+   stream → pipeline → book → vault → stream. Each glyph holds through a
+   wide plateau around its station so it can be read, then morphs straight
+   into the next. The stream only opens and closes the chapter: a detour
+   through it between stations took longer than the gap allowed and read as
+   filler (owner's call). */
 export const STATION_CENTRES = [0.2, 0.5, 0.8] as const;
 
 const CHAIN_KEYS: [number, number][] = [
   [0, 0],
   [0.06, 0],
   [0.13, 1],
-  [0.27, 1],
-  [0.35, 2],
-  [0.43, 3],
-  [0.57, 3],
-  [0.65, 4],
-  [0.73, 5],
-  [0.87, 5],
-  [0.94, 6],
-  [1, 6],
+  [0.3, 1],
+  [0.4, 2],
+  [0.6, 2],
+  [0.7, 3],
+  [0.87, 3],
+  [0.94, 4],
+  [1, 4],
 ];
 
-/** Progress → position on the chain, 0 → 6. */
+/** Progress → position on the chain, 0 → 4. */
 export function chainCoord(p: number) {
   if (p <= 0) return 0;
   for (let i = 0; i < CHAIN_KEYS.length - 1; i++) {
@@ -49,5 +49,5 @@ export function chainCoord(p: number) {
     const [p1, c1] = CHAIN_KEYS[i + 1];
     if (p <= p1) return c0 + ((p - p0) / (p1 - p0 || 1)) * (c1 - c0);
   }
-  return 6;
+  return 4;
 }

@@ -69,7 +69,7 @@ const ART = [
 
 /* The Experience chain, by slot kind: 1 stream, 2 pipeline, 3 book,
    4 vault (see experienceState.ts for where each one holds). */
-const CHAIN = [1, 2, 1, 3, 1, 4, 1] as const;
+const CHAIN = [1, 2, 3, 4, 1] as const;
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
@@ -324,8 +324,7 @@ export function ParticleField({ simSize, reducedMotion }: Props) {
     scrollState.chapterSmooth = damp(scrollState.chapterSmooth, scrollState.chapterT, 3.2, dt);
 
     /* Chapter position → slots. Chapters blend two clouds; chapter 1 is
-       itself a chain (stream → pipeline → stream → book → stream → vault →
-       stream) walked by the held chapter's own progress, so where it meets
+       itself a chain (stream → pipeline → book → vault → stream) walked by the held chapter's own progress, so where it meets
        a neighbour three clouds are in play at once. */
     const segments = targets.length - 1;
     const scaled = Math.min(Math.max(scrollState.chapterSmooth, 0), segments);

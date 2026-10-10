@@ -79,9 +79,8 @@ export function Thaw() {
       section.dataset.span = 'whole';
 
       /* The list: the field still shows the station being read. The
-         viewport's centre, passing each station's middle, walks the same
-         progress the hold would, so each station's sculpture is there
-         beside it (and the stream between them). */
+         viewport's centre, passing each station's middle, picks the station
+         nearest it, so each sculpture is there beside its text. */
       mm.add(LIST, () => {
         const stations = gsap.utils.toArray<HTMLElement>('[data-station]', root);
         let keys: [number, number][] = [];
@@ -105,7 +104,12 @@ export function Thaw() {
               break;
             }
           }
-          experienceState.progress = p;
+          /* Settle on a station, never between two: the field's damping
+             then plays the morph through in about a second. Following the
+             scroll continuously parked the field on a half-and-half blend
+             of two sculptures whenever the reader stopped between them. */
+          experienceState.progress =
+            p < 0.1 ? 0 : p > 0.9 ? 1 : STATION_CENTRES.reduce((a, c) => (Math.abs(p - c) < Math.abs(p - a) ? c : a));
         };
         measure();
         const st = ScrollTrigger.create({

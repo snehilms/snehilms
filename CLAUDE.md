@@ -88,9 +88,10 @@ so `chapterT` sits flat at 1 there, and the field walks its own chain instead.
 The list layout (phones, reduced motion, which the owner's Mac has on) drives
 the same progress from the viewport centre passing each station's middle, so
 each sculpture still sits beside its station; without that the list showed a
-half-formed stream for every station. The chain: stream → pipeline → stream → book → stream
-→ vault → stream (`chainCoord` in lib/experienceState.ts, plateaus at the
-station centres 0.2/0.5/0.8, which are also the snap points). So the velocity
+half-formed stream for every station. The chain: stream → pipeline → book → vault → stream (`chainCoord` in lib/experienceState.ts, wide plateaus at the
+station centres 0.2/0.5/0.8, which are also the snap points; glyphs morph
+straight into each other: a detour through the stream between stations read
+as filler and took longer than the gap, owner's call). So the velocity
 pass blends up to THREE targets (uWeights/uKinds; kind 1 is the procedural
 stream, 2–4 the glyphs), and the render pass reads the same slot uniforms by
 reference. The glyphs (gpgpu/careerGlyphs.ts) are surface-sampled 3D sculptures
